@@ -1,6 +1,6 @@
 /**
  * NIFTY 50 Daily High-Low Tracker & Trading Journal
- * Handles data loading, Lightweight Charts rendering, local markings, table filters, and theme toggling.
+ * Handles data loading, Lightweight Charts rendering, local & GitHub repository markings, table filters, and theme toggling.
  */
 
 // Application State
@@ -9,7 +9,7 @@ const state = {
   history: [],          // Chronological list
   displayHistory: [],   // Reverse chronological for table
   filteredHistory: [],
-  marks: {},            // Saved in localStorage: { [date]: { ... } }
+  marks: {},            // Saved in localStorage & GitHub repo
   activeFilter: 'all',  // 'all', 'marked', 'inside'
   searchQuery: '',
   currentPage: 1,
@@ -17,6 +17,13 @@ const state = {
   chart: null,
   candleSeries: null,
   activeTheme: localStorage.getItem('nifty_theme') || 'dark',
+  github: {
+    repo: localStorage.getItem('nifty_gh_repo') || 'sagnikseal/nifty-tracker',
+    token: localStorage.getItem('nifty_gh_token') || '',
+    autoSync: localStorage.getItem('nifty_gh_autosync') !== 'false',
+    isSyncing: false,
+    fileSha: null,
+  }
 };
 
 // DOM Elements
@@ -81,6 +88,20 @@ const el = {
   markNotes: document.getElementById('mark-notes'),
   markTags: document.getElementById('mark-tags'),
   toast: document.getElementById('toast'),
+
+  // GitHub Sync Elements
+  btnGithubSync: document.getElementById('btn-github-sync'),
+  syncBtnLabel: document.getElementById('sync-btn-label'),
+  syncModal: document.getElementById('sync-modal'),
+  btnCloseSyncModal: document.getElementById('btn-close-sync-modal'),
+  ghRepoInput: document.getElementById('gh-repo-input'),
+  ghTokenInput: document.getElementById('gh-token-input'),
+  ghAutoSyncToggle: document.getElementById('gh-auto-sync-toggle'),
+  btnSaveGhToken: document.getElementById('btn-save-gh-token'),
+  btnPushToGithub: document.getElementById('btn-push-to-github'),
+  btnPullFromGithub: document.getElementById('btn-pull-from-github'),
+  btnDisconnectGithub: document.getElementById('btn-disconnect-github'),
+  syncStatusMsg: document.getElementById('sync-status-msg'),
 };
 
 // Number Format Helper
@@ -102,7 +123,6 @@ function showToast(message, duration = 3000) {
 // Market Clock (IST)
 // ==========================================================================
 function updateMarketStatus() {
-  // Current UTC time + 5.5 hours for IST
   const now = new Date();
   const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
   const ist = new Date(utc + (3600000 * 5.5));
@@ -138,9 +158,10 @@ function updateMarketStatus() {
 }
 
 // ==========================================================================
-// Local Storage: Trading Marks Management
+// Trading Marks Management: Local Storage + GitHub Repository
 // ==========================================================================
-function loadMarksFromStorage() {
+async function loadMarks() {
+  // 1. Load from browser localStorage
   try {
     const raw = localStorage.getItem('nifty_user_marks');
     if (raw) {
@@ -152,15 +173,42 @@ function loadMarksFromStorage() {
     console.error('Failed to load marks from localStorage:', e);
     state.marks = {};
   }
+
+  // 2. Also try fetching committed marks from repository data/trading_marks.json
+  try {
+    const resp = await fetch('data/trading_marks.json?v=' + Date.now());
+    if (resp.ok) {
+      const repoData = await resp.json();
+      const repoMarks = repoData.marks || {};
+      let mergedCount = 0;
+      for (const [dt, m] of Object.entries(repoMarks)) {
+        if (!state.marks[dt]) {
+          state.marks[dt] = m;
+          mergedCount++;
+        }
+      }
+      if (mergedCount > 0) {
+        saveMarksToStorage(false); // Don't trigger github push loop
+      }
+    }
+  } catch (e) {
+    console.log('No repository trading_marks.json loaded or file offline');
+  }
+
   updateMarkedCount();
+  updateSyncButtonUI();
 }
 
-function saveMarksToStorage() {
+function saveMarksToStorage(triggerGitHubSync = true) {
   try {
     localStorage.setItem('nifty_user_marks', JSON.stringify(state.marks));
     updateMarkedCount();
   } catch (e) {
     console.error('Failed to save marks to localStorage:', e);
+  }
+
+  if (triggerGitHubSync && state.github.token && state.github.autoSync) {
+    pushMarksToGitHub(true); // silent background push
   }
 }
 
@@ -170,7 +218,154 @@ function updateMarkedCount() {
 }
 
 // ==========================================================================
-// Data Fetching
+// GitHub Repository Sync API Integration
+// ==========================================================================
+function updateSyncButtonUI() {
+  if (state.github.isSyncing) {
+    el.syncBtnLabel.textContent = 'Syncing...';
+    el.btnGithubSync.style.borderColor = 'var(--yellow)';
+  } else if (state.github.token) {
+    el.syncBtnLabel.textContent = '🟢 GitHub Synced';
+    el.btnGithubSync.style.borderColor = 'var(--green)';
+  } else {
+    el.syncBtnLabel.textContent = '☁️ GitHub Sync';
+    el.btnGithubSync.style.borderColor = 'var(--border-subtle)';
+  }
+}
+
+async function getFileShaFromGitHub(repo, token) {
+  const url = `https://api.github.com/repos/${repo}/contents/data/trading_marks.json`;
+  const resp = await fetch(url, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    }
+  });
+
+  if (resp.status === 404) {
+    return null; // file doesn't exist yet
+  }
+  if (!resp.ok) {
+    const errData = await resp.json();
+    throw new Error(errData.message || `GitHub error ${resp.status}`);
+  }
+  const data = await resp.json();
+  return data.sha;
+}
+
+// Push all marks to GitHub repo data/trading_marks.json
+async function pushMarksToGitHub(silent = false) {
+  const { repo, token } = state.github;
+  if (!token || !repo) {
+    if (!silent) alert('Please configure your GitHub Repository and Token first.');
+    return;
+  }
+
+  state.github.isSyncing = true;
+  updateSyncButtonUI();
+  if (el.syncStatusMsg) el.syncStatusMsg.innerHTML = '<span style="color:var(--yellow)">⏳ Committing to GitHub repository...</span>';
+
+  try {
+    const sha = await getFileShaFromGitHub(repo, token);
+
+    const payload = {
+      version: '1.0',
+      last_updated: new Date().toISOString(),
+      marks: state.marks
+    };
+
+    const contentStr = JSON.stringify(payload, null, 2);
+    // Safe base64 encoding of UTF-8 string in browser
+    const contentB64 = btoa(unescape(encodeURIComponent(contentStr)));
+
+    const putUrl = `https://api.github.com/repos/${repo}/contents/data/trading_marks.json`;
+    const body = {
+      message: `Update trading marks (${Object.keys(state.marks).length} entries) [skip ci]`,
+      content: contentB64,
+    };
+    if (sha) body.sha = sha;
+
+    const resp = await fetch(putUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json',
+        'X-GitHub-Api-Version': '2022-11-28'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json();
+      throw new Error(err.message || `HTTP ${resp.status}`);
+    }
+
+    state.github.isSyncing = false;
+    updateSyncButtonUI();
+    if (el.syncStatusMsg) {
+      el.syncStatusMsg.innerHTML = `<span style="color:var(--green)">✅ Successfully committed to ${repo}!</span>`;
+    }
+    showToast(`☁️ Marks committed to GitHub (${repo})!`);
+  } catch (err) {
+    console.error('GitHub Push failed:', err);
+    state.github.isSyncing = false;
+    updateSyncButtonUI();
+    if (el.syncStatusMsg) {
+      el.syncStatusMsg.innerHTML = `<span style="color:var(--red)">❌ Sync failed: ${err.message}</span>`;
+    }
+    if (!silent) alert(`GitHub Sync error: ${err.message}`);
+  }
+}
+
+// Pull latest marks from GitHub repo
+async function pullMarksFromGitHub() {
+  const { repo, token } = state.github;
+  if (!repo) return;
+
+  if (el.syncStatusMsg) el.syncStatusMsg.innerHTML = '<span style="color:var(--yellow)">⏳ Fetching from GitHub...</span>';
+
+  try {
+    const url = `https://api.github.com/repos/${repo}/contents/data/trading_marks.json`;
+    const headers = { 'Accept': 'application/vnd.github+json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const resp = await fetch(url, { headers });
+    if (!resp.ok) {
+      throw new Error(`Could not fetch data/trading_marks.json (${resp.status})`);
+    }
+
+    const data = await resp.json();
+    const jsonStr = decodeURIComponent(escape(atob(data.content)));
+    const parsed = JSON.parse(jsonStr);
+    const incomingMarks = parsed.marks || {};
+
+    let added = 0;
+    for (const [dt, m] of Object.entries(incomingMarks)) {
+      state.marks[dt] = m;
+      added++;
+    }
+
+    localStorage.setItem('nifty_user_marks', JSON.stringify(state.marks));
+    updateMarkedCount();
+    updateChartMarkers();
+    applyFilter(state.activeFilter);
+
+    if (el.syncStatusMsg) {
+      el.syncStatusMsg.innerHTML = `<span style="color:var(--green)">✅ Pulled ${added} marks from GitHub!</span>`;
+    }
+    showToast(`☁️ Pulled latest marks from GitHub!`);
+  } catch (err) {
+    console.error('GitHub Pull failed:', err);
+    if (el.syncStatusMsg) {
+      el.syncStatusMsg.innerHTML = `<span style="color:var(--red)">❌ Pull failed: ${err.message}</span>`;
+    }
+  }
+}
+
+// ==========================================================================
+// Data Fetching: NIFTY 50 Daily Data
 // ==========================================================================
 async function loadNiftyData() {
   try {
@@ -193,7 +388,7 @@ async function loadNiftyData() {
     el.tableBody.innerHTML = `
       <tr>
         <td colspan="10" class="text-center" style="padding: 2rem; color: var(--red);">
-          ⚠️ Could not load <code>data/nifty_data.json</code>. Please verify that the data file exists or trigger the GitHub Action.
+          ⚠️ Could not load <code>data/nifty_data.json</code>.
         </td>
       </tr>
     `;
@@ -272,7 +467,6 @@ function round(val, dec = 2) {
 function renderChart() {
   if (!window.LightweightCharts || !el.tvChart) return;
 
-  // Clear previous instance
   el.tvChart.innerHTML = '';
 
   const isDark = state.activeTheme === 'dark';
@@ -295,10 +489,7 @@ function renderChart() {
     },
     rightPriceScale: {
       borderColor: isDark ? '#23293a' : '#e2e8f0',
-      scaleMargins: {
-        top: 0.1,
-        bottom: 0.1,
-      },
+      scaleMargins: { top: 0.1, bottom: 0.1 },
     },
     timeScale: {
       borderColor: isDark ? '#23293a' : '#e2e8f0',
@@ -319,7 +510,6 @@ function renderChart() {
     wickUpColor: '#10b981',
   });
 
-  // Convert history data to chart format
   const chartData = state.history.map(item => ({
     time: item.date,
     open: item.open,
@@ -330,11 +520,8 @@ function renderChart() {
 
   state.candleSeries.setData(chartData);
   updateChartMarkers();
-
-  // Set default view to last 90 days
   setTimeframeDays(90);
 
-  // Crosshair move handler
   state.chart.subscribeCrosshairMove(param => {
     if (!param || !param.time || !param.seriesData) {
       const latest = state.data?.latest;
@@ -350,7 +537,6 @@ function renderChart() {
     }
   });
 
-  // Responsive resize
   window.addEventListener('resize', () => {
     if (state.chart && el.tvChart) {
       state.chart.applyOptions({ width: el.tvChart.clientWidth });
@@ -374,7 +560,6 @@ function updateChartMarkers() {
     });
   }
 
-  // Markers must be sorted chronologically
   markers.sort((a, b) => (a.time > b.time ? 1 : -1));
   state.candleSeries.setMarkers(markers);
 }
@@ -405,7 +590,6 @@ function setTimeframeDays(days) {
 function applyFilter(filterName) {
   state.activeFilter = filterName;
 
-  // Update filter buttons UI
   el.filterAll.classList.toggle('active', filterName === 'all');
   el.filterMarked.classList.toggle('active', filterName === 'marked');
   el.filterInside.classList.toggle('active', filterName === 'inside');
@@ -418,7 +602,6 @@ function applyFilter(filterName) {
     list = list.filter(item => item.is_inside_day);
   }
 
-  // Apply search query if present
   if (state.searchQuery.trim() !== '') {
     const q = state.searchQuery.toLowerCase().trim();
     list = list.filter(item => {
@@ -465,13 +648,11 @@ function renderTable() {
     const isUp = item.change >= 0;
     const changeSign = isUp ? '+' : '';
 
-    // Badges
     const insideBadge = item.is_inside_day ? `<span class="pill-badge badge-inside" title="High <= Prev High, Low >= Prev Low">Inside Bar</span>` : '';
     const outsideBadge = item.is_outside_day ? `<span class="pill-badge badge-outside" title="High >= Prev High, Low <= Prev Low">Outside Bar</span>` : '';
     const gapBadge = item.gap_type === 'Gap Up' ? `<span class="pill-badge badge-gap-up">Gap Up (${item.gap})</span>`
                    : (item.gap_type === 'Gap Down' ? `<span class="pill-badge badge-gap-down">Gap Down (${item.gap})</span>` : '');
 
-    // User Mark Cell
     let markCellHtml = '';
     if (mark) {
       const sentimentClass = `sentiment-${mark.sentiment || 'Neutral'}`;
@@ -527,7 +708,6 @@ function renderTable() {
     `;
   }).join('');
 
-  // Update Pagination Controls
   el.paginationInfo.textContent = `Showing ${startIdx + 1}–${endIdx} of ${totalItems} records`;
   el.pageNum.textContent = `${state.currentPage} / ${totalPages}`;
   el.btnPrevPage.disabled = state.currentPage <= 1;
@@ -543,12 +723,10 @@ function escapeHtml(str) {
 // Mark Trading Info Modal
 // ==========================================================================
 function openMarkModal(dateStr) {
-  // If no date passed, default to latest trading day
   const targetDate = dateStr || state.data?.latest?.date || new Date().toISOString().split('T')[0];
   el.markDate.value = targetDate;
   el.modalDateSubtitle.textContent = `Date: ${targetDate}`;
 
-  // Find record in history
   const record = state.history.find(d => d.date === targetDate);
   if (record) {
     el.snapHigh.textContent = formatNumber(record.high);
@@ -562,10 +740,8 @@ function openMarkModal(dateStr) {
     el.snapClose.textContent = '--';
   }
 
-  // Populate existing mark if present
   const existing = state.marks[targetDate];
   if (existing) {
-    // Radio sentiment
     const radio = document.querySelector(`input[name="sentiment"][value="${existing.sentiment || 'Bullish'}"]`);
     if (radio) radio.checked = true;
 
@@ -577,7 +753,6 @@ function openMarkModal(dateStr) {
     el.markTags.value = existing.tags || '';
     el.btnDeleteMark.style.display = 'inline-block';
   } else {
-    // Reset to defaults
     const defaultRadio = document.querySelector('input[name="sentiment"][value="Bullish"]');
     if (defaultRadio) defaultRadio.checked = true;
     el.markPattern.value = record?.is_inside_day ? 'Inside Bar Setup (Harami)' : 'Trend Day (Unidirectional)';
@@ -697,7 +872,7 @@ function setupEventListeners() {
     };
 
     state.marks[date] = markData;
-    saveMarksToStorage();
+    saveMarksToStorage(true); // Triggers GitHub auto-sync if connected
     updateChartMarkers();
     applyFilter(state.activeFilter);
     closeMarkModal();
@@ -710,11 +885,84 @@ function setupEventListeners() {
     if (!date || !state.marks[date]) return;
     if (confirm(`Are you sure you want to delete your trading mark for ${date}?`)) {
       delete state.marks[date];
-      saveMarksToStorage();
+      saveMarksToStorage(true); // Triggers GitHub auto-sync
       updateChartMarkers();
       applyFilter(state.activeFilter);
       closeMarkModal();
       showToast(`🗑️ Trading mark removed for ${date}`);
+    }
+  });
+
+  // ========================================================================
+  // GitHub Sync Modal Handlers
+  // ========================================================================
+  el.btnGithubSync.addEventListener('click', () => {
+    el.ghRepoInput.value = state.github.repo;
+    el.ghTokenInput.value = state.github.token;
+    el.ghAutoSyncToggle.checked = state.github.autoSync;
+    el.btnDisconnectGithub.style.display = state.github.token ? 'inline-block' : 'none';
+    el.syncStatusMsg.innerHTML = state.github.token ? `<span style="color:var(--green)">Connected to repository ${state.github.repo}</span>` : '<span>Not connected to GitHub</span>';
+    el.syncModal.style.display = 'flex';
+  });
+
+  el.btnCloseSyncModal.addEventListener('click', () => {
+    el.syncModal.style.display = 'none';
+  });
+
+  el.syncModal.addEventListener('click', e => {
+    if (e.target === el.syncModal) el.syncModal.style.display = 'none';
+  });
+
+  el.btnSaveGhToken.addEventListener('click', async () => {
+    const repo = el.ghRepoInput.value.trim();
+    const token = el.ghTokenInput.value.trim();
+    const autoSync = el.ghAutoSyncToggle.checked;
+
+    if (!repo) {
+      alert('Please enter your GitHub repository (e.g. sagnikseal/nifty-tracker)');
+      return;
+    }
+
+    state.github.repo = repo;
+    state.github.token = token;
+    state.github.autoSync = autoSync;
+
+    localStorage.setItem('nifty_gh_repo', repo);
+    localStorage.setItem('nifty_gh_token', token);
+    localStorage.setItem('nifty_gh_autosync', String(autoSync));
+
+    updateSyncButtonUI();
+    el.btnDisconnectGithub.style.display = token ? 'inline-block' : 'none';
+
+    if (token) {
+      el.syncStatusMsg.innerHTML = '<span style="color:var(--yellow)">Testing GitHub connection...</span>';
+      try {
+        await getFileShaFromGitHub(repo, token);
+        el.syncStatusMsg.innerHTML = `<span style="color:var(--green)">✅ Connected successfully to ${repo}!</span>`;
+        showToast('Connected to GitHub!');
+      } catch (err) {
+        el.syncStatusMsg.innerHTML = `<span style="color:var(--yellow)">⚠️ Connected to repo (file will be created on first push): ${err.message}</span>`;
+      }
+    } else {
+      el.syncStatusMsg.innerHTML = '<span>Saved. Operating in local-only mode.</span>';
+    }
+  });
+
+  el.btnPushToGithub.addEventListener('click', () => pushMarksToGitHub(false));
+  el.btnPullFromGitHub = el.btnPullFromGithub;
+  if (el.btnPullFromGithub) {
+    el.btnPullFromGithub.addEventListener('click', () => pullMarksFromGitHub());
+  }
+
+  el.btnDisconnectGithub.addEventListener('click', () => {
+    if (confirm('Disconnect GitHub token? Your marks will remain stored safely locally.')) {
+      state.github.token = '';
+      localStorage.removeItem('nifty_gh_token');
+      el.ghTokenInput.value = '';
+      el.btnDisconnectGithub.style.display = 'none';
+      updateSyncButtonUI();
+      el.syncStatusMsg.innerHTML = '<span>Disconnected. Operating locally.</span>';
+      showToast('GitHub token disconnected.');
     }
   });
 
@@ -762,7 +1010,7 @@ function setupEventListeners() {
             addedCount++;
           }
         }
-        saveMarksToStorage();
+        saveMarksToStorage(true);
         updateChartMarkers();
         applyFilter(state.activeFilter);
         showToast(`✅ Successfully imported ${addedCount} trading marks!`);
@@ -807,14 +1055,12 @@ function setupEventListeners() {
 // Initialization
 // ==========================================================================
 document.addEventListener('DOMContentLoaded', () => {
-  // Set theme from storage
   document.body.className = `theme-${state.activeTheme}`;
 
   updateMarketStatus();
-  setInterval(updateMarketStatus, 60000); // Check market status every 1 min
+  setInterval(updateMarketStatus, 60000);
 
-  loadMarksFromStorage();
   setupEventListeners();
+  loadMarks();
   loadNiftyData();
 });
-

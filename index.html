@@ -46,6 +46,12 @@
             </svg>
             <span>Mark Trading Info</span>
           </button>
+          <button id="btn-github-sync" class="btn btn-outline" title="Sync marks directly to your GitHub repository">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 18a3.5 3.5 0 0 0 0-7h-1A5 5 0 0 0 8 7.2 3.5 3.5 0 0 0 5 13a3.5 3.5 0 0 0 0 7h14z"></path>
+            </svg>
+            <span id="sync-btn-label">GitHub Sync</span>
+          </button>
           <button id="btn-export-journal" class="btn btn-outline" title="Export your journal and marks">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -365,6 +371,53 @@
           </div>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL: GITHUB SYNC SETTINGS -->
+  <div class="modal-overlay" id="sync-modal" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">GitHub Repository Sync</h3>
+          <p class="modal-subtitle">Save marks directly to <code>data/trading_marks.json</code> in your repository</p>
+        </div>
+        <button class="btn-close" id="btn-close-sync-modal">&times;</button>
+      </div>
+      <div class="modal-form">
+        <p style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.5;">
+          Marks are always saved locally in your browser. Connect a GitHub Personal Access Token to also save, version-control, and sync your marks across all your devices directly inside your GitHub repository!
+        </p>
+
+        <div class="form-group">
+          <label for="gh-repo-input">GitHub Repository (Owner/Repo)</label>
+          <input type="text" id="gh-repo-input" value="sagnikseal/nifty-tracker" placeholder="sagnikseal/nifty-tracker">
+        </div>
+
+        <div class="form-group">
+          <label for="gh-token-input">Personal Access Token (PAT)</label>
+          <input type="password" id="gh-token-input" placeholder="ghp_... or github_pat_...">
+          <span style="font-size: 0.72rem; color: var(--text-dim); margin-top: 2px;">
+            Token is stored strictly in your browser's private localStorage. Only needs <code>Contents: Read and write</code> (or classic <code>repo</code>) scope.
+          </span>
+        </div>
+
+        <div class="form-group" style="flex-direction: row; align-items: center; gap: 0.5rem; margin-top: 0.25rem;">
+          <input type="checkbox" id="gh-auto-sync-toggle" checked style="width: auto;">
+          <label for="gh-auto-sync-toggle" style="text-transform: none; font-size: 0.8rem; cursor: pointer; color: var(--text-main);">
+            Auto-commit to GitHub whenever I add, edit, or delete a mark
+          </label>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+          <button type="button" id="btn-save-gh-token" class="btn btn-primary btn-sm">Save & Connect</button>
+          <button type="button" id="btn-push-to-github" class="btn btn-outline btn-sm">Push Local Marks to GitHub</button>
+          <button type="button" id="btn-pull-from-github" class="btn btn-outline btn-sm">Pull from GitHub</button>
+          <button type="button" id="btn-disconnect-github" class="btn btn-danger btn-sm" style="display: none;">Disconnect Token</button>
+        </div>
+
+        <div id="sync-status-msg" style="font-size: 0.78rem; font-family: var(--font-mono); margin-top: 0.5rem; min-height: 1.2rem;"></div>
+      </div>
     </div>
   </div>
 
