@@ -3,8 +3,8 @@
   "ticker": "^NSEI",
   "exchange": "NSE",
   "currency": "INR",
-  "last_updated": "2026-10-30 02:20:14 IST",
-  "last_updated_iso": "2026-10-30T02:20:14.083834+00:00",
+  "last_updated": "2026-10-30 02:35:41 IST",
+  "last_updated_iso": "2026-10-30T02:35:41.191321+00:00",
   "meta": {
     "fifty_two_week_high": 26373.2,
     "fifty_two_week_low": 22179.9,
