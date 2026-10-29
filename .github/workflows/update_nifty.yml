@@ -1,0 +1,69 @@
+name: Update NIFTY Data & Deploy to Pages
+
+on:
+  schedule:
+    # 10:30 UTC = 16:00 IST (4:00 PM IST, 30 min after NSE close)
+    - cron: '30 10 * * 1-5'
+    # 11:15 UTC = 16:45 IST (4:45 PM IST, post-closing settlement sync)
+    - cron: '15 11 * * 1-5'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - '.gitignore'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
+jobs:
+  update-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Fetch Latest NIFTY 50 Data
+        run: |
+          python scripts/fetch_nifty.py
+
+      - name: Commit and Push Updated Data
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain data/nifty_data.json)" ]; then
+            git add data/nifty_data.json
+            git commit -m "Auto-update NIFTY daily data [skip ci]"
+            git push
+          else
+            echo "No changes in NIFTY data to commit."
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

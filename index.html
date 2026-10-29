@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NIFTY 50 Daily High-Low Tracker & Trading Journal</title>
+  <meta name="description" content="Automated daily tracker for NIFTY 50 High, Low, Range, CPR, and personal trading journal markings.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Lightweight Charts by TradingView -->
+  <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body class="theme-dark">
+
+  <!-- TOP HEADER -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+            <polyline points="16 7 22 7 22 13"></polyline>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">NIFTY 50 <span class="badge-index">NSE</span></h1>
+          <p class="brand-subtitle">Daily High-Low Tracker & Trading Marks</p>
+        </div>
+      </div>
+
+      <div class="header-meta">
+        <div class="market-status" id="market-status-badge">
+          <span class="status-dot"></span>
+          <span id="market-status-text">Checking market...</span>
+        </div>
+        <div class="last-sync" id="last-sync-text">
+          Sync: Fetching...
+        </div>
+        <div class="header-actions">
+          <button id="btn-quick-mark" class="btn btn-primary" title="Add trading note / mark for today">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+            <span>Mark Trading Info</span>
+          </button>
+          <button id="btn-export-journal" class="btn btn-outline" title="Export your journal and marks">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Export</span>
+          </button>
+          <button id="btn-import-journal" class="btn btn-outline" title="Import backup of marks">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span>Import</span>
+          </button>
+          <input type="file" id="import-file-input" accept=".json" style="display:none;">
+          <button id="btn-theme-toggle" class="btn btn-icon" title="Toggle Dark/Light theme">
+            <span class="icon-sun">☀️</span>
+            <span class="icon-moon">🌙</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <!-- HERO METRICS: SPOTLIGHT ON HIGH & LOW -->
+    <section class="hero-grid">
+      <!-- High Card -->
+      <div class="stat-card card-high">
+        <div class="card-header">
+          <span class="card-label">Daily High</span>
+          <span class="card-pill pill-high">High of Day</span>
+        </div>
+        <div class="card-value" id="val-day-high">--</div>
+        <div class="card-sub" id="sub-day-high">
+          <span>vs Prev High:</span> <span id="diff-prev-high">--</span>
+        </div>
+      </div>
+
+      <!-- Low Card -->
+      <div class="stat-card card-low">
+        <div class="card-header">
+          <span class="card-label">Daily Low</span>
+          <span class="card-pill pill-low">Low of Day</span>
+        </div>
+        <div class="card-value" id="val-day-low">--</div>
+        <div class="card-sub" id="sub-day-low">
+          <span>vs Prev Low:</span> <span id="diff-prev-low">--</span>
+        </div>
+      </div>
+
+      <!-- Daily Range Card -->
+      <div class="stat-card card-range">
+        <div class="card-header">
+          <span class="card-label">Daily Range (H - L)</span>
+          <span class="card-pill" id="pill-range-type">Range</span>
+        </div>
+        <div class="card-value" id="val-day-range">--</div>
+        <div class="card-sub" id="sub-day-range">
+          <span>20D ADR:</span> <strong id="val-adr-20">-- pts</strong>
+        </div>
+      </div>
+
+      <!-- Close & Net Change Card -->
+      <div class="stat-card card-close">
+        <div class="card-header">
+          <span class="card-label">Settled Close</span>
+          <span class="card-pill" id="pill-close-change">--%</span>
+        </div>
+        <div class="card-value" id="val-day-close">--</div>
+        <div class="card-sub" id="sub-day-change">
+          <span>Change:</span> <strong id="val-net-change">--</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- 52-WEEK RANGE GAUGE & CPR BAR -->
+    <section class="levels-strip">
+      <div class="levels-item range-meter-wrapper">
+        <div class="levels-header">
+          <span>52-Week Range Positioning</span>
+          <span class="levels-detail"><strong id="val-52w-low">--</strong> to <strong id="val-52w-high">--</strong></span>
+        </div>
+        <div class="range-track">
+          <div class="range-progress" id="track-52w-progress" style="width: 50%;"></div>
+          <div class="range-pin" id="pin-52w" style="left: 50%;" title="Current Price"></div>
+        </div>
+      </div>
+
+      <div class="levels-item pivots-strip">
+        <div class="levels-header">
+          <span>Next Session CPR & Key Pivots</span>
+          <span class="badge-cpr" id="badge-cpr-type">CPR: --</span>
+        </div>
+        <div class="pivots-pills">
+          <div class="pivot-chip"><span class="lbl">S1:</span><span id="p-s1">--</span></div>
+          <div class="pivot-chip"><span class="lbl">BC:</span><span id="p-bc">--</span></div>
+          <div class="pivot-chip highlight"><span class="lbl">Pivot:</span><span id="p-pivot">--</span></div>
+          <div class="pivot-chip"><span class="lbl">TC:</span><span id="p-tc">--</span></div>
+          <div class="pivot-chip"><span class="lbl">R1:</span><span id="p-r1">--</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHART CONTAINER -->
+    <section class="chart-section card-container">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <h2 class="section-title">NIFTY 50 Price Action & High/Low Range</h2>
+          <div class="chart-legend" id="chart-legend">
+            Hover candle to view OHLC
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <div class="timeframe-selector" id="timeframe-buttons">
+            <button class="btn-tf" data-days="30">1M</button>
+            <button class="btn-tf active" data-days="90">3M</button>
+            <button class="btn-tf" data-days="180">6M</button>
+            <button class="btn-tf" data-days="365">1Y</button>
+            <button class="btn-tf" data-days="all">All</button>
+          </div>
+        </div>
+      </div>
+      <div id="tv-chart" class="chart-canvas"></div>
+    </section>
+
+    <!-- DATA TABLE & JOURNAL MARKS -->
+    <section class="table-section card-container">
+      <div class="section-toolbar table-toolbar">
+        <div class="toolbar-left">
+          <h2 class="section-title">Daily Market Records & Trading Marks</h2>
+          <span class="badge-count" id="table-count-badge">0 days</span>
+        </div>
+        <div class="toolbar-right table-controls">
+          <div class="search-box">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="filter-search" placeholder="Search date, notes, #tags...">
+          </div>
+          <div class="filter-group">
+            <button class="btn-filter active" id="filter-all">All Days</button>
+            <button class="btn-filter" id="filter-marked">My Marks Only (<span id="marked-count">0</span>)</button>
+            <button class="btn-filter" id="filter-inside">Inside Bars</button>
+          </div>
+          <button id="btn-download-csv" class="btn btn-outline btn-sm" title="Download historical data as CSV">
+            Download CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table" id="nifty-table">
+          <thead>
+            <tr>
+              <th>Date & Day</th>
+              <th class="text-right">Daily High</th>
+              <th class="text-right">Daily Low</th>
+              <th class="text-right">Daily Range</th>
+              <th class="text-right">Open</th>
+              <th class="text-right">Close</th>
+              <th class="text-right">Net Change</th>
+              <th>Pattern / CPR</th>
+              <th>My Trading Marks & Notes</th>
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <tr>
+              <td colspan="10" class="loading-cell">Loading historical records...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <div class="pagination-info" id="pagination-info">Showing records</div>
+        <div class="pagination-controls">
+          <button id="btn-prev-page" class="btn btn-sm btn-outline" disabled>Previous</button>
+          <span id="page-number" class="page-num">1</span>
+          <button id="btn-next-page" class="btn btn-sm btn-outline">Next</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: MARK TRADING INFO -->
+  <div class="modal-overlay" id="mark-modal" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">Mark Trading Info</h3>
+          <p class="modal-subtitle" id="modal-date-subtitle">Record daily observations, levels, setups & psychology</p>
+        </div>
+        <button class="btn-close" id="btn-close-modal">&times;</button>
+      </div>
+
+      <form id="mark-form" class="modal-form">
+        <!-- Date & Reference Preview -->
+        <div class="form-row form-row-split">
+          <div class="form-group">
+            <label for="mark-date">Trading Date</label>
+            <input type="date" id="mark-date" required>
+          </div>
+          <div class="form-group">
+            <label>Market Snapshot</label>
+            <div class="mini-snapshot" id="modal-snapshot">
+              <span>H: <strong id="snap-high">--</strong></span>
+              <span>L: <strong id="snap-low">--</strong></span>
+              <span>Range: <strong id="snap-range">--</strong></span>
+              <span>Close: <strong id="snap-close">--</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sentiment & Pattern -->
+        <div class="form-row form-row-split">
+          <div class="form-group">
+            <label>Day Sentiment / Bias</label>
+            <div class="radio-pill-group">
+              <label class="radio-pill sentiment-bullish">
+                <input type="radio" name="sentiment" value="Bullish" checked>
+                <span>🟢 Bullish</span>
+              </label>
+              <label class="radio-pill sentiment-bearish">
+                <input type="radio" name="sentiment" value="Bearish">
+                <span>🔴 Bearish</span>
+              </label>
+              <label class="radio-pill sentiment-neutral">
+                <input type="radio" name="sentiment" value="Neutral">
+                <span>🟡 Range / Chop</span>
+              </label>
+              <label class="radio-pill sentiment-volatile">
+                <input type="radio" name="sentiment" value="Volatile">
+                <span>⚡ High Volatility</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="mark-pattern">Price Action Setup / Structure</label>
+            <select id="mark-pattern" class="form-select">
+              <option value="Trend Day (Unidirectional)">Trend Day (One-way Trend)</option>
+              <option value="Rangebound / Inside Value">Rangebound / Inside Value</option>
+              <option value="Inside Bar Setup (Harami)">Inside Bar Setup</option>
+              <option value="Outside Bar / Engulfing">Outside Bar / Expansion</option>
+              <option value="Gap & Go">Gap & Go</option>
+              <option value="Gap Fill & Reversal">Gap Fill & Reversal</option>
+              <option value="PDH Breakout / Expansion">PDH (Prev Day High) Breakout</option>
+              <option value="PDL Breakdown / Expansion">PDL (Prev Day Low) Breakdown</option>
+              <option value="CPR Rejection / Bounce">CPR Bounce / Rejection</option>
+              <option value="Fake Breakout / Bull Trap / Bear Trap">Fake Breakout / Trap</option>
+              <option value="Expiry 0DTE Volatility">Expiry Special Gamma Move</option>
+              <option value="Other / Custom">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Trade Execution & Outcome -->
+        <div class="form-row form-row-split">
+          <div class="form-group">
+            <label for="mark-trade-taken">Traded Today?</label>
+            <select id="mark-trade-taken" class="form-select">
+              <option value="No">No (Observer / No trade taken)</option>
+              <option value="Yes - Long">Yes (Long / Call Buyer / Put Seller)</option>
+              <option value="Yes - Short">Yes (Short / Put Buyer / Call Seller)</option>
+              <option value="Yes - Non-Directional">Yes (Non-directional Strangle/Straddle)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="mark-outcome">Trade Outcome / P&L Status</label>
+            <select id="mark-outcome" class="form-select">
+              <option value="N/A">N/A (No trade)</option>
+              <option value="Profit">🟢 Target Hit / In Profit</option>
+              <option value="Loss">🔴 Stop Loss Hit / In Loss</option>
+              <option value="Breakeven">⚪ Breakeven</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Key Levels Watched -->
+        <div class="form-group">
+          <label for="mark-levels">Key Levels Tested / Watched</label>
+          <input type="text" id="mark-levels" placeholder="e.g. 22960 PDH rejection, 22650 Support hold, 22800 CPR">
+          <div class="chip-hints">
+            <span class="chip-hint" onclick="appendLevel('PDH Tested')">+ PDH Tested</span>
+            <span class="chip-hint" onclick="appendLevel('PDL Tested')">+ PDL Tested</span>
+            <span class="chip-hint" onclick="appendLevel('CPR Respected')">+ CPR Respected</span>
+            <span class="chip-hint" onclick="appendLevel('VWAP Rejection')">+ VWAP Rejection</span>
+            <span class="chip-hint" onclick="appendLevel('Round Number Level')">+ Round Number</span>
+          </div>
+        </div>
+
+        <!-- Detailed Journal Notes -->
+        <div class="form-group">
+          <label for="mark-notes">Trading Notes, Psychology & Key Learnings</label>
+          <textarea id="mark-notes" rows="4" placeholder="Write your market observations: morning opening price action, sector support (BankNifty, IT), market breadth, execution discipline, lessons learned..."></textarea>
+        </div>
+
+        <!-- Tags -->
+        <div class="form-group">
+          <label for="mark-tags">Tags (comma separated)</label>
+          <input type="text" id="mark-tags" placeholder="#expiry, #trend, #reversal, #disciplined, #hero-or-zero">
+        </div>
+
+        <!-- Form Actions -->
+        <div class="modal-actions">
+          <button type="button" id="btn-delete-mark" class="btn btn-danger" style="display:none;">Delete Mark</button>
+          <div class="actions-right">
+            <button type="button" class="btn btn-outline" id="btn-cancel-modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Trading Mark</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast"></div>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>NIFTY 50 High-Low Tracker & Trading Journal • Automatically updated via GitHub Actions after NSE Market Close (15:30 IST).</p>
+      <p class="footer-sub">Data source: Yahoo Finance (^NSEI). Designed for disciplined index traders.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
