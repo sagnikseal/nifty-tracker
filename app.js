@@ -1,6 +1,12 @@
 /**
- * NIFTY 50 Daily High-Low Tracker & Trading Journal
- * Handles data loading, Lightweight Charts rendering, local & GitHub repository markings, table filters, and theme toggling.
+ * NIFTY 50 Daily High-Low Tracker & Trading Journal with SMC Engine
+ * Features:
+ * - Smart Money Concepts (SMC) Liquidity & Sweep Engine (PDH, PDL, PWH, PWL, BOS, Sweeps)
+ * - Next-Day Algorithmic Directional Bias & Fuel Targets
+ * - Beginner Hover-Activated Definitions for All Technical Terms
+ * - SMC Terminology Glossary & Searchable Cheat Sheet
+ * - Local Storage + Two-Way GitHub Repository Cloud Sync
+ * - Interactive TradingView Lightweight Charts & Filtering
  */
 
 // Application State
@@ -10,7 +16,7 @@ const state = {
   displayHistory: [],   // Reverse chronological for table
   filteredHistory: [],
   marks: {},            // Saved in localStorage & GitHub repo
-  activeFilter: 'all',  // 'all', 'marked', 'inside'
+  activeFilter: 'all',  // 'all', 'marked', 'smc', 'inside'
   searchQuery: '',
   currentPage: 1,
   pageSize: 20,
@@ -23,6 +29,136 @@ const state = {
     autoSync: localStorage.getItem('nifty_gh_autosync') !== 'false',
     isSyncing: false,
     fileSha: null,
+  }
+};
+
+// SMC & Trading Terminology Dictionary (For Tooltips and Glossary Modal)
+const GLOSSARY_DATA = {
+  SMC: {
+    term: 'SMC',
+    full: 'Smart Money Concepts',
+    cat: 'Theory',
+    def: 'A trading methodology focused on tracking the footprints of institutional market participants (FIIs, DIIs, banks, and hedge funds) rather than retail indicators.',
+    edge: 'Institutions move markets with massive orders that require counterparty liquidity. SMC shows where those orders enter and exit.'
+  },
+  PDH: {
+    term: 'PDH',
+    full: 'Previous Day High (External Buy-Side Liquidity)',
+    cat: 'Liquidity',
+    def: 'The highest price reached during yesterday\'s trading session. Acts as a major cluster for retail stop-losses and breakout buy orders.',
+    edge: 'Algorithms treat PDH as "Fuel". Price often surges above PDH to trigger buy stops, and either expands higher (BOS) or reverses downward (Liquidity Sweep).'
+  },
+  PDL: {
+    term: 'PDL',
+    full: 'Previous Day Low (External Sell-Side Liquidity)',
+    cat: 'Liquidity',
+    def: 'The lowest price reached during yesterday\'s session. Clusters retail panic sell stops and breakdown orders.',
+    edge: 'Algorithms hunt below PDL to absorb sell orders at discount prices before driving a bullish reversal (Turtle Soup).'
+  },
+  PWH: {
+    term: 'PWH',
+    full: 'Previous Week High',
+    cat: 'Liquidity',
+    def: 'The highest price traded in the preceding calendar week.',
+    edge: 'Higher timeframe liquidity pool. When swept, can cause multi-day trend shifts on NIFTY.'
+  },
+  PWL: {
+    term: 'PWL',
+    full: 'Previous Week Low',
+    cat: 'Liquidity',
+    def: 'The lowest price traded in the preceding calendar week.',
+    edge: 'Higher timeframe institutional discount level. Major demand target for swing traders.'
+  },
+  ERL: {
+    term: 'ERL',
+    full: 'External Range Liquidity',
+    cat: 'Liquidity',
+    def: 'Liquidity pools sitting outside the recent trading range: PDH, PDL, Weekly Highs/Lows, and major swing extremes.',
+    edge: 'The market continuously alternates: it runs from Internal Liquidity (gaps/CPR) outward to sweep External Liquidity (PDH/PDL).'
+  },
+  IRL: {
+    term: 'IRL',
+    full: 'Internal Range Liquidity',
+    cat: 'Liquidity',
+    def: 'Liquidity pools inside the recent range: Fair Value Gaps (FVG), Central Pivot Range (CPR), opening gaps, and 50% Equilibrium.',
+    edge: 'After sweeping an external high or low, price frequently retraces back inside to rebalance internal liquidity.'
+  },
+  BSL: {
+    term: 'BSL',
+    full: 'Buy-Side Liquidity',
+    cat: 'Liquidity',
+    def: 'A concentration of buy orders (short-seller stop losses and breakout buyers) above key highs.',
+    edge: 'Smart money sells into Buy-Side Liquidity to exit long trades without negative slippage.'
+  },
+  SSL: {
+    term: 'SSL',
+    full: 'Sell-Side Liquidity',
+    cat: 'Liquidity',
+    def: 'A concentration of sell orders (buyer stop losses and breakdown sellers) below key lows.',
+    edge: 'Smart money buys into Sell-Side Liquidity at discounted prices to accumulate massive long positions.'
+  },
+  BOS: {
+    term: 'BOS',
+    full: 'Break of Structure',
+    cat: 'Structure',
+    def: 'When a daily candle closes beyond a key swing high or low, confirming trend continuation.',
+    edge: 'Indicates strong institutional commitment to carry the market in the direction of the break.'
+  },
+  Sweep: {
+    term: 'Sweep',
+    full: 'Liquidity Sweep / Turtle Soup',
+    cat: 'Pattern',
+    def: 'Price spikes past PDH or PDL to trigger stop-losses, but immediately fails to sustain and closes back inside the range.',
+    edge: 'Classic institutional trap. Generates rapid, high-probability counter-trend reversals.'
+  },
+  CPR: {
+    term: 'CPR',
+    full: 'Central Pivot Range',
+    cat: 'Pivots',
+    def: 'A 3-level price band (Top Central TC, Pivot, Bottom Central BC) calculated from yesterday\'s High, Low, and Close.',
+    edge: 'Narrow CPR (<40 pts on NIFTY) predicts a strong trending day. Wide CPR (>90 pts) predicts sideways, rangebound chop.'
+  },
+  ADR: {
+    term: 'ADR',
+    full: 'Average Daily Range (20-Day)',
+    cat: 'Volatility',
+    def: 'The average distance between the daily high and daily low over the last 20 trading sessions.',
+    edge: 'Used to calculate realistic daily profit targets. When daily range exceeds ADR, exhaustion is likely.'
+  },
+  Discount: {
+    term: 'Discount',
+    full: 'Discount Zone (<50% Equilibrium)',
+    cat: 'Valuation',
+    def: 'When price trades below the 50% midpoint of the 20-day high-low range.',
+    edge: 'Institutions prefer buying in Discount zones where prices are mathematically cheap.'
+  },
+  Premium: {
+    term: 'Premium',
+    full: 'Premium Zone (>50% Equilibrium)',
+    cat: 'Valuation',
+    def: 'When price trades above the 50% midpoint of the 20-day high-low range.',
+    edge: 'Institutions avoid chasing longs in Premium; they prefer distributing or hedging.'
+  },
+  Fuel: {
+    term: 'Fuel',
+    full: 'Liquidity Fuel',
+    cat: 'Theory',
+    def: 'Retail stop-loss orders that algorithms seek to trigger to absorb liquidity.',
+    edge: 'As noted in market theory: trends need fuel to continue. Without liquidity, price stalls.'
+  },
+  Event: {
+    term: 'Event',
+    full: 'Macro / Catalyst Event',
+    cat: 'Fundamentals',
+    def: 'High-impact news (RBI policy, US Fed, CPI, elections, corporate earnings, breaking news on Twitter/X).',
+    edge: 'Injects sudden volume that can invalidate standard technical setups and cause aggressive two-sided liquidity sweeps.'
+  },
+  Pivots: {
+    term: 'Pivots',
+    full: 'Classic Pivot Points (S1, S2, R1, R2, P)',
+    cat: 'Pivots',
+    def: 'Support and resistance benchmark levels derived mathematically from the prior day\'s auction.',
+    edge: 'Widely observed by institutional execution algos for intraday target setting.'
   }
 };
 
@@ -48,6 +184,25 @@ const el = {
   pPivot: document.getElementById('p-pivot'),
   pTc: document.getElementById('p-tc'),
   pR1: document.getElementById('p-r1'),
+
+  // SMC Prediction Radar Elements
+  smcBiasBadge: document.getElementById('smc-bias-badge'),
+  predConfidence: document.getElementById('pred-confidence'),
+  predBiasText: document.getElementById('pred-bias-text'),
+  predRationale: document.getElementById('pred-rationale'),
+  predEventRule: document.getElementById('pred-event-rule'),
+  predPrimaryTarget: document.getElementById('pred-primary-target'),
+  predSecondaryTarget: document.getElementById('pred-secondary-target'),
+  predAdrExp: document.getElementById('pred-adr-exp'),
+  predCprExp: document.getElementById('pred-cpr-exp'),
+  smcPdh: document.getElementById('smc-pdh'),
+  smcPdl: document.getElementById('smc-pdl'),
+  smcPwh: document.getElementById('smc-pwh'),
+  smcPwl: document.getElementById('smc-pwl'),
+  smcZone: document.getElementById('smc-zone'),
+  smcStructureEvent: document.getElementById('smc-structure-event'),
+
+  // Table & Controls
   marketStatusBadge: document.getElementById('market-status-badge'),
   marketStatusText: document.getElementById('market-status-text'),
   lastSyncText: document.getElementById('last-sync-text'),
@@ -69,7 +224,10 @@ const el = {
   filterSearch: document.getElementById('filter-search'),
   filterAll: document.getElementById('filter-all'),
   filterMarked: document.getElementById('filter-marked'),
+  filterSmc: document.getElementById('filter-smc'),
   filterInside: document.getElementById('filter-inside'),
+
+  // Mark Modal
   markModal: document.getElementById('mark-modal'),
   markForm: document.getElementById('mark-form'),
   btnCloseModal: document.getElementById('btn-close-modal'),
@@ -85,6 +243,9 @@ const el = {
   markTradeTaken: document.getElementById('mark-trade-taken'),
   markOutcome: document.getElementById('mark-outcome'),
   markLevels: document.getElementById('mark-levels'),
+  markPredBias: document.getElementById('mark-pred-bias'),
+  markPredTarget: document.getElementById('mark-pred-target'),
+  markEventCheck: document.getElementById('mark-event-check'),
   markNotes: document.getElementById('mark-notes'),
   markTags: document.getElementById('mark-tags'),
   toast: document.getElementById('toast'),
@@ -102,6 +263,18 @@ const el = {
   btnPullFromGithub: document.getElementById('btn-pull-from-github'),
   btnDisconnectGithub: document.getElementById('btn-disconnect-github'),
   syncStatusMsg: document.getElementById('sync-status-msg'),
+
+  // Glossary & Tooltips
+  btnOpenGlossary: document.getElementById('btn-open-glossary'),
+  glossaryModal: document.getElementById('glossary-modal'),
+  btnCloseGlossaryModal: document.getElementById('btn-close-glossary-modal'),
+  glossarySearch: document.getElementById('glossary-search'),
+  glossaryGrid: document.getElementById('glossary-grid'),
+  termTooltip: document.getElementById('term-tooltip'),
+  ttTerm: document.getElementById('tt-term'),
+  ttFull: document.getElementById('tt-full'),
+  ttBody: document.getElementById('tt-body'),
+  ttEdge: document.getElementById('tt-edge'),
 };
 
 // Number Format Helper
@@ -127,7 +300,7 @@ function updateMarketStatus() {
   const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
   const ist = new Date(utc + (3600000 * 5.5));
   
-  const day = ist.getDay(); // 0 is Sunday, 6 is Saturday
+  const day = ist.getDay();
   const hours = ist.getHours();
   const minutes = ist.getMinutes();
   const totalMinutes = hours * 60 + minutes;
@@ -158,23 +331,120 @@ function updateMarketStatus() {
 }
 
 // ==========================================================================
+// Hover-Activated Term Tooltip Engine
+// ==========================================================================
+function initTermTooltips() {
+  let activeTarget = null;
+
+  document.addEventListener('mouseover', e => {
+    const tipEl = e.target.closest('.term-tip');
+    if (!tipEl) return;
+
+    activeTarget = tipEl;
+    const termKey = tipEl.dataset.term;
+    const item = GLOSSARY_DATA[termKey];
+    if (!item) return;
+
+    el.ttTerm.textContent = item.term;
+    el.ttFull.textContent = item.full;
+    el.ttBody.textContent = item.def;
+    el.ttEdge.textContent = item.edge;
+
+    el.termTooltip.style.display = 'block';
+    positionTooltip(e);
+    requestAnimationFrame(() => el.termTooltip.classList.add('visible'));
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (activeTarget && el.termTooltip.classList.contains('visible')) {
+      positionTooltip(e);
+    }
+  });
+
+  document.addEventListener('mouseout', e => {
+    const tipEl = e.target.closest('.term-tip');
+    if (tipEl && tipEl === activeTarget) {
+      activeTarget = null;
+      el.termTooltip.classList.remove('visible');
+      setTimeout(() => {
+        if (!activeTarget) el.termTooltip.style.display = 'none';
+      }, 150);
+    }
+  });
+}
+
+function positionTooltip(e) {
+  const tt = el.termTooltip;
+  const padding = 14;
+  let x = e.clientX + 16;
+  let y = e.clientY + 16;
+
+  // Window bounds check
+  const rect = tt.getBoundingClientRect();
+  if (x + rect.width + padding > window.innerWidth) {
+    x = e.clientX - rect.width - 12;
+  }
+  if (y + rect.height + padding > window.innerHeight) {
+    y = e.clientY - rect.height - 12;
+  }
+
+  tt.style.left = `${Math.max(padding, x)}px`;
+  tt.style.top = `${Math.max(padding, y)}px`;
+}
+
+// ==========================================================================
+// SMC Glossary Modal & Search
+// ==========================================================================
+function renderGlossary(filterText = '') {
+  if (!el.glossaryGrid) return;
+
+  const query = filterText.toLowerCase().trim();
+  const entries = Object.values(GLOSSARY_DATA).filter(item => {
+    if (!query) return true;
+    return (
+      item.term.toLowerCase().includes(query) ||
+      item.full.toLowerCase().includes(query) ||
+      item.def.toLowerCase().includes(query) ||
+      item.cat.toLowerCase().includes(query)
+    );
+  });
+
+  if (entries.length === 0) {
+    el.glossaryGrid.innerHTML = `
+      <div style="grid-column: 1 / -1; padding: 2rem; text-align: center; color: var(--text-muted);">
+        No matching SMC concepts found for "${filterText}".
+      </div>
+    `;
+    return;
+  }
+
+  el.glossaryGrid.innerHTML = entries.map(item => `
+    <div class="glossary-card">
+      <div class="glossary-card-top">
+        <span class="glossary-term">${item.term}</span>
+        <span class="glossary-cat">${item.cat}</span>
+      </div>
+      <div class="glossary-full-name">${item.full}</div>
+      <div class="glossary-def">${item.def}</div>
+      <div class="glossary-edge">
+        <strong style="color:var(--blue);">Smart Money Edge:</strong> ${item.edge}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ==========================================================================
 // Trading Marks Management: Local Storage + GitHub Repository
 // ==========================================================================
 async function loadMarks() {
-  // 1. Load from browser localStorage
   try {
     const raw = localStorage.getItem('nifty_user_marks');
-    if (raw) {
-      state.marks = JSON.parse(raw);
-    } else {
-      state.marks = {};
-    }
+    state.marks = raw ? JSON.parse(raw) : {};
   } catch (e) {
     console.error('Failed to load marks from localStorage:', e);
     state.marks = {};
   }
 
-  // 2. Also try fetching committed marks from repository data/trading_marks.json
   try {
     const resp = await fetch('data/trading_marks.json?v=' + Date.now());
     if (resp.ok) {
@@ -188,7 +458,7 @@ async function loadMarks() {
         }
       }
       if (mergedCount > 0) {
-        saveMarksToStorage(false); // Don't trigger github push loop
+        saveMarksToStorage(false);
       }
     }
   } catch (e) {
@@ -208,7 +478,7 @@ function saveMarksToStorage(triggerGitHubSync = true) {
   }
 
   if (triggerGitHubSync && state.github.token && state.github.autoSync) {
-    pushMarksToGitHub(true); // silent background push
+    pushMarksToGitHub(true);
   }
 }
 
@@ -243,9 +513,7 @@ async function getFileShaFromGitHub(repo, token) {
     }
   });
 
-  if (resp.status === 404) {
-    return null; // file doesn't exist yet
-  }
+  if (resp.status === 404) return null;
   if (!resp.ok) {
     const errData = await resp.json();
     throw new Error(errData.message || `GitHub error ${resp.status}`);
@@ -254,7 +522,6 @@ async function getFileShaFromGitHub(repo, token) {
   return data.sha;
 }
 
-// Push all marks to GitHub repo data/trading_marks.json
 async function pushMarksToGitHub(silent = false) {
   const { repo, token } = state.github;
   if (!token || !repo) {
@@ -276,7 +543,6 @@ async function pushMarksToGitHub(silent = false) {
     };
 
     const contentStr = JSON.stringify(payload, null, 2);
-    // Safe base64 encoding of UTF-8 string in browser
     const contentB64 = btoa(unescape(encodeURIComponent(contentStr)));
 
     const putUrl = `https://api.github.com/repos/${repo}/contents/data/trading_marks.json`;
@@ -319,7 +585,6 @@ async function pushMarksToGitHub(silent = false) {
   }
 }
 
-// Pull latest marks from GitHub repo
 async function pullMarksFromGitHub() {
   const { repo, token } = state.github;
   if (!repo) return;
@@ -376,10 +641,11 @@ async function loadNiftyData() {
     const data = await response.json();
     state.data = data;
     state.history = data.history || [];
-    state.displayHistory = [...state.history].reverse(); // Latest day first
+    state.displayHistory = [...state.history].reverse();
     state.filteredHistory = [...state.displayHistory];
     
     renderHeroMetrics();
+    renderSmcPrediction();
     renderChart();
     applyFilter(state.activeFilter);
     el.lastSyncText.textContent = `Sync: ${data.last_updated || 'Updated'}`;
@@ -387,7 +653,7 @@ async function loadNiftyData() {
     console.error('Error loading NIFTY data:', err);
     el.tableBody.innerHTML = `
       <tr>
-        <td colspan="10" class="text-center" style="padding: 2rem; color: var(--red);">
+        <td colspan="11" class="text-center" style="padding: 2rem; color: var(--red);">
           ⚠️ Could not load <code>data/nifty_data.json</code>.
         </td>
       </tr>
@@ -455,6 +721,66 @@ function renderHeroMetrics() {
   el.pPivot.textContent = formatNumber(latest.pivot);
   el.pTc.textContent = formatNumber(latest.tc);
   el.pR1.textContent = formatNumber(latest.r1);
+}
+
+// ==========================================================================
+// Render SMC Prediction & Liquidity Radar
+// ==========================================================================
+function renderSmcPrediction() {
+  const pred = state.data?.next_day_prediction;
+  const latest = state.data?.latest;
+  const meta = state.data?.meta;
+
+  if (!pred || !latest) return;
+
+  // Bias Headline & Badge
+  el.smcBiasBadge.textContent = pred.bias;
+  el.predBiasText.textContent = pred.bias;
+  el.predConfidence.textContent = `${pred.confidence} Confidence`;
+
+  const isBull = pred.bias.toLowerCase().includes('bull');
+  const isBear = pred.bias.toLowerCase().includes('bear');
+  el.predBiasText.style.color = isBull ? 'var(--green)' : (isBear ? 'var(--red)' : 'var(--yellow)');
+
+  // Rationale & Event Warning
+  el.predRationale.textContent = pred.rationale;
+  if (el.predEventRule) el.predEventRule.textContent = pred.event_rule;
+
+  // Targets
+  el.predPrimaryTarget.textContent = pred.primary_liquidity_target;
+  el.predSecondaryTarget.textContent = pred.secondary_target;
+  el.predAdrExp.textContent = `${meta?.adr_20 || '--'} pts`;
+  el.predCprExp.textContent = latest.cpr_type || 'Normal';
+
+  // Matrix: PDH, PDL, PWH, PWL, Zone, Structure
+  el.smcPdh.textContent = formatNumber(latest.high);
+  el.smcPdl.textContent = formatNumber(latest.low);
+  el.smcPwh.textContent = latest.pwh ? formatNumber(latest.pwh) : '--';
+  el.smcPwl.textContent = latest.pwl ? formatNumber(latest.pwl) : '--';
+
+  const zoneText = `${latest.zone || 'Discount'} Zone`;
+  el.smcZone.innerHTML = `<span class="term-tip" data-term="${latest.zone || 'Discount'}">${zoneText}</span>`;
+
+  let structBadge = latest.smc_structure || 'Normal';
+  el.smcStructureEvent.innerHTML = `<span class="term-tip" data-term="BOS">${structBadge}</span>`;
+}
+
+function openMarkModalWithPrediction() {
+  const latest = state.data?.latest;
+  const pred = state.data?.next_day_prediction;
+  openMarkModal(latest?.date);
+
+  if (pred) {
+    if (el.markPredBias) {
+      if (pred.bias.toLowerCase().includes('bull')) el.markPredBias.value = 'Bullish Continuation';
+      else if (pred.bias.toLowerCase().includes('bear')) el.markPredBias.value = 'Bearish Continuation';
+      else if (pred.bias.toLowerCase().includes('revers')) el.markPredBias.value = 'BSL Sweep & Reverse';
+      else el.markPredBias.value = 'Rangebound / Inside Value';
+    }
+    if (el.markPredTarget) {
+      el.markPredTarget.value = pred.primary_liquidity_target;
+    }
+  }
 }
 
 function round(val, dec = 2) {
@@ -592,6 +918,7 @@ function applyFilter(filterName) {
 
   el.filterAll.classList.toggle('active', filterName === 'all');
   el.filterMarked.classList.toggle('active', filterName === 'marked');
+  if (el.filterSmc) el.filterSmc.classList.toggle('active', filterName === 'smc');
   el.filterInside.classList.toggle('active', filterName === 'inside');
 
   let list = [...state.displayHistory];
@@ -600,6 +927,8 @@ function applyFilter(filterName) {
     list = list.filter(item => Boolean(state.marks[item.date]));
   } else if (filterName === 'inside') {
     list = list.filter(item => item.is_inside_day);
+  } else if (filterName === 'smc') {
+    list = list.filter(item => item.pdh_sweep || item.pdl_sweep || item.bullish_bos || item.bearish_bos);
   }
 
   if (state.searchQuery.trim() !== '') {
@@ -608,7 +937,7 @@ function applyFilter(filterName) {
       const mark = state.marks[item.date];
       const matchDate = item.date.includes(q);
       const matchNotes = mark?.notes?.toLowerCase().includes(q);
-      const matchPattern = (mark?.pattern || item.candle_type)?.toLowerCase().includes(q);
+      const matchPattern = (mark?.pattern || item.candle_type || item.smc_structure)?.toLowerCase().includes(q);
       const matchTags = mark?.tags?.toLowerCase().includes(q);
       const matchLevels = mark?.levels?.toLowerCase().includes(q);
       return matchDate || matchNotes || matchPattern || matchTags || matchLevels;
@@ -627,7 +956,7 @@ function renderTable() {
   if (totalItems === 0) {
     el.tableBody.innerHTML = `
       <tr>
-        <td colspan="10" class="text-center" style="padding: 2.5rem; color: var(--text-muted);">
+        <td colspan="11" class="text-center" style="padding: 2.5rem; color: var(--text-muted);">
           No records found matching the active filter or search query.
         </td>
       </tr>
@@ -648,18 +977,41 @@ function renderTable() {
     const isUp = item.change >= 0;
     const changeSign = isUp ? '+' : '';
 
-    const insideBadge = item.is_inside_day ? `<span class="pill-badge badge-inside" title="High <= Prev High, Low >= Prev Low">Inside Bar</span>` : '';
-    const outsideBadge = item.is_outside_day ? `<span class="pill-badge badge-outside" title="High >= Prev High, Low <= Prev Low">Outside Bar</span>` : '';
+    // Standard Badges
+    const insideBadge = item.is_inside_day ? `<span class="pill-badge badge-inside term-tip" data-term="Inside Bar">Inside Bar</span>` : '';
+    const outsideBadge = item.is_outside_day ? `<span class="pill-badge badge-outside term-tip" data-term="Outside Bar">Outside Bar</span>` : '';
     const gapBadge = item.gap_type === 'Gap Up' ? `<span class="pill-badge badge-gap-up">Gap Up (${item.gap})</span>`
                    : (item.gap_type === 'Gap Down' ? `<span class="pill-badge badge-gap-down">Gap Down (${item.gap})</span>` : '');
 
+    // SMC Structure Badge
+    let smcBadge = '';
+    if (item.pdh_sweep) {
+      smcBadge = `<span class="pill-badge badge-sweep-bear term-tip" data-term="Sweep">⚡ BSL Swept (Reversal)</span>`;
+    } else if (item.pdl_sweep) {
+      smcBadge = `<span class="pill-badge badge-sweep-bull term-tip" data-term="Sweep">⚡ SSL Swept (Turtle Soup)</span>`;
+    } else if (item.bullish_bos) {
+      smcBadge = `<span class="pill-badge badge-bos-bull term-tip" data-term="BOS">Bullish BOS</span>`;
+    } else if (item.bearish_bos) {
+      smcBadge = `<span class="pill-badge badge-bos-bear term-tip" data-term="BOS">Bearish BOS</span>`;
+    } else if (item.is_expansion_bar) {
+      smcBadge = `<span class="pill-badge badge-inside term-tip" data-term="Expansion Bar">Expansion (${item.body_pct}% body)</span>`;
+    } else {
+      smcBadge = `<span style="font-size:0.7rem; color:var(--text-dim);">${item.zone || 'Normal'}</span>`;
+    }
+
+    // User Mark Cell
     let markCellHtml = '';
     if (mark) {
       const sentimentClass = `sentiment-${mark.sentiment || 'Neutral'}`;
       const tagList = mark.tags ? mark.tags.split(',').map(t => `<span class="mark-tag-pill">${t.trim()}</span>`).join(' ') : '';
+      const predHtml = mark.predBias ? `<span style="font-size:0.68rem; color:var(--blue); font-weight:700;">Pred: ${mark.predBias}</span>` : '';
+      const eventPill = mark.isEvent ? `<span style="font-size:0.68rem; color:var(--yellow); font-weight:700;">⚠️ Event</span>` : '';
+
       markCellHtml = `
         <div class="mark-cell-content" onclick="openMarkModal('${item.date}')" style="cursor: pointer;" title="Click to view/edit mark">
           <span class="badge-sentiment ${sentimentClass}">${mark.sentiment || 'Marked'}</span>
+          ${predHtml}
+          ${eventPill}
           <span class="mark-notes-snippet">${mark.notes ? escapeHtml(mark.notes) : (mark.pattern || 'Marked day')}</span>
           ${tagList}
         </div>
@@ -697,6 +1049,9 @@ function renderTable() {
           <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">
             P: ${formatNumber(item.pivot)} | CPR: ${item.cpr_width} pts
           </div>
+        </td>
+        <td>
+          ${smcBadge}
         </td>
         <td>${markCellHtml}</td>
         <td class="text-center">
@@ -749,6 +1104,9 @@ function openMarkModal(dateStr) {
     el.markTradeTaken.value = existing.tradeTaken || 'No';
     el.markOutcome.value = existing.outcome || 'N/A';
     el.markLevels.value = existing.levels || '';
+    if (el.markPredBias) el.markPredBias.value = existing.predBias || 'Bullish Continuation';
+    if (el.markPredTarget) el.markPredTarget.value = existing.predTarget || '';
+    if (el.markEventCheck) el.markEventCheck.checked = Boolean(existing.isEvent);
     el.markNotes.value = existing.notes || '';
     el.markTags.value = existing.tags || '';
     el.btnDeleteMark.style.display = 'inline-block';
@@ -759,8 +1117,15 @@ function openMarkModal(dateStr) {
     el.markTradeTaken.value = 'No';
     el.markOutcome.value = 'N/A';
     el.markLevels.value = record ? `PDH: ${record.high}, PDL: ${record.low}` : '';
+    if (el.markPredBias) {
+      el.markPredBias.value = record?.close > record?.open ? 'Bullish Continuation' : 'Bearish Continuation';
+    }
+    if (el.markPredTarget) {
+      el.markPredTarget.value = record ? `Sweep PDH: ${record.high}` : '';
+    }
+    if (el.markEventCheck) el.markEventCheck.checked = false;
     el.markNotes.value = '';
-    el.markTags.value = '';
+    el.markTags.value = record?.pdh_sweep ? '#BSL-Sweep' : (record?.pdl_sweep ? '#SSL-Sweep' : '');
     el.btnDeleteMark.style.display = 'none';
   }
 
@@ -773,10 +1138,18 @@ function closeMarkModal() {
 
 function appendLevel(text) {
   const current = el.markLevels.value.trim();
-  if (current.length > 0 && !current.endsWith(',')) {
-    el.markLevels.value = `${current}, ${text}`;
-  } else {
-    el.markLevels.value = `${current} ${text}`.trim();
+  el.markLevels.value = current ? `${current}, ${text}` : text;
+}
+
+function appendTarget(text) {
+  const current = el.markPredTarget.value.trim();
+  el.markPredTarget.value = current ? `${current}, ${text}` : text;
+}
+
+function appendTag(tag) {
+  const current = el.markTags.value.trim();
+  if (!current.includes(tag)) {
+    el.markTags.value = current ? `${current}, ${tag}` : tag;
   }
 }
 
@@ -809,6 +1182,7 @@ function setupEventListeners() {
   // Filter Buttons
   el.filterAll.addEventListener('click', () => applyFilter('all'));
   el.filterMarked.addEventListener('click', () => applyFilter('marked'));
+  if (el.filterSmc) el.filterSmc.addEventListener('click', () => applyFilter('smc'));
   el.filterInside.addEventListener('click', () => applyFilter('inside'));
 
   // Search input with debounce
@@ -847,7 +1221,6 @@ function setupEventListeners() {
     if (e.target === el.markModal) closeMarkModal();
   });
 
-  // Date change inside modal updates snapshot
   el.markDate.addEventListener('change', e => {
     openMarkModal(e.target.value);
   });
@@ -866,13 +1239,16 @@ function setupEventListeners() {
       tradeTaken: el.markTradeTaken.value,
       outcome: el.markOutcome.value,
       levels: el.markLevels.value.trim(),
+      predBias: el.markPredBias ? el.markPredBias.value : '',
+      predTarget: el.markPredTarget ? el.markPredTarget.value.trim() : '',
+      isEvent: el.markEventCheck ? el.markEventCheck.checked : false,
       notes: el.markNotes.value.trim(),
       tags: el.markTags.value.trim(),
       savedAt: new Date().toISOString(),
     };
 
     state.marks[date] = markData;
-    saveMarksToStorage(true); // Triggers GitHub auto-sync if connected
+    saveMarksToStorage(true);
     updateChartMarkers();
     applyFilter(state.activeFilter);
     closeMarkModal();
@@ -885,13 +1261,42 @@ function setupEventListeners() {
     if (!date || !state.marks[date]) return;
     if (confirm(`Are you sure you want to delete your trading mark for ${date}?`)) {
       delete state.marks[date];
-      saveMarksToStorage(true); // Triggers GitHub auto-sync
+      saveMarksToStorage(true);
       updateChartMarkers();
       applyFilter(state.activeFilter);
       closeMarkModal();
       showToast(`🗑️ Trading mark removed for ${date}`);
     }
   });
+
+  // ========================================================================
+  // Glossary Modal & Search Handlers
+  // ========================================================================
+  if (el.btnOpenGlossary) {
+    el.btnOpenGlossary.addEventListener('click', () => {
+      renderGlossary('');
+      if (el.glossarySearch) el.glossarySearch.value = '';
+      el.glossaryModal.style.display = 'flex';
+    });
+  }
+
+  if (el.btnCloseGlossaryModal) {
+    el.btnCloseGlossaryModal.addEventListener('click', () => {
+      el.glossaryModal.style.display = 'none';
+    });
+  }
+
+  if (el.glossaryModal) {
+    el.glossaryModal.addEventListener('click', e => {
+      if (e.target === el.glossaryModal) el.glossaryModal.style.display = 'none';
+    });
+  }
+
+  if (el.glossarySearch) {
+    el.glossarySearch.addEventListener('input', e => {
+      renderGlossary(e.target.value);
+    });
+  }
 
   // ========================================================================
   // GitHub Sync Modal Handlers
@@ -941,7 +1346,7 @@ function setupEventListeners() {
         el.syncStatusMsg.innerHTML = `<span style="color:var(--green)">✅ Connected successfully to ${repo}!</span>`;
         showToast('Connected to GitHub!');
       } catch (err) {
-        el.syncStatusMsg.innerHTML = `<span style="color:var(--yellow)">⚠️ Connected to repo (file will be created on first push): ${err.message}</span>`;
+        el.syncStatusMsg.innerHTML = `<span style="color:var(--yellow)">⚠️ Connected to repo: ${err.message}</span>`;
       }
     } else {
       el.syncStatusMsg.innerHTML = '<span>Saved. Operating in local-only mode.</span>';
@@ -949,7 +1354,6 @@ function setupEventListeners() {
   });
 
   el.btnPushToGithub.addEventListener('click', () => pushMarksToGitHub(false));
-  el.btnPullFromGitHub = el.btnPullFromGithub;
   if (el.btnPullFromGithub) {
     el.btnPullFromGithub.addEventListener('click', () => pullMarksFromGitHub());
   }
@@ -1025,7 +1429,7 @@ function setupEventListeners() {
   // Download CSV
   el.btnDownloadCsv.addEventListener('click', () => {
     if (!state.history.length) return;
-    const headers = ['Date', 'Day', 'Open', 'High', 'Low', 'Close', 'Range', 'Change', 'Change_Pct', 'Pivot', 'CPR_Width', 'Inside_Bar'];
+    const headers = ['Date', 'Day', 'Open', 'High', 'Low', 'Close', 'Range', 'Change', 'Change_Pct', 'Pivot', 'CPR_Width', 'Structure_Event', 'Zone'];
     const rows = state.history.map(d => [
       d.date,
       d.day,
@@ -1038,7 +1442,8 @@ function setupEventListeners() {
       d.change_pct,
       d.pivot,
       d.cpr_width,
-      d.is_inside_day ? 'YES' : 'NO'
+      d.smc_structure || '',
+      d.zone || ''
     ]);
     const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -1060,7 +1465,8 @@ document.addEventListener('DOMContentLoaded', () => {
   updateMarketStatus();
   setInterval(updateMarketStatus, 60000);
 
-  setupEventListeners();
+  initTermTooltips();
   loadMarks();
+  setupEventListeners();
   loadNiftyData();
 });

@@ -46,6 +46,9 @@
             </svg>
             <span>Mark Trading Info</span>
           </button>
+          <button id="btn-open-glossary" class="btn btn-outline" title="Open SMC & Trading Terminology Cheat Sheet with Full Forms & Explanations">
+            📖 <span>SMC Glossary</span>
+          </button>
           <button id="btn-github-sync" class="btn btn-outline" title="Sync marks directly to your GitHub repository">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M19 18a3.5 3.5 0 0 0 0-7h-1A5 5 0 0 0 8 7.2 3.5 3.5 0 0 0 5 13a3.5 3.5 0 0 0 0 7h14z"></path>
@@ -146,7 +149,7 @@
 
       <div class="levels-item pivots-strip">
         <div class="levels-header">
-          <span>Next Session CPR & Key Pivots</span>
+          <span>Next Session <span class="term-tip" data-term="CPR">CPR</span> & Key <span class="term-tip" data-term="Pivots">Pivots</span></span>
           <span class="badge-cpr" id="badge-cpr-type">CPR: --</span>
         </div>
         <div class="pivots-pills">
@@ -155,6 +158,100 @@
           <div class="pivot-chip highlight"><span class="lbl">Pivot:</span><span id="p-pivot">--</span></div>
           <div class="pivot-chip"><span class="lbl">TC:</span><span id="p-tc">--</span></div>
           <div class="pivot-chip"><span class="lbl">R1:</span><span id="p-r1">--</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SMART MONEY CONCEPTS (SMC) & NEXT-DAY PREDICTION RADAR -->
+    <section class="smc-prediction-card card-container">
+      <div class="smc-header">
+        <div class="smc-title-group">
+          <div class="smc-radar-icon">
+            <span class="radar-pulse"></span>
+            🔮
+          </div>
+          <div>
+            <div class="smc-badge-bar">
+              <h2 class="section-title">Next-Session Bias & <span class="term-tip" data-term="SMC">SMC</span> Liquidity Radar</h2>
+              <span class="badge-smc-tag" id="smc-bias-badge">Calculating...</span>
+            </div>
+            <p class="section-subtitle">Algorithmic next-day forecast based on Trend Inertia, <span class="term-tip" data-term="ERL">External Liquidity</span>, and <span class="term-tip" data-term="BOS">Structure</span></p>
+          </div>
+        </div>
+        <div class="smc-header-action">
+          <button class="btn btn-sm btn-outline" onclick="openMarkModalWithPrediction()">
+            ✍️ Plan Tomorrow's Trade
+          </button>
+        </div>
+      </div>
+
+      <div class="smc-grid">
+        <!-- Col 1: Algorithmic Direction & Momentum -->
+        <div class="smc-box box-bias">
+          <div class="box-label">
+            <span>Next-Day Directional Bias</span>
+            <span class="box-sub-badge" id="pred-confidence">-- Confidence</span>
+          </div>
+          <div class="bias-headline" id="pred-bias-text">Loading Forecast...</div>
+          <div class="bias-rationale" id="pred-rationale">Analyzing candle dominance, closing acceptance, and liquidity sweep patterns...</div>
+          <div class="bias-event-rule">
+            <span class="icon-warning">⚠️</span>
+            <span id="pred-event-rule">Notice: Major overnight events, breaking news, or opening gaps > 60 pts invalidate technical continuation.</span>
+          </div>
+        </div>
+
+        <!-- Col 2: The Fuel: Target Liquidity Pools -->
+        <div class="smc-box box-targets">
+          <div class="box-label">
+            <span>Target Liquidity Pools (<span class="term-tip" data-term="Fuel">Market Fuel</span>)</span>
+            <span class="term-tip icon-info" data-term="BSL">ℹ️</span>
+          </div>
+          <div class="target-row">
+            <span class="target-tag tag-primary">Primary Target</span>
+            <div class="target-val" id="pred-primary-target">--</div>
+          </div>
+          <div class="target-row">
+            <span class="target-tag tag-secondary">Opposing Guard</span>
+            <div class="target-val" id="pred-secondary-target">--</div>
+          </div>
+          <div class="target-sub-stats">
+            <div><span class="sub-lbl"><span class="term-tip" data-term="ADR">20D ADR</span> Exp:</span> <strong id="pred-adr-exp">-- pts</strong></div>
+            <div><span class="sub-lbl"><span class="term-tip" data-term="CPR">CPR</span> Volatility:</span> <strong id="pred-cpr-exp">--</strong></div>
+          </div>
+        </div>
+
+        <!-- Col 3: External Range Liquidity & Structure Matrix -->
+        <div class="smc-box box-matrix">
+          <div class="box-label">
+            <span><span class="term-tip" data-term="ERL">External Liquidity (ERL)</span> Matrix</span>
+            <span class="term-tip icon-info" data-term="ERL">ℹ️</span>
+          </div>
+          <div class="matrix-grid">
+            <div class="matrix-item">
+              <span class="matrix-lbl"><span class="term-tip" data-term="PDH">PDH</span> (Buy Stops):</span>
+              <span class="matrix-val td-high" id="smc-pdh">--</span>
+            </div>
+            <div class="matrix-item">
+              <span class="matrix-lbl"><span class="term-tip" data-term="PDL">PDL</span> (Sell Stops):</span>
+              <span class="matrix-val td-low" id="smc-pdl">--</span>
+            </div>
+            <div class="matrix-item">
+              <span class="matrix-lbl"><span class="term-tip" data-term="PWH">PWH</span> (Weekly BSL):</span>
+              <span class="matrix-val" id="smc-pwh">--</span>
+            </div>
+            <div class="matrix-item">
+              <span class="matrix-lbl"><span class="term-tip" data-term="PWL">PWL</span> (Weekly SSL):</span>
+              <span class="matrix-val" id="smc-pwl">--</span>
+            </div>
+            <div class="matrix-item matrix-span-2">
+              <span class="matrix-lbl">Market Zone:</span>
+              <span class="matrix-val" id="smc-zone"><span class="term-tip" data-term="Discount">--</span></span>
+            </div>
+            <div class="matrix-item matrix-span-2">
+              <span class="matrix-lbl">Structure Event:</span>
+              <span class="matrix-val" id="smc-structure-event"><span class="term-tip" data-term="BOS">--</span></span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -198,7 +295,8 @@
           </div>
           <div class="filter-group">
             <button class="btn-filter active" id="filter-all">All Days</button>
-            <button class="btn-filter" id="filter-marked">My Marks Only (<span id="marked-count">0</span>)</button>
+            <button class="btn-filter" id="filter-marked">My Marks (<span id="marked-count">0</span>)</button>
+            <button class="btn-filter" id="filter-smc">SMC Sweeps & BOS</button>
             <button class="btn-filter" id="filter-inside">Inside Bars</button>
           </div>
           <button id="btn-download-csv" class="btn btn-outline btn-sm" title="Download historical data as CSV">
@@ -218,8 +316,9 @@
               <th class="text-right">Open</th>
               <th class="text-right">Close</th>
               <th class="text-right">Net Change</th>
-              <th>Pattern / CPR</th>
-              <th>My Trading Marks & Notes</th>
+              <th>Pattern / <span class="term-tip" data-term="CPR">CPR</span></th>
+              <th><span class="term-tip" data-term="SMC">SMC</span> Structure & <span class="term-tip" data-term="Sweep">Sweeps</span></th>
+              <th>My Trading Marks & Prediction</th>
               <th class="text-center">Action</th>
             </tr>
           </thead>
@@ -350,6 +449,42 @@
           </div>
         </div>
 
+        <!-- Next-Day Prediction & SMC Plan -->
+        <div class="form-section-divider">
+          <span>🔮 Next-Day Prediction & SMC Plan ("Where It Goes Next")</span>
+        </div>
+
+        <div class="form-row form-row-split">
+          <div class="form-group">
+            <label for="mark-pred-bias">Tomorrow's Expected Direction</label>
+            <select id="mark-pred-bias" class="form-select">
+              <option value="Bullish Continuation">🟢 Bullish Continuation (Follow-Through)</option>
+              <option value="Bearish Continuation">🔴 Bearish Continuation (Follow-Through)</option>
+              <option value="BSL Sweep & Reverse">⚡ Sweep PDH (BSL) & Reverse Down</option>
+              <option value="SSL Sweep & Bounce">⚡ Sweep PDL (SSL) & Reverse Up</option>
+              <option value="Rangebound / Inside Value">🟡 Rangebound / Sideways Chop</option>
+              <option value="Event Volatility Expansion">⚡ High Volatility / Event Expansion</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="mark-pred-target">Target Liquidity Pool (The Fuel)</label>
+            <input type="text" id="mark-pred-target" placeholder="e.g. Sweep PDH at 22,960 or Retrace to CPR">
+            <div class="chip-hints">
+              <span class="chip-hint" onclick="appendTarget('Target PDH')">+ PDH</span>
+              <span class="chip-hint" onclick="appendTarget('Target PDL')">+ PDL</span>
+              <span class="chip-hint" onclick="appendTarget('Target CPR')">+ CPR</span>
+              <span class="chip-hint" onclick="appendTarget('Target PWH')">+ PWH</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" style="flex-direction: row; align-items: center; gap: 0.5rem;">
+          <input type="checkbox" id="mark-event-check" style="width: auto;">
+          <label for="mark-event-check" style="text-transform: none; font-size: 0.8rem; cursor: pointer; color: var(--yellow);">
+            ⚠️ Upcoming Macro Event / Catalyst expected (RBI, Fed, CPI, Earnings, Breaking News)
+          </label>
+        </div>
+
         <!-- Detailed Journal Notes -->
         <div class="form-group">
           <label for="mark-notes">Trading Notes, Psychology & Key Learnings</label>
@@ -358,8 +493,16 @@
 
         <!-- Tags -->
         <div class="form-group">
-          <label for="mark-tags">Tags (comma separated)</label>
-          <input type="text" id="mark-tags" placeholder="#expiry, #trend, #reversal, #disciplined, #hero-or-zero">
+          <label for="mark-tags">Tags & SMC Setup Chips</label>
+          <input type="text" id="mark-tags" placeholder="#expiry, #trend, #reversal, #BSL-Sweep, #BOS">
+          <div class="chip-hints">
+            <span class="chip-hint" onclick="appendTag('#BSL-Sweep')">+ #BSL-Sweep</span>
+            <span class="chip-hint" onclick="appendTag('#SSL-Sweep')">+ #SSL-Sweep</span>
+            <span class="chip-hint" onclick="appendTag('#Bullish-BOS')">+ #Bullish-BOS</span>
+            <span class="chip-hint" onclick="appendTag('#Bearish-BOS')">+ #Bearish-BOS</span>
+            <span class="chip-hint" onclick="appendTag('#Expansion-Bar')">+ #Expansion-Bar</span>
+            <span class="chip-hint" onclick="appendTag('#Event-Day')">+ #Event-Day</span>
+          </div>
         </div>
 
         <!-- Form Actions -->
@@ -418,6 +561,45 @@
 
         <div id="sync-status-msg" style="font-size: 0.78rem; font-family: var(--font-mono); margin-top: 0.5rem; min-height: 1.2rem;"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SMC & TRADING GLOSSARY -->
+  <div class="modal-overlay" id="glossary-modal" style="display: none;">
+    <div class="modal-box modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">📖 Smart Money Concepts (SMC) & Trading Cheat Sheet</h3>
+          <p class="modal-subtitle">Beginner guide to institutional liquidity, market structure, and pivot terminology</p>
+        </div>
+        <button class="btn-close" id="btn-close-glossary-modal">&times;</button>
+      </div>
+      <div class="modal-form">
+        <div class="search-box" style="margin-bottom: 1rem; width: 100%;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="glossary-search" placeholder="Search terms (e.g. BSL, Sweep, BOS, CPR, Liquidity...)" style="width: 100%;">
+        </div>
+
+        <div class="glossary-grid" id="glossary-grid">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING TERM TOOLTIP (Hover Activated) -->
+  <div id="term-tooltip" class="term-tooltip" style="display: none;">
+    <div class="tt-header">
+      <span class="tt-term" id="tt-term">TERM</span>
+      <span class="tt-full" id="tt-full">Full Term Name</span>
+    </div>
+    <div class="tt-body" id="tt-body">Definition text goes here.</div>
+    <div class="tt-smc" id="tt-smc">
+      <span class="tt-smc-label">Smart Money Edge:</span>
+      <span id="tt-edge">Why algorithms watch this level.</span>
     </div>
   </div>
 
