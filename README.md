@@ -71,20 +71,19 @@ git commit -m "Initial commit: NIFTY Daily Tracker & Trading Journal"
 
 ### Step 2: Create a New GitHub Repository
 
-1. Open [GitHub](https://github.com/new).
-2. Create a new repository (e.g. `nifty-daily-tracker` or `Trading`).
-3. Set it to **Public** (or Private if you have GitHub Pro for Pages).
-4. Do not initialize with README or .gitignore (we already have them).
+1. Open this direct link: **[Create `nifty-tracker` on GitHub](https://github.com/new?name=nifty-tracker)**.
+2. Ensure the repository name is **`nifty-tracker`**.
+3. Choose **Public** (or Private if you have GitHub Pro for Pages).
+4. Leave "Add a README file", ".gitignore", and "license" unchecked (we already have them created and committed).
+5. Click **Create repository**.
 
-### Step 3: Link & Push to GitHub
+### Step 3: Push to GitHub
 
 In your local terminal inside this folder, run:
 ```bash
-# Replace <YOUR-USERNAME> and <REPO-NAME> with your GitHub details
-git remote add origin https://github.com/<YOUR-USERNAME>/<REPO-NAME>.git
-git branch -M main
 git push -u origin main
 ```
+*(The remote `origin` is already pre-configured to `https://github.com/sagnikseal/nifty-tracker.git`)*
 
 ### Step 4: Configure GitHub Pages Settings
 
@@ -108,7 +107,7 @@ Because the workflow commits the newly fetched daily data back into `data/nifty_
 2. In the left sidebar, click **Update NIFTY Data & Deploy to Pages**.
 3. Click the **Run workflow** dropdown on the right and click the green **Run workflow** button.
 4. Once completed (approx. 40 seconds), your site will be live at:
-   `https://<YOUR-USERNAME>.github.io/<REPO-NAME>/`
+   **`https://sagnikseal.github.io/nifty-tracker/`**
 
 ---
 
@@ -130,3 +129,4 @@ Then visit `http://localhost:8000` in your web browser.
 ## 📝 License
 
 MIT License. Built for index traders and market participants.
+
