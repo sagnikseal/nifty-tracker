@@ -817,3 +817,4 @@ document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
   loadNiftyData();
 });
+
