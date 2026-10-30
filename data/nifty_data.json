@@ -3,8 +3,8 @@
   "ticker": "^NSEI",
   "exchange": "NSE",
   "currency": "INR",
-  "last_updated": "2026-10-30 22:17:47 IST",
-  "last_updated_iso": "2026-10-30T22:17:47.722723+00:00",
+  "last_updated": "2026-10-30 22:31:51 IST",
+  "last_updated_iso": "2026-10-30T22:31:51.247658+00:00",
   "meta": {
     "fifty_two_week_high": 26373.2,
     "fifty_two_week_low": 22179.9,
@@ -163,39 +163,39 @@
   },
   "overnight_macro": {
     "status": "Active",
-    "last_checked_ist": "2026-10-30 22:17:47 IST",
-    "macro_score": 2.09,
+    "last_checked_ist": "2026-10-30 22:31:51 IST",
+    "macro_score": 0.88,
     "bias": "Moderate Global Tailwind",
     "gap_expectation": "Mild Gap-Up to Flat (+15 to +40 pts)",
     "decision_factors": [
-      "US Tech (Nasdaq -1.98%) provides directional momentum for Indian IT & growth heavyweights.",
+      "US Tech (Nasdaq -2.08%) provides directional momentum for Indian IT & growth heavyweights.",
       "Asian morning market cues (Nikkei 225 +1.77%) establish early opening risk sentiment.",
-      "Brent Crude dropped -2.06% to $113.42/bbl, easing imported inflation and reducing India's trade deficit (Tailwind for Paints, Autos, FMCG).",
-      "\u2694\ufe0f Geopolitical Shock Watch (War / Military Conflict): 'Iran war looming? Trump airport, Mar-a-Lago golf estate get missile shield' (India Today). Conflict escalation increases supply risk on crude and prompts risk-off flows."
+      "Brent Crude dropped -1.75% to $113.78/bbl, easing imported inflation and reducing India's trade deficit (Tailwind for Paints, Autos, FMCG).",
+      "\u2694\ufe0f Geopolitical Shock Watch (War / Military Conflict): 'US weighs new Iran strikes as Vance reaches out: Is war or a deal closer?' (Al Jazeera). Conflict escalation increases supply risk on crude and prompts risk-off flows."
     ],
     "market_data": {
       "S&P 500": {
         "symbol": "^GSPC",
         "category": "US Markets",
-        "price": 7599.18,
+        "price": 7579.55,
         "prev_close": 7623.68,
-        "change_pct": -0.32,
+        "change_pct": -0.58,
         "status": "Bearish"
       },
       "Nasdaq 100": {
         "symbol": "^IXIC",
         "category": "US Markets",
-        "price": 25440.87,
+        "price": 25414.62,
         "prev_close": 25955.34,
-        "change_pct": -1.98,
+        "change_pct": -2.08,
         "status": "Bearish"
       },
       "Dow Jones": {
         "symbol": "^DJI",
         "category": "US Markets",
-        "price": 51931.05,
+        "price": 51845.33,
         "prev_close": 52215.16,
-        "change_pct": -0.54,
+        "change_pct": -0.71,
         "status": "Bearish"
       },
       "Nikkei 225": {
@@ -217,25 +217,25 @@
       "Brent Crude": {
         "symbol": "BZ=F",
         "category": "Commodities & FX",
-        "price": 113.42,
+        "price": 113.78,
         "prev_close": 115.81,
-        "change_pct": -2.06,
+        "change_pct": -1.75,
         "status": "Bearish"
       },
       "US Dollar Index": {
         "symbol": "DX-Y.NYB",
         "category": "Commodities & FX",
-        "price": 101.91,
+        "price": 101.92,
         "prev_close": 101.96,
-        "change_pct": -0.05,
+        "change_pct": -0.03,
         "status": "Neutral"
       },
       "US 10Y Yield": {
         "symbol": "^TNX",
         "category": "Commodities & FX",
-        "price": 4.95,
+        "price": 4.94,
         "prev_close": 4.99,
-        "change_pct": -0.82,
+        "change_pct": -0.94,
         "status": "Bearish"
       }
     },
@@ -245,6 +245,12 @@
       "shock_count": 3,
       "risk_penalty": -2.5,
       "flagged_events": [
+        {
+          "headline": "US weighs new Iran strikes as Vance reaches out: Is war or a deal closer?",
+          "category": "Geopolitical & War",
+          "shock_type": "War / Military Conflict",
+          "source": "Al Jazeera"
+        },
         {
           "headline": "Iran war looming? Trump airport, Mar-a-Lago golf estate get missile shield",
           "category": "Geopolitical & War",
@@ -256,12 +262,6 @@
           "category": "Geopolitical & War",
           "shock_type": "War / Military Conflict",
           "source": "WSJ"
-        },
-        {
-          "headline": "Iran's IRGC Navy says three tankers catch fire in Strait of Hormuz",
-          "category": "Geopolitical & War",
-          "shock_type": "Geopolitical Trade / Supply Disruption",
-          "source": "Reuters"
         }
       ]
     },
@@ -275,17 +275,24 @@
       },
       {
         "category": "Market & Macro",
+        "title": "Bank credit and interest rate trends for September show significant movements: RBI",
+        "source": "News On AIR",
+        "pub_date": "Fri, 30 Oct 2026 16:13:24 GMT",
+        "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPSTZad2hnQUJxYXFGaTY1QWszNkh4MENadkprWkFDRFBYdmw3aDVzeWVHMS1QSFBRTDhUSGdmTjN4OW01MjI1TmY1X2Z5NWpFcmY1dkQ4VlcyaHpQa3A3RzVBbUUzemVYNkZvYWRZR2I2dmU0R0pzVFZfTWF3RlZhcFNsWnF6V214dDJoOXZMd3h4SG5iMC1iV1FVZTlUaHRSZ1NLNTV3SmNCUmc?oc=5"
+      },
+      {
+        "category": "Market & Macro",
         "title": "India's FX reserves dip for seventh straight week to hit over two-month low",
         "source": "Reuters",
         "pub_date": "Fri, 30 Oct 2026 13:33:03 GMT",
         "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOMVdhVU9LVWhlNTdlQmJFYjdoWS15Nzd4YW1uZFM0UDlDbTNUcnFQMmtLWFRtU3A0WWN3S2pjd25KR1Vfc3NucHBMSGs2UDZJSVRhM0dETTg0WDlQcjRVUjNfWXc0eG1hOVY2Yk9KNl9PX2swM3lpR0J3cWxXZklZUl9acDFsQng4aHR5bi1JUEpBeVpZZzhUMUtIMEZoRWF3Nnpkdzd1ZlQ5bjZZckxwRmtSeXBsUQ?oc=5"
       },
       {
-        "category": "Market & Macro",
-        "title": "Bank credit and interest rate trends for September show significant movements: RBI",
-        "source": "News On AIR",
-        "pub_date": "Fri, 30 Oct 2026 16:13:24 GMT",
-        "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPSTZad2hnQUJxYXFGaTY1QWszNkh4MENadkprWkFDRFBYdmw3aDVzeWVHMS1QSFBRTDhUSGdmTjN4OW01MjI1TmY1X2Z5NWpFcmY1dkQ4VlcyaHpQa3A3RzVBbUUzemVYNkZvYWRZR2I2dmU0R0pzVFZfTWF3RlZhcFNsWnF6V214dDJoOXZMd3h4SG5iMC1iV1FVZTlUaHRSZ1NLNTV3SmNCUmc?oc=5"
+        "category": "Geopolitical & War",
+        "title": "US weighs new Iran strikes as Vance reaches out: Is war or a deal closer?",
+        "source": "Al Jazeera",
+        "pub_date": "Fri, 30 Oct 2026 10:44:57 GMT",
+        "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOTGN2bDJnRlZBUFNOTlVyNkF2Y3BydmxnS002TXB5MHZ6WnVmN1JlajliLXpmQ2hnMk9iejQ5MFZrdDNKU19nRWg2LWpST3ZYVHB4ckZ1Y0JhaFJNU1RaSlpOWGVjZkdreHB4YllHOTdhQzJ3NzJzcEY5LUo1Y1gtTzU2U0x0ejJ0ckFTTHcwbXJCVXdUZnEwNzBDd09uQk9XVG1lVl81MVloZi0yQVJOWS1NQdIBuAFBVV95cUxPUzd5NDgxT3R6MW9xenM1TFFrdlBPandwQkRNaVd2ODFmcF9EeXBCeXpwUERFOHl5WUtfNTVzZFo3eUpDaFFHbEJ3bmRpNFd5SDd6bnBDNGV0UWtxNUI2YzNTNWpObHktMVFPc0pkMGlISVJxb0Vfc0d5UDZZWXVtbXNKYmxBdVQxeUhzT2hraXQ2TzIydWgxWS1qazFEU1RWUzdySWNpbXRGeFZxWE1qZWNqZUh0Sk5y?oc=5"
       },
       {
         "category": "Geopolitical & War",
@@ -298,15 +305,8 @@
         "category": "Geopolitical & War",
         "title": "Oil Prices Rise After Hormuz Tanker Attack, Houthi Claims Stoke Supply Fears",
         "source": "WSJ",
-        "pub_date": "Fri, 30 Oct 2026 13:50:59 GMT",
+        "pub_date": "Fri, 30 Oct 2026 13:24:00 GMT",
         "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPUnhpZVZHQUliUnJIQUJWb3JmbVl6VV9GZ3NJN0M3X0EzZU9pa2N4SEcybGNlakZkcmxyeVNqV0E5LWRxTU1VZUM4Uk9TdGZTS0RJLU1CZ1JVVFBlM0pTcWFPd2U0b1RFTkVyV2oxSzNwZzYzMjBwVmRtbUFvWUowS1RPSEQ3eE1Qa2ZQQVJ5SExsbzVXQTQtNlZYRC1Bbnh2YmpnZ2VGaHZLQlJDRWJRZEZOU2VCZ1hPcENQcTUtYw?oc=5"
-      },
-      {
-        "category": "Geopolitical & War",
-        "title": "Iran's IRGC Navy says three tankers catch fire in Strait of Hormuz",
-        "source": "Reuters",
-        "pub_date": "Fri, 30 Oct 2026 13:08:58 GMT",
-        "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPMzdWakFCLTEzM2pYaGh6ZHpxZE9KMjh2QjkzcE1ieWVwa0dmRFZZWUlOamZJUlpwN0M1ajJuZ3dNRFJ4ZzJwSmFJaGl4cGFWTEZPYmI0UllLZ1lCRzIzWVpNSlhkQnpCejl4RFltVXJvV3QtcXhqY1JiUF91TjZmSU5XYXFHM05CcE1fbzV6dVNmOFFUNEExZm1qVTFQWnhBYnVyZkUxYmlRTnEtTHlla3l0RGxncHgwbDRyVVVuMjU?oc=5"
       },
       {
         "category": "Crisis & Policy",
@@ -324,10 +324,10 @@
       },
       {
         "category": "Crisis & Policy",
-        "title": "Israel faces weeks of coalition haggling as Netanyahu\u2019s party claims election 'stolen'",
-        "source": "CNBC",
-        "pub_date": "Fri, 30 Oct 2026 03:28:00 GMT",
-        "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOcjZLZHRxZkVSV2NDbHE3ai00Q1R6bE52bUJPUXhTSGFkNWJpRnhFeFdMS3ZZZFNod2xvLW14cnBzN1VGYXBkZDliV0MwRm5XcVE3djl6UVpqVEhVWVZGMjdyR0o5U2Jua0k5V2FkTGR1aVptSE9OX0dYQ3ZTREZnWktxamJjdXhheWJkMlpoVl9iZ9IBlwFBVV95cUxOTmJZay1naWtSSEQ5V1JFTnduMnNxMmh1NGFQOVZ1eGplRFRxall0cFd4RExKQzRBZGhCb3YxT2RRSXhqVTRaSTdzQU80NUFCNE91cUpsWnBPNFcxUTd1OEtfcHBKd0Z1Y3JJM2R5Zy1Xc09MSWVhRDBZWGdoN0VuWHhuVU5ha2kzX243NUNja1hWTEdHc093?oc=5"
+        "title": "Challenge to powers of the Chief Election Commissioner",
+        "source": "Supreme Court Observer",
+        "pub_date": "Wed, 28 Oct 2026 07:00:00 GMT",
+        "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxNV3ZldmFfcFRNMWRDYVZiSTUxT1FfNU5Ya3F2aVJMeVpTdk85SndqbE5sM05rcGNCeGFSQVpUVkNjZ1NkVVVyR3JPY2RYM1NMSk8tS0o5QS01RnJnQmFzTVVDN2NtaEJudzJISVFTU1Y4ZWxBQkFWUFdfRV9lenJiZ1Juek4weWRMcXpDN3UyZGc?oc=5"
       }
     ]
   },
@@ -351,13 +351,13 @@
     "expected_range_adr": "307.36 pts",
     "rationale": "Break of Structure (BOS): Daily close broke and held cleanly above previous high (22961.95) with strong auction settlement (CLQ: 0.69). Trend inertia remains dominant (67.4% hit rate).",
     "playbook": "Expect shallow opening dips into Central Pivot (23025.43) to act as demand. Ride continuation momentum towards PDH (23118.1) and target R1 (23145.76).",
-    "event_rule": "\ud83d\udea8 GEOPOLITICAL / CRISIS ALERT: Critical Geopolitical / Conflict Shocks Detected ('Iran war looming? Trump airport, Mar-a-Lago golf estate get missile shield'). Elevated gap volatility risk. The 9:15 AM Opening Execution Gate is MANDATORY.",
+    "event_rule": "\ud83d\udea8 GEOPOLITICAL / CRISIS ALERT: Critical Geopolitical / Conflict Shocks Detected ('US weighs new Iran strikes as Vance reaches out: Is war or a deal closer?'). Elevated gap volatility risk. The 9:15 AM Opening Execution Gate is MANDATORY.",
     "overnight_synthesis": {
-      "alignment": "Aligned",
+      "alignment": "Neutral",
       "macro_bias": "Moderate Global Tailwind",
-      "macro_score": 2.09,
+      "macro_score": 0.88,
       "gap_expectation": "Mild Gap-Up to Flat (+15 to +40 pts)",
-      "adjustment_note": "Global Tailwind (+2.09) reinforces technical bullish structure. Expected Mild Gap-Up to Flat (+15 to +40 pts) increases odds of early PDH liquidity sweep. Opening Gate confirmation probability elevated."
+      "adjustment_note": "Global cues are balanced (+0.88). Price auction will be guided primarily by internal CPR levels and baseline SMC liquidity targets."
     }
   },
   "history": [
