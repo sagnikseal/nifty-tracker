@@ -202,6 +202,32 @@
         </div>
       </div>
 
+      <!-- OVERNIGHT GLOBAL & MACRO CATALYST RADAR -->
+      <div class="overnight-macro-bar" id="overnight-macro-card">
+        <div class="macro-bar-left">
+          <div class="macro-pulse-wrapper">
+            <span class="macro-radar-pulse"></span>
+            <span class="macro-globe-icon">🌐</span>
+          </div>
+          <div class="macro-summary-text">
+            <div class="macro-title-row">
+              <span class="macro-bar-title">Overnight Global & Macro Radar</span>
+              <span class="macro-badge" id="macro-bias-badge">Analyzing Global Cues...</span>
+              <span class="macro-gap-badge" id="macro-gap-badge">--</span>
+            </div>
+            <div class="macro-synthesis-note" id="macro-synthesis-text">
+              Tracking US markets, Asian morning cues, Brent Crude, DXY dollar index, and overnight financial headlines...
+            </div>
+          </div>
+        </div>
+        <div class="macro-bar-right">
+          <button class="btn btn-sm btn-macro-hover" id="btn-macro-breakdown" aria-label="Inspect Global Factor Breakdown">
+            <span class="btn-macro-text">🔍 Global Factor Breakdown & News</span>
+            <span class="macro-btn-pill" id="macro-score-pill">--</span>
+          </button>
+        </div>
+      </div>
+
       <div class="smc-grid">
         <!-- Col 1: Algorithmic Direction & Momentum -->
         <div class="smc-box box-bias">
@@ -656,6 +682,48 @@
     <div class="tt-smc" id="tt-smc">
       <span class="tt-smc-label">Smart Money Edge:</span>
       <span id="tt-edge">Why algorithms watch this level.</span>
+    </div>
+  </div>
+
+  <!-- OVERNIGHT GLOBAL & MACRO FACTORS POPOVER (Hover & Touch Activated) -->
+  <div id="macro-popover" class="macro-popover" style="display: none;">
+    <div class="macro-pop-header">
+      <div class="macro-pop-title-wrap">
+        <span class="macro-pop-icon">🌐</span>
+        <div>
+          <div class="macro-pop-title">Overnight Global Catalysts & Market Intelligence</div>
+          <div class="macro-pop-sync" id="macro-pop-sync">Updated: --</div>
+        </div>
+      </div>
+      <button class="macro-pop-close" id="macro-pop-close" title="Close">&times;</button>
+    </div>
+
+    <div class="macro-pop-body">
+      <!-- Algorithmic Decision Synthesis Box -->
+      <div class="macro-impact-box">
+        <div class="impact-box-header">
+          <span class="impact-tag" id="macro-pop-bias-tag">Strong Global Tailwind (+10.0)</span>
+          <span class="impact-gap" id="macro-pop-gap">Gap-Up Favored</span>
+        </div>
+        <div class="impact-box-rationale" id="macro-pop-rationale">
+          Analyzing how overnight US, Asian, crude oil, and currency factors alter the 9:15 AM opening...
+        </div>
+        <ul class="impact-factors-list" id="macro-pop-factors">
+          <!-- Populated dynamically with live bullet points -->
+        </ul>
+      </div>
+
+      <!-- Live Global Factors Grid -->
+      <div class="macro-grid-heading">Global Factor Matrix (Cues between 3:30 PM & 9:15 AM)</div>
+      <div class="macro-tickers-grid" id="macro-tickers-grid">
+        <!-- Populated dynamically: S&P, Nasdaq, Dow, Nikkei, Hang Seng, Crude, DXY, 10Y Yield -->
+      </div>
+
+      <!-- Overnight Breaking News Headlines -->
+      <div class="macro-news-heading">Overnight Financial Headlines & Market Drivers</div>
+      <div class="macro-news-list" id="macro-news-list">
+        <!-- Populated dynamically with RSS items -->
+      </div>
     </div>
   </div>
 

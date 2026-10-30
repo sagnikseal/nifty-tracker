@@ -2,6 +2,8 @@ name: Update NIFTY Data & Deploy to Pages
 
 on:
   schedule:
+    # 03:00 UTC = 08:30 AM IST (Overnight Global Macro & Pre-Market Catalyst Sync)
+    - cron: '00 3 * * 1-5'
     # 10:30 UTC = 16:00 IST (4:00 PM IST, 30 min after NSE close)
     - cron: '30 10 * * 1-5'
     # 11:15 UTC = 16:45 IST (4:45 PM IST, post-closing settlement sync)

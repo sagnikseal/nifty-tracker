@@ -11,6 +11,7 @@ import sys
 import json
 import os
 import datetime
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 try:
@@ -598,18 +599,256 @@ def generate_next_day_prediction(latest, prev, adr_20, scorecard):
     }
 
 
+def fetch_overnight_macro_and_news(existing_macro=None):
+    """
+    Fetches real-time overnight global market catalysts and news headlines
+    between market close (3:30 PM IST) and next day open (9:15 AM IST):
+    - US Equities: S&P 500 (^GSPC), Nasdaq 100 (^IXIC), Dow Jones (^DJI)
+    - Asian Morning Openers: Nikkei 225 (^N225), Hang Seng (^HSI)
+    - Macro Risk Factors: Brent Crude (BZ=F), US Dollar Index (DX-Y.NYB), US 10Y Yield (^TNX)
+    - Live Overnight Financial Headlines (Google News RSS / Financial Wires)
+    Calculates quantitative Macro Impact Score (-10 to +10) and dynamic adjustment vector.
+    """
+    tickers = {
+        "S&P 500": {"symbol": "^GSPC", "category": "US Markets"},
+        "Nasdaq 100": {"symbol": "^IXIC", "category": "US Markets"},
+        "Dow Jones": {"symbol": "^DJI", "category": "US Markets"},
+        "Nikkei 225": {"symbol": "^N225", "category": "Asian Markets"},
+        "Hang Seng": {"symbol": "^HSI", "category": "Asian Markets"},
+        "Brent Crude": {"symbol": "BZ=F", "category": "Commodities & FX"},
+        "US Dollar Index": {"symbol": "DX-Y.NYB", "category": "Commodities & FX"},
+        "US 10Y Yield": {"symbol": "^TNX", "category": "Commodities & FX"}
+    }
+    
+    headers = {"User-Agent": USER_AGENT}
+    market_data = {}
+    
+    for label, info in tickers.items():
+        symbol = info["symbol"]
+        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=5d"
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=6) as resp:
+                d = json.loads(resp.read().decode("utf-8"))
+                meta = d.get("chart", {}).get("result", [{}])[0].get("meta", {})
+                price = meta.get("regularMarketPrice")
+                prev = meta.get("chartPreviousClose")
+                pct = round(((price - prev) / prev) * 100, 2) if (price and prev) else 0.0
+                market_data[label] = {
+                    "symbol": symbol,
+                    "category": info["category"],
+                    "price": round(price, 2) if price else None,
+                    "prev_close": round(prev, 2) if prev else None,
+                    "change_pct": pct,
+                    "status": "Bullish" if pct > 0.2 else ("Bearish" if pct < -0.2 else "Neutral")
+                }
+        except Exception as e:
+            old_item = (existing_macro.get("market_data", {}).get(label)) if existing_macro else None
+            if old_item:
+                market_data[label] = old_item
+            else:
+                market_data[label] = {
+                    "symbol": symbol,
+                    "category": info["category"],
+                    "price": None,
+                    "prev_close": None,
+                    "change_pct": 0.0,
+                    "status": "Unavailable",
+                    "error": str(e)
+                }
+
+    # Macro Impact Score calculation
+    sp_pct = market_data.get("S&P 500", {}).get("change_pct", 0.0)
+    nasdaq_pct = market_data.get("Nasdaq 100", {}).get("change_pct", 0.0)
+    dow_pct = market_data.get("Dow Jones", {}).get("change_pct", 0.0)
+    nikkei_pct = market_data.get("Nikkei 225", {}).get("change_pct", 0.0)
+    hsi_pct = market_data.get("Hang Seng", {}).get("change_pct", 0.0)
+    crude_pct = market_data.get("Brent Crude", {}).get("change_pct", 0.0)
+    dxy_pct = market_data.get("US Dollar Index", {}).get("change_pct", 0.0)
+    tnx_pct = market_data.get("US 10Y Yield", {}).get("change_pct", 0.0)
+    
+    us_score = ((sp_pct + nasdaq_pct + dow_pct) / 3.0) * 3.5
+    asia_score = ((nikkei_pct + hsi_pct) / 2.0) * 2.5
+    crude_score = (-crude_pct) * 2.0  # Falling crude is bullish for India
+    dxy_score = (-dxy_pct) * 1.5      # Weakening DXY stops FII outflows
+    yield_score = (-tnx_pct) * 0.5
+    
+    raw_macro_score = us_score + asia_score + crude_score + dxy_score + yield_score
+    macro_score = round(max(-10.0, min(10.0, raw_macro_score)), 2)
+    
+    if macro_score >= 2.5:
+        bias = "Strong Global Tailwind"
+        gap_expectation = "Gap-Up Favored (+40 to +80 pts)"
+    elif macro_score >= 0.8:
+        bias = "Moderate Global Tailwind"
+        gap_expectation = "Mild Gap-Up to Flat (+15 to +40 pts)"
+    elif macro_score <= -2.5:
+        bias = "Severe Global Headwind"
+        gap_expectation = "Gap-Down Risk (-40 to -80 pts)"
+    elif macro_score <= -0.8:
+        bias = "Moderate Global Headwind"
+        gap_expectation = "Mild Gap-Down to Flat (-15 to -40 pts)"
+    else:
+        bias = "Neutral / Mixed Global Cues"
+        gap_expectation = "Flat / Range Opening (±15 pts)"
+
+    decision_factors = []
+    if abs(nasdaq_pct) >= 0.35:
+        decision_factors.append(f"US Tech (Nasdaq {nasdaq_pct:+.2f}%) provides directional momentum for Indian IT & growth heavyweights.")
+    if abs(nikkei_pct) >= 0.4:
+        decision_factors.append(f"Asian morning market cues (Nikkei 225 {nikkei_pct:+.2f}%) establish early opening risk sentiment.")
+    crude_price = market_data.get("Brent Crude", {}).get("price")
+    if crude_pct <= -1.0:
+        decision_factors.append(f"Brent Crude dropped {crude_pct:+.2f}% to ${crude_price}/bbl, easing imported inflation and reducing India's trade deficit (Tailwind for Paints, Autos, FMCG).")
+    elif crude_pct >= 1.0:
+        decision_factors.append(f"Brent Crude surged {crude_pct:+.2f}% to ${crude_price}/bbl, increasing imported inflation pressure on Indian equities.")
+    if dxy_pct <= -0.10:
+        decision_factors.append(f"US Dollar Index softening (DXY {dxy_pct:+.2f}%) reduces pressure on the Rupee and discourages foreign institutional (FII) capital outflow.")
+    elif dxy_pct >= 0.15:
+        decision_factors.append(f"Strong US Dollar (DXY {dxy_pct:+.2f}%) creates emerging market currency pressure and triggers FII selling.")
+    if abs(tnx_pct) >= 1.0:
+        decision_factors.append(f"US 10-Yr Treasury Yield shifted {tnx_pct:+.2f}% to {market_data.get('US 10Y Yield', {}).get('price')}%, influencing global cost of capital.")
+
+    # News Headlines via Google News RSS
+    news_items = []
+    news_url = "https://news.google.com/rss/search?q=Nifty+OR+%22stock+market%22+OR+%22Federal+Reserve%22&hl=en-IN&gl=IN&ceid=IN:en"
+    try:
+        req = urllib.request.Request(news_url, headers=headers)
+        with urllib.request.urlopen(req, timeout=6) as resp:
+            root = ET.fromstring(resp.read())
+            items = root.findall(".//item")[:5]
+            for it in items:
+                title = it.find("title").text if it.find("title") is not None else ""
+                pub = it.find("pubDate").text if it.find("pubDate") is not None else ""
+                link = it.find("link").text if it.find("link") is not None else "#"
+                source = it.find("source").text if it.find("source") is not None else "Financial Wire"
+                clean_title = title.rsplit(" - ", 1)[0] if " - " in title else title
+                news_items.append({
+                    "title": clean_title,
+                    "source": source,
+                    "pub_date": pub,
+                    "link": link
+                })
+    except Exception as e:
+        if existing_macro and existing_macro.get("news_headlines"):
+            news_items = existing_macro["news_headlines"]
+        else:
+            news_items = []
+
+    utc_now = datetime.datetime.now(datetime.timezone.utc)
+    ist_now = utc_now + datetime.timedelta(hours=5, minutes=30)
+    ist_str = ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
+
+    return {
+        "status": "Active",
+        "last_checked_ist": ist_str,
+        "macro_score": macro_score,
+        "bias": bias,
+        "gap_expectation": gap_expectation,
+        "decision_factors": decision_factors,
+        "market_data": market_data,
+        "news_headlines": news_items
+    }
+
+
+def synthesize_macro_with_prediction(prediction, overnight_macro):
+    """
+    Synthesizes the 3:30 PM technical SMC setup with real-time overnight macro cues:
+    - Verifies whether global liquidity aligns with or opposes the technical structure.
+    - Adjusts opening execution gate confidence and flags divergence risks.
+    """
+    if not prediction or not overnight_macro:
+        return prediction
+        
+    macro_score = overnight_macro.get("macro_score", 0.0)
+    bias_desc = overnight_macro.get("bias", "Neutral")
+    gap_exp = overnight_macro.get("gap_expectation", "Flat")
+    tech_bias = prediction.get("bias", "")
+    
+    is_tech_bullish = "Bullish" in tech_bias
+    is_tech_bearish = "Bearish" in tech_bias
+    
+    if is_tech_bullish:
+        if macro_score >= 1.0:
+            alignment = "Aligned"
+            adjustment_note = (
+                f"Global Tailwind (+{macro_score}) reinforces technical bullish structure. "
+                f"Expected {gap_exp} increases odds of early PDH liquidity sweep. "
+                f"Opening Gate confirmation probability elevated."
+            )
+        elif macro_score <= -1.5:
+            alignment = "Divergent"
+            adjustment_note = (
+                f"⚠️ Severe Macro Headwind ({macro_score}) opposes bullish setup. "
+                f"Watch for gap-down opening that may violate the 9:15 AM Opening Gate. "
+                f"Strict Rule: Stand down on long trades if open violates Central Pivot."
+            )
+        else:
+            alignment = "Neutral"
+            adjustment_note = (
+                f"Global cues are balanced ({macro_score:+0.2f}). Price auction will be guided "
+                f"primarily by internal CPR levels and baseline SMC liquidity targets."
+            )
+    elif is_tech_bearish:
+        if macro_score <= -1.0:
+            alignment = "Aligned"
+            adjustment_note = (
+                f"Global Headwind ({macro_score}) confirms technical bearish continuation. "
+                f"Opening gap-down pressure targets PDL sell-stop pools and S1 support."
+            )
+        elif macro_score >= 1.5:
+            alignment = "Divergent"
+            adjustment_note = (
+                f"⚠️ Global Tailwind (+{macro_score}) opposes bearish technical setup. "
+                f"Expect opening bounce. Stand down on short trades until price confirms "
+                f"rejection at PDH or Central Pivot."
+            )
+        else:
+            alignment = "Neutral"
+            adjustment_note = (
+                f"Global cues are neutral ({macro_score:+0.2f}). Technical mean-reversion "
+                f"into Central Pivot remains the primary auction roadmap."
+            )
+    else: # Range / Compression
+        if abs(macro_score) >= 2.0:
+            alignment = "Breakout Catalyst"
+            direction = "Upside" if macro_score > 0 else "Downside"
+            target_lvl = "PDH" if macro_score > 0 else "PDL"
+            adjustment_note = (
+                f"High global momentum ({macro_score:+0.2f}) serves as external fuel to break "
+                f"yesterday's compression. Favors {direction} breakout towards {target_lvl}."
+            )
+        else:
+            alignment = "Range Bound"
+            adjustment_note = (
+                f"Global cues are balanced ({macro_score:+0.2f}). Confirms range-bound expectation "
+                f"between S1 and R1. Fading range extremes remains the favored tactic."
+            )
+            
+    prediction["overnight_synthesis"] = {
+        "alignment": alignment,
+        "macro_bias": bias_desc,
+        "macro_score": macro_score,
+        "gap_expectation": gap_exp,
+        "adjustment_note": adjustment_note
+    }
+    return prediction
+
+
 def main():
     print("=" * 60)
     print("Fetching NIFTY 50 Market Data with SMC Quantitative Engine...")
     print("=" * 60)
     
     existing_records_dict = {}
+    existing_overnight_macro = None
     if DATA_PATH.exists():
         try:
             with open(DATA_PATH, "r", encoding="utf-8") as f:
                 old_data = json.load(f)
                 for item in old_data.get("history", []):
                     existing_records_dict[item["date"]] = item
+                existing_overnight_macro = old_data.get("overnight_macro")
             print(f"Loaded {len(existing_records_dict)} existing records from {DATA_PATH.name}")
         except Exception as e:
             print(f"Warning: could not read existing data ({e}), starting fresh")
@@ -690,8 +929,13 @@ def main():
     latest = enriched[-1] if enriched else None
     prev_day = enriched[-2] if len(enriched) > 1 else None
     
+    # Fetch Overnight Global Macro Factors & News
+    overnight_macro = fetch_overnight_macro_and_news(existing_macro=existing_overnight_macro)
+
     # Generate Next-Day Prediction backed by the validation scorecard
     next_day_prediction = generate_next_day_prediction(latest, prev_day, adr_20, validation_scorecard)
+    if next_day_prediction and overnight_macro:
+        next_day_prediction = synthesize_macro_with_prediction(next_day_prediction, overnight_macro)
     
     utc_now = datetime.datetime.now(datetime.timezone.utc)
     ist_now = utc_now + datetime.timedelta(hours=5, minutes=30)
@@ -714,6 +958,7 @@ def main():
         "latest": latest,
         "prev_day": prev_day,
         "validation_scorecard": validation_scorecard,
+        "overnight_macro": overnight_macro,
         "next_day_prediction": next_day_prediction,
         "history": enriched
     }
@@ -723,6 +968,13 @@ def main():
         json.dump(output_payload, f, indent=2)
         
     print(f"Successfully saved {len(enriched)} records to {DATA_PATH}")
+    if overnight_macro:
+        print("\n--- OVERNIGHT GLOBAL & MACRO RADAR ---")
+        print(f"Macro Score: {overnight_macro['macro_score']:+.2f} ({overnight_macro['bias']})")
+        print(f"Opening Exp: {overnight_macro['gap_expectation']}")
+        print(f"Decisions:   {len(overnight_macro['decision_factors'])} factors identified")
+        print(f"Headlines:   {len(overnight_macro['news_headlines'])} overnight news items")
+        print("--------------------------------------")
     if next_day_prediction:
         print("\n--- NEXT-DAY SMC PREDICTION ---")
         print(f"Setup:      {next_day_prediction['setup_name']}")
@@ -731,6 +983,8 @@ def main():
         print(f"Target:     {next_day_prediction['primary_liquidity_target']}")
         print(f"Stop/Inval: {next_day_prediction['invalidation_level']}")
         print(f"Playbook:   {next_day_prediction['playbook']}")
+        if "overnight_synthesis" in next_day_prediction:
+            print(f"Global Adj: {next_day_prediction['overnight_synthesis']['adjustment_note']}")
         print("-------------------------------\n")
 
 

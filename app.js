@@ -221,6 +221,23 @@ const el = {
   predRrRatio: document.getElementById('pred-rr-ratio'),
   ttCloseBtn: document.getElementById('tt-close-btn'),
 
+  // Overnight Global Macro Radar Elements
+  overnightMacroCard: document.getElementById('overnight-macro-card'),
+  macroBiasBadge: document.getElementById('macro-bias-badge'),
+  macroGapBadge: document.getElementById('macro-gap-badge'),
+  macroSynthesisText: document.getElementById('macro-synthesis-text'),
+  btnMacroBreakdown: document.getElementById('btn-macro-breakdown'),
+  macroScorePill: document.getElementById('macro-score-pill'),
+  macroPopover: document.getElementById('macro-popover'),
+  macroPopClose: document.getElementById('macro-pop-close'),
+  macroPopSync: document.getElementById('macro-pop-sync'),
+  macroPopBiasTag: document.getElementById('macro-pop-bias-tag'),
+  macroPopGap: document.getElementById('macro-pop-gap'),
+  macroPopRationale: document.getElementById('macro-pop-rationale'),
+  macroPopFactors: document.getElementById('macro-pop-factors'),
+  macroTickersGrid: document.getElementById('macro-tickers-grid'),
+  macroNewsList: document.getElementById('macro-news-list'),
+
   // Table & Controls
   marketStatusBadge: document.getElementById('market-status-badge'),
   marketStatusText: document.getElementById('market-status-text'),
@@ -844,6 +861,122 @@ function renderSmcPrediction() {
 
   let structBadge = latest.smc_structure || 'Normal';
   el.smcStructureEvent.innerHTML = `<span class="term-tip" data-term="BOS">${structBadge}</span>`;
+
+  // Render Overnight Macro Radar & Cues
+  renderOvernightMacro(state.data?.overnight_macro, pred);
+}
+
+function renderOvernightMacro(macro, pred) {
+  if (!macro || !el.overnightMacroCard) return;
+
+  const score = macro.macro_score ?? 0;
+  const isTailwind = score > 0.5;
+  const isHeadwind = score < -0.5;
+
+  // Macro Bias Pill
+  if (el.macroBiasBadge) {
+    el.macroBiasBadge.textContent = macro.bias || 'Neutral';
+    el.macroBiasBadge.className = 'macro-badge ' + (isTailwind ? '' : (isHeadwind ? 'badge-headwind' : 'badge-neutral'));
+  }
+
+  // Gap Expectation
+  if (el.macroGapBadge) {
+    el.macroGapBadge.textContent = macro.gap_expectation || 'Flat / Range Open';
+  }
+
+  // Score Pill
+  if (el.macroScorePill) {
+    const sign = score > 0 ? '+' : '';
+    el.macroScorePill.textContent = `${sign}${score.toFixed(1)}`;
+    el.macroScorePill.style.color = isTailwind ? 'var(--green)' : (isHeadwind ? 'var(--red)' : 'var(--text-muted)');
+  }
+
+  // Synthesis text on bar
+  if (el.macroSynthesisText) {
+    if (pred?.overnight_synthesis?.adjustment_note) {
+      el.macroSynthesisText.textContent = pred.overnight_synthesis.adjustment_note;
+    } else {
+      el.macroSynthesisText.textContent = `${macro.bias} • Expected: ${macro.gap_expectation}`;
+    }
+  }
+
+  // Enhance the prediction box event rule with dynamic overnight status
+  if (el.predEventRule && pred?.overnight_synthesis) {
+    el.predEventRule.innerHTML = `<strong>Overnight Global Synthesis (${pred.overnight_synthesis.alignment}):</strong> ${pred.overnight_synthesis.adjustment_note}`;
+  }
+
+  // Populate Popover Contents
+  if (el.macroPopSync) el.macroPopSync.textContent = `Sync: ${macro.last_checked_ist || 'Active'}`;
+  if (el.macroPopBiasTag) {
+    const sign = score > 0 ? '+' : '';
+    el.macroPopBiasTag.textContent = `${macro.bias} (${sign}${score.toFixed(1)})`;
+    el.macroPopBiasTag.style.color = isTailwind ? 'var(--green)' : (isHeadwind ? 'var(--red)' : 'var(--text-muted)');
+  }
+  if (el.macroPopGap) el.macroPopGap.textContent = macro.gap_expectation || '--';
+
+  if (el.macroPopRationale) {
+    if (pred?.overnight_synthesis?.adjustment_note) {
+      el.macroPopRationale.innerHTML = `<strong>SMC Setup Alignment (${pred.overnight_synthesis.alignment}):</strong> ${pred.overnight_synthesis.adjustment_note}`;
+    } else {
+      el.macroPopRationale.textContent = 'Global markets overnight establish early momentum, liquidity shifts, and currency direction.';
+    }
+  }
+
+  // Factors List
+  if (el.macroPopFactors && Array.isArray(macro.decision_factors)) {
+    el.macroPopFactors.innerHTML = macro.decision_factors.map(f => `<li>${f}</li>`).join('');
+  }
+
+  // Tickers Grid (8 Factors)
+  if (el.macroTickersGrid && macro.market_data) {
+    const contextLabels = {
+      'Brent Crude': 'Crude drop eases India import cost & inflation',
+      'US Dollar Index': 'Dollar soft stabilizes INR & halts FII selling',
+      'US 10Y Yield': 'Yield shift influences equity valuation multiples',
+      'Nasdaq 100': 'Tech lead sets momentum for Indian IT heavyweights',
+      'S&P 500': 'Broad US equity benchmark sentiment',
+      'Dow Jones': 'US industrial & blue-chip performance',
+      'Nikkei 225': 'Early Asian morning risk appetite lead',
+      'Hang Seng': 'Greater China emerging market liquidity cues'
+    };
+
+    el.macroTickersGrid.innerHTML = Object.entries(macro.market_data).map(([name, item]) => {
+      const chg = item.change_pct ?? 0;
+      const isUp = chg >= 0;
+      const sign = isUp ? '+' : '';
+      const cls = chg > 0.05 ? 'up' : (chg < -0.05 ? 'down' : '');
+      const sub = contextLabels[name] || item.category || '';
+      const priceStr = item.price != null ? item.price.toLocaleString('en-US') : '--';
+
+      return `
+        <div class="macro-ticker-card">
+          <div class="tc-top">
+            <span class="tc-name">${name}</span>
+            <span class="tc-chg ${cls}">${sign}${chg.toFixed(2)}%</span>
+          </div>
+          <div class="tc-price">${priceStr}</div>
+          <div class="tc-sub">${sub}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // News List
+  if (el.macroNewsList && Array.isArray(macro.news_headlines)) {
+    if (macro.news_headlines.length === 0) {
+      el.macroNewsList.innerHTML = `<div style="font-size:0.75rem; color:var(--text-dim);">No overnight breaking headlines flagged.</div>`;
+    } else {
+      el.macroNewsList.innerHTML = macro.news_headlines.map(n => `
+        <a class="macro-news-item" href="${n.link || '#'}" target="_blank" rel="noopener noreferrer">
+          <span class="news-source-tag">${n.source || 'News'}</span>
+          <div class="news-title-wrap">
+            <div class="news-title">${n.title}</div>
+            <div class="news-time">${n.pub_date || ''}</div>
+          </div>
+        </a>
+      `).join('');
+    }
+  }
 }
 
 function openMarkModalWithPrediction() {
@@ -1537,6 +1670,86 @@ function setupEventListeners() {
   });
 }
 
+function initMacroPopover() {
+  if (!el.overnightMacroCard || !el.macroPopover) return;
+
+  let closeTimer = null;
+
+  function showPopover() {
+    clearTimeout(closeTimer);
+    el.macroPopover.style.display = 'block';
+
+    if (window.innerWidth > 640) {
+      const rect = el.overnightMacroCard.getBoundingClientRect();
+      const popWidth = Math.min(580, window.innerWidth - 30);
+      let left = rect.left + (rect.width / 2) - (popWidth / 2);
+      if (left < 15) left = 15;
+      if (left + popWidth > window.innerWidth - 15) left = window.innerWidth - popWidth - 15;
+
+      el.macroPopover.style.left = `${left}px`;
+      el.macroPopover.style.top = `${rect.bottom + 8}px`;
+    }
+
+    requestAnimationFrame(() => {
+      el.macroPopover.classList.add('visible');
+    });
+  }
+
+  function hidePopover() {
+    el.macroPopover.classList.remove('visible');
+    closeTimer = setTimeout(() => {
+      if (!el.macroPopover.classList.contains('visible')) {
+        el.macroPopover.style.display = 'none';
+      }
+    }, 200);
+  }
+
+  // Desktop Hover on Card and Button
+  el.overnightMacroCard.addEventListener('mouseenter', () => {
+    if (window.innerWidth > 640) showPopover();
+  });
+
+  el.overnightMacroCard.addEventListener('mouseleave', e => {
+    if (window.innerWidth > 640) {
+      if (e.relatedTarget && el.macroPopover.contains(e.relatedTarget)) return;
+      hidePopover();
+    }
+  });
+
+  el.macroPopover.addEventListener('mouseleave', e => {
+    if (window.innerWidth > 640) {
+      if (e.relatedTarget && el.overnightMacroCard.contains(e.relatedTarget)) return;
+      hidePopover();
+    }
+  });
+
+  // Mobile Click / Tap
+  el.overnightMacroCard.addEventListener('click', e => {
+    if (e.target.closest('.macro-pop-close')) return;
+    if (el.macroPopover.classList.contains('visible')) {
+      hidePopover();
+    } else {
+      showPopover();
+    }
+  });
+
+  if (el.macroPopClose) {
+    el.macroPopClose.addEventListener('click', e => {
+      e.stopPropagation();
+      hidePopover();
+    });
+  }
+
+  // Close when clicking outside
+  document.addEventListener('click', e => {
+    if (el.macroPopover.classList.contains('visible')) {
+      if (!el.macroPopover.contains(e.target) && !el.overnightMacroCard.contains(e.target)) {
+        hidePopover();
+      }
+    }
+  });
+}
+
 // ==========================================================================
 // Initialization
 // ==========================================================================
@@ -1547,6 +1760,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(updateMarketStatus, 60000);
 
   initTermTooltips();
+  initMacroPopover();
   loadMarks();
   setupEventListeners();
   loadNiftyData();
