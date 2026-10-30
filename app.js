@@ -447,22 +447,41 @@ function initTermTooltips() {
 
 function positionTooltip(clientX, clientY) {
   const tt = el.termTooltip;
-  if (!tt || window.innerWidth <= 640) return; // on mobile phones, CSS handles bottom popover positioning
+  if (!tt || window.innerWidth <= 640) return; // on mobile phones, CSS handles bottom drawer positioning
 
-  const padding = 14;
-  let x = (clientX || window.innerWidth / 2) + 16;
-  let y = (clientY || window.innerHeight / 2) + 16;
+  const pad = 16;
+  const dockBuffer = 32; // Buffer to guarantee macOS dock / taskbar never clips tooltip
+  const vh = window.innerHeight;
+  const vw = window.innerWidth;
+
+  // Set maximum height so tooltip never exceeds viewport
+  const maxH = vh - (pad * 2) - dockBuffer;
+  tt.style.maxHeight = `${Math.max(160, maxH)}px`;
+  tt.style.overflowY = 'auto';
 
   const rect = tt.getBoundingClientRect();
-  if (x + rect.width + padding > window.innerWidth) {
-    x = (clientX || window.innerWidth / 2) - rect.width - 12;
-  }
-  if (y + rect.height + padding > window.innerHeight) {
-    y = (clientY || window.innerHeight / 2) - rect.height - 12;
-  }
+  let x = (clientX || vw / 2) + 16;
+  let y = (clientY || vh / 2) + 16;
 
-  tt.style.left = `${Math.max(padding, x)}px`;
-  tt.style.top = `${Math.max(padding, y)}px`;
+  // Horizontal fit: flip to left of cursor if overflowing right
+  if (x + rect.width + pad > vw) {
+    x = (clientX || vw / 2) - rect.width - 14;
+  }
+  x = Math.max(pad, Math.min(x, vw - rect.width - pad));
+
+  // Vertical fit: flip above cursor if extending into dock
+  if (y + rect.height + dockBuffer > vh) {
+    const flippedY = (clientY || vh / 2) - rect.height - 14;
+    if (flippedY >= pad) {
+      y = flippedY;
+    } else {
+      y = Math.max(pad, vh - rect.height - dockBuffer);
+    }
+  }
+  y = Math.max(pad, y);
+
+  tt.style.left = `${Math.round(x)}px`;
+  tt.style.top = `${Math.round(y)}px`;
 }
 
 // ==========================================================================
@@ -1675,27 +1694,75 @@ function initMacroPopover() {
 
   let closeTimer = null;
 
+  function updatePosition() {
+    if (window.innerWidth <= 640) {
+      // Mobile style reset so responsive bottom drawer applies cleanly
+      el.macroPopover.style.left = '';
+      el.macroPopover.style.top = '';
+      el.macroPopover.style.bottom = '';
+      el.macroPopover.style.width = '';
+      el.macroPopover.style.maxHeight = '';
+      return;
+    }
+
+    const rect = el.overnightMacroCard.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const vw = window.innerWidth;
+    const dockBuffer = 32; // Generous safety buffer so macOS dock never cuts off popover
+    const topBuffer = 18;
+
+    // Horizontal positioning: Center with card, clamped within screen margins
+    const popWidth = Math.min(620, vw - 32);
+    let left = rect.left + (rect.width / 2) - (popWidth / 2);
+    left = Math.max(16, Math.min(left, vw - popWidth - 16));
+    el.macroPopover.style.left = `${Math.round(left)}px`;
+    el.macroPopover.style.width = `${Math.round(popWidth)}px`;
+
+    // Vertical positioning: evaluate available space above and below
+    const spaceBelow = vh - rect.bottom - dockBuffer;
+    const spaceAbove = rect.top - topBuffer;
+
+    if (spaceBelow >= 360) {
+      // Comfortably fits below trigger card
+      const maxH = Math.min(spaceBelow, 620);
+      el.macroPopover.style.top = `${Math.round(rect.bottom + 8)}px`;
+      el.macroPopover.style.bottom = 'auto';
+      el.macroPopover.style.maxHeight = `${Math.round(maxH)}px`;
+    } else if (spaceAbove > spaceBelow && spaceAbove >= 280) {
+      // More room above: flip ABOVE trigger card!
+      const maxH = Math.min(spaceAbove, 620);
+      el.macroPopover.style.top = 'auto';
+      el.macroPopover.style.bottom = `${Math.round(vh - rect.top + 8)}px`;
+      el.macroPopover.style.maxHeight = `${Math.round(maxH)}px`;
+    } else {
+      // Screen is tight vertically: clamp within topBuffer and dockBuffer
+      const maxH = Math.max(220, vh - topBuffer - dockBuffer);
+      const top = Math.max(topBuffer, Math.min(rect.bottom + 8, vh - maxH - dockBuffer));
+      el.macroPopover.style.top = `${Math.round(top)}px`;
+      el.macroPopover.style.bottom = 'auto';
+      el.macroPopover.style.maxHeight = `${Math.round(maxH)}px`;
+    }
+  }
+
   function showPopover() {
     clearTimeout(closeTimer);
-    el.macroPopover.style.display = 'block';
-
-    if (window.innerWidth > 640) {
-      const rect = el.overnightMacroCard.getBoundingClientRect();
-      const popWidth = Math.min(580, window.innerWidth - 30);
-      let left = rect.left + (rect.width / 2) - (popWidth / 2);
-      if (left < 15) left = 15;
-      if (left + popWidth > window.innerWidth - 15) left = window.innerWidth - popWidth - 15;
-
-      el.macroPopover.style.left = `${left}px`;
-      el.macroPopover.style.top = `${rect.bottom + 8}px`;
-    }
+    el.macroPopover.style.display = 'flex';
+    updatePosition();
 
     requestAnimationFrame(() => {
       el.macroPopover.classList.add('visible');
     });
   }
 
+  function scheduleHide() {
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(() => {
+      hidePopover();
+    }, 220); // 220ms grace period so moving mouse into popover is smooth
+  }
+
   function hidePopover() {
+    clearTimeout(closeTimer);
     el.macroPopover.classList.remove('visible');
     closeTimer = setTimeout(() => {
       if (!el.macroPopover.classList.contains('visible')) {
@@ -1711,17 +1778,39 @@ function initMacroPopover() {
 
   el.overnightMacroCard.addEventListener('mouseleave', e => {
     if (window.innerWidth > 640) {
-      if (e.relatedTarget && el.macroPopover.contains(e.relatedTarget)) return;
-      hidePopover();
+      if (e.relatedTarget && (el.macroPopover.contains(e.relatedTarget) || el.macroPopover === e.relatedTarget)) return;
+      scheduleHide();
     }
+  });
+
+  el.macroPopover.addEventListener('mouseenter', () => {
+    clearTimeout(closeTimer);
   });
 
   el.macroPopover.addEventListener('mouseleave', e => {
     if (window.innerWidth > 640) {
-      if (e.relatedTarget && el.overnightMacroCard.contains(e.relatedTarget)) return;
-      hidePopover();
+      if (e.relatedTarget && (el.overnightMacroCard.contains(e.relatedTarget) || el.overnightMacroCard === e.relatedTarget)) return;
+      scheduleHide();
     }
   });
+
+  // Dynamic repositioning on window resize or scroll
+  window.addEventListener('resize', () => {
+    if (el.macroPopover.classList.contains('visible')) {
+      updatePosition();
+    }
+  });
+
+  window.addEventListener('scroll', () => {
+    if (el.macroPopover.classList.contains('visible') && window.innerWidth > 640) {
+      const rect = el.overnightMacroCard.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > window.innerHeight) {
+        hidePopover();
+      } else {
+        updatePosition();
+      }
+    }
+  }, { passive: true });
 
   // Mobile Click / Tap
   el.overnightMacroCard.addEventListener('click', e => {
