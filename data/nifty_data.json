@@ -3,8 +3,8 @@
   "ticker": "^NSEI",
   "exchange": "NSE",
   "currency": "INR",
-  "last_updated": "2026-10-30 13:57:02 IST",
-  "last_updated_iso": "2026-10-30T13:57:02.679853+00:00",
+  "last_updated": "2026-10-30 22:17:47 IST",
+  "last_updated_iso": "2026-10-30T22:17:47.722723+00:00",
   "meta": {
     "fifty_two_week_high": 26373.2,
     "fifty_two_week_low": 22179.9,
@@ -18,21 +18,21 @@
     "open": 22964.5,
     "high": 23118.1,
     "low": 22905.1,
-    "close": 23027.75,
+    "close": 23053.1,
     "volume": 0,
     "range": 213.0,
     "range_pct": 0.93,
     "prev_close": 22936.75,
     "prev_high": 22961.95,
     "prev_low": 22656.75,
-    "change": 91.0,
-    "change_pct": 0.4,
+    "change": 116.35,
+    "change_pct": 0.51,
     "gap": 27.75,
     "gap_type": "Gap Up",
-    "body": 63.25,
-    "body_pct": 29.7,
-    "clq": 0.58,
-    "upper_wick": 90.35,
+    "body": 88.6,
+    "body_pct": 41.6,
+    "clq": 0.69,
+    "upper_wick": 65.0,
     "lower_wick": 59.4,
     "is_expansion_bar": false,
     "is_pinbar": false,
@@ -48,15 +48,15 @@
     "pwl": 22372.0,
     "equilibrium": 22677.58,
     "zone": "Premium",
-    "pivot": 23016.98,
-    "tc": 23022.36,
+    "pivot": 23025.43,
+    "tc": 23039.26,
     "bc": 23011.6,
-    "cpr_width": 10.76,
+    "cpr_width": 27.66,
     "cpr_type": "Narrow (Trend Potential)",
-    "r1": 23128.86,
-    "s1": 22915.86,
-    "r2": 23229.98,
-    "s2": 22803.98
+    "r1": 23145.76,
+    "s1": 22932.76,
+    "r2": 23238.43,
+    "s2": 22812.43
   },
   "prev_day": {
     "date": "2026-10-29",
@@ -163,40 +163,39 @@
   },
   "overnight_macro": {
     "status": "Active",
-    "last_checked_ist": "2026-10-30 13:57:02 IST",
-    "macro_score": 7.04,
-    "bias": "Strong Global Tailwind",
-    "gap_expectation": "Gap-Up Favored (+40 to +80 pts)",
+    "last_checked_ist": "2026-10-30 22:17:47 IST",
+    "macro_score": 2.09,
+    "bias": "Moderate Global Tailwind",
+    "gap_expectation": "Mild Gap-Up to Flat (+15 to +40 pts)",
     "decision_factors": [
-      "US Tech (Nasdaq +0.68%) provides directional momentum for Indian IT & growth heavyweights.",
+      "US Tech (Nasdaq -1.98%) provides directional momentum for Indian IT & growth heavyweights.",
       "Asian morning market cues (Nikkei 225 +1.77%) establish early opening risk sentiment.",
-      "Brent Crude dropped -2.68% to $112.71/bbl, easing imported inflation and reducing India's trade deficit (Tailwind for Paints, Autos, FMCG).",
-      "US Dollar Index softening (DXY -0.26%) reduces pressure on the Rupee and discourages foreign institutional (FII) capital outflow.",
-      "\u2694\ufe0f Geopolitical Shock Watch (War / Military Conflict): 'Ukraine war briefing: Outrage in Europe after Russian drone kills 14 on rail platform in Dnipro' (The Guardian). Conflict escalation increases supply risk on crude and prompts risk-off flows."
+      "Brent Crude dropped -2.06% to $113.42/bbl, easing imported inflation and reducing India's trade deficit (Tailwind for Paints, Autos, FMCG).",
+      "\u2694\ufe0f Geopolitical Shock Watch (War / Military Conflict): 'Iran war looming? Trump airport, Mar-a-Lago golf estate get missile shield' (India Today). Conflict escalation increases supply risk on crude and prompts risk-off flows."
     ],
     "market_data": {
       "S&P 500": {
         "symbol": "^GSPC",
         "category": "US Markets",
-        "price": 7720.39,
-        "prev_close": 7663.43,
-        "change_pct": 0.74,
-        "status": "Bullish"
+        "price": 7599.18,
+        "prev_close": 7623.68,
+        "change_pct": -0.32,
+        "status": "Bearish"
       },
       "Nasdaq 100": {
         "symbol": "^IXIC",
         "category": "US Markets",
-        "price": 26184.72,
-        "prev_close": 26008.86,
-        "change_pct": 0.68,
-        "status": "Bullish"
+        "price": 25440.87,
+        "prev_close": 25955.34,
+        "change_pct": -1.98,
+        "status": "Bearish"
       },
       "Dow Jones": {
         "symbol": "^DJI",
         "category": "US Markets",
-        "price": 52342.56,
-        "prev_close": 52867.98,
-        "change_pct": -0.99,
+        "price": 51931.05,
+        "prev_close": 52215.16,
+        "change_pct": -0.54,
         "status": "Bearish"
       },
       "Nikkei 225": {
@@ -218,26 +217,26 @@
       "Brent Crude": {
         "symbol": "BZ=F",
         "category": "Commodities & FX",
-        "price": 112.71,
+        "price": 113.42,
         "prev_close": 115.81,
-        "change_pct": -2.68,
+        "change_pct": -2.06,
         "status": "Bearish"
       },
       "US Dollar Index": {
         "symbol": "DX-Y.NYB",
         "category": "Commodities & FX",
-        "price": 101.7,
+        "price": 101.91,
         "prev_close": 101.96,
-        "change_pct": -0.26,
-        "status": "Bearish"
+        "change_pct": -0.05,
+        "status": "Neutral"
       },
       "US 10Y Yield": {
         "symbol": "^TNX",
         "category": "Commodities & FX",
-        "price": 4.99,
+        "price": 4.95,
         "prev_close": 4.99,
-        "change_pct": 0.02,
-        "status": "Neutral"
+        "change_pct": -0.82,
+        "status": "Bearish"
       }
     },
     "geopolitical_risk": {
@@ -247,21 +246,21 @@
       "risk_penalty": -2.5,
       "flagged_events": [
         {
-          "headline": "Ukraine war briefing: Outrage in Europe after Russian drone kills 14 on rail platform in Dnipro",
-          "category": "Geopolitical & War",
-          "shock_type": "War / Military Conflict",
-          "source": "The Guardian"
-        },
-        {
-          "headline": "Insane, will cause devastating escalation: US senator on Trump's Iran war plan",
+          "headline": "Iran war looming? Trump airport, Mar-a-Lago golf estate get missile shield",
           "category": "Geopolitical & War",
           "shock_type": "War / Military Conflict",
           "source": "India Today"
         },
         {
-          "headline": "Oil set for fourth monthly gain as Hormuz tanker attack highlights supply risks from war",
+          "headline": "Oil Prices Rise After Hormuz Tanker Attack, Houthi Claims Stoke Supply Fears",
           "category": "Geopolitical & War",
           "shock_type": "War / Military Conflict",
+          "source": "WSJ"
+        },
+        {
+          "headline": "Iran's IRGC Navy says three tankers catch fire in Strait of Hormuz",
+          "category": "Geopolitical & War",
+          "shock_type": "Geopolitical Trade / Supply Disruption",
           "source": "Reuters"
         }
       ]
@@ -276,38 +275,52 @@
       },
       {
         "category": "Market & Macro",
-        "title": "Gold slips as higher oil, US inflation data bolster Fed hike bets",
+        "title": "India's FX reserves dip for seventh straight week to hit over two-month low",
         "source": "Reuters",
-        "pub_date": "Fri, 30 Oct 2026 03:24:00 GMT",
-        "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOMFY2WEZOWHhyVDVPMkM2ZVUxM01TR09lcUZ0RlBWNF96QkJzWXhUZWpIbmlRSUlxN3FiZ0pEYWVXOW1YcVBQcHQ4cjU1NFpCQVlnS3pneWlKeTZIRjJzWkJuek9OeDhNSGxTU1ozV1g0czltbldNNkJORWRWS0ZBU25WdURjNWNpREdpdmZoV1c2ZzBnUmM5cm5HTG16OFpEdVhLWC13RkxHM3IxX1E?oc=5"
+        "pub_date": "Fri, 30 Oct 2026 13:33:03 GMT",
+        "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOMVdhVU9LVWhlNTdlQmJFYjdoWS15Nzd4YW1uZFM0UDlDbTNUcnFQMmtLWFRtU3A0WWN3S2pjd25KR1Vfc3NucHBMSGs2UDZJSVRhM0dETTg0WDlQcjRVUjNfWXc0eG1hOVY2Yk9KNl9PX2swM3lpR0J3cWxXZklZUl9acDFsQng4aHR5bi1JUEpBeVpZZzhUMUtIMEZoRWF3Nnpkdzd1ZlQ5bjZZckxwRmtSeXBsUQ?oc=5"
       },
       {
         "category": "Market & Macro",
-        "title": "Bank of Japan Declares Inflation Win, Clearing Way for Rate Hikes",
-        "source": "WSJ",
-        "pub_date": "Fri, 30 Oct 2026 06:34:00 GMT",
-        "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPWnJWU0FUQ3RzZzNCVjVCREZiMTJvOGI5UjU1VmlwR2lmYThxSGt2LS10eTEzd054TXpCVjhnRFlVcDBWYjAxOHRSSFZKdlVqMGJ0WDJGck43cTFGRXRiYW1TYTlrZUVEdEJVWVdCZjI4ZUV0czFUOC15dG9FYlpwRk5FOHFNR25RbWhrRVVPVlVkcWJUTGtrNVlzMnFaa1JjOGtrQjRLWG5JTnBrMi1R?oc=5"
+        "title": "Bank credit and interest rate trends for September show significant movements: RBI",
+        "source": "News On AIR",
+        "pub_date": "Fri, 30 Oct 2026 16:13:24 GMT",
+        "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPSTZad2hnQUJxYXFGaTY1QWszNkh4MENadkprWkFDRFBYdmw3aDVzeWVHMS1QSFBRTDhUSGdmTjN4OW01MjI1TmY1X2Z5NWpFcmY1dkQ4VlcyaHpQa3A3RzVBbUUzemVYNkZvYWRZR2I2dmU0R0pzVFZfTWF3RlZhcFNsWnF6V214dDJoOXZMd3h4SG5iMC1iV1FVZTlUaHRSZ1NLNTV3SmNCUmc?oc=5"
       },
       {
         "category": "Geopolitical & War",
-        "title": "Ukraine war briefing: Outrage in Europe after Russian drone kills 14 on rail platform in Dnipro",
-        "source": "The Guardian",
-        "pub_date": "Fri, 30 Oct 2026 07:04:00 GMT",
-        "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPSWt0VWJyTE1EbGtrSXlMd0NBcVZuZE1nMV9tMkNTVzVrQzFjTTVrZ1F5alhlVEJPdExmakltQkkybkRmNmd5X1ZEMTJ0QnZFNGFNejRPMG1jenhjQVRadEVUZTVnNmtJNDNnVzVPNlBSbGNIYjVGRml0QmlWc3Iyb1lEY09nbVE4TnluamRxdXJyZzR2SFA0a2J0QzQ4QlRFSUtJZ1d3X0FLNF9T?oc=5"
-      },
-      {
-        "category": "Geopolitical & War",
-        "title": "Insane, will cause devastating escalation: US senator on Trump's Iran war plan",
+        "title": "Iran war looming? Trump airport, Mar-a-Lago golf estate get missile shield",
         "source": "India Today",
-        "pub_date": "Fri, 30 Oct 2026 05:38:44 GMT",
-        "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNaVpvcWJkems0OWlnRmY1Z1l3Y0p1ekkxLUdiMHVxMXNOaFdLWE5LdmhYYmtnOWJPNFhvMGNlbGRBYXRET3Y1UEM4TVo5cXlWWkZfNTRMamNTdzVaOXI1ZmNzcXo3Mjc4UFZVZzE5T1dNS0pUbjdnRHg4RUdlbGxLVTNRcjZ0bjE4TktHeTQyOFl1WVRQNFRKajBNcGlXb0MzeFg3MmFUOVVTQkRkUXAxYlNWYTd3Z9IBuwFBVV95cUxPYTVwbjNySEJZMkNCbWtfeGY5WGV1Qzd0WVVtNjZrY2g0Smhkc2xRc3UtREVJc0paRE5NQVpEcGRycFRfNUkyUUdIVkhGeVFtYTN1WTlMOTVlUk5rU2RnQmk3MVhUUEs5dzhWWjRTZk96dWNQM08xUW5URkdLMTh3QWc0UzVfR3dEVzVLQU1xSWJkVEVvWEVja1RKbzA2Y1JhV0pYUXc5dVZvM2F4eGFzbHJnVmhMWGEzVC04?oc=5"
+        "pub_date": "Fri, 30 Oct 2026 08:15:10 GMT",
+        "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxNVXFpTUtWQV9lU3E0SlFBWk9rRV82aW55RC1MV1hURURRSm43VGlBdnNDUVhCLVVQdl85eF9obWlWV3N1RG1XRnFPU0RFZTZSQVFhaXRtMDZyME1SSlFpcVdzVkhSVXhjeDJUUEd6WFp2WWQxZlU4ZmdDZXhqLTh6SE9yVVBDbFJZcVJSMGdqeEJNakNNekIwMFZSa3VPTTRZTmNvZURXejVNQ0JnTjY2RkM4VzJkZV9hcEpBLTV4SEt3amdPdmNnME930gHPAUFVX3lxTE5DNXNFa0h2dzRFc3hhZ0VabmJoOTdxNmVBWFM3TUV5VWZ4V3l5U0lQTERYV3V0b2V0ZHZCTExNc1FteGdOV3ByaEk5WmhNbmt0OG5MRUM1dDVoR1NzaEJlYnZfTVdocmRKV0RkU2dSY2tiZlVoR19NN19ReGhwUmFwTFlEQko2MEoxLVFBWDRBX1Z0bURBMlRPSmFWVFdQN014WEV5WDlEUERsQWI3eDFIMjI0U1R0WTg3eHlKWTEzMjZSSkh1YmNBWm8xUFRlbw?oc=5"
       },
       {
         "category": "Geopolitical & War",
-        "title": "Oil set for fourth monthly gain as Hormuz tanker attack highlights supply risks from war",
+        "title": "Oil Prices Rise After Hormuz Tanker Attack, Houthi Claims Stoke Supply Fears",
+        "source": "WSJ",
+        "pub_date": "Fri, 30 Oct 2026 13:50:59 GMT",
+        "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPUnhpZVZHQUliUnJIQUJWb3JmbVl6VV9GZ3NJN0M3X0EzZU9pa2N4SEcybGNlakZkcmxyeVNqV0E5LWRxTU1VZUM4Uk9TdGZTS0RJLU1CZ1JVVFBlM0pTcWFPd2U0b1RFTkVyV2oxSzNwZzYzMjBwVmRtbUFvWUowS1RPSEQ3eE1Qa2ZQQVJ5SExsbzVXQTQtNlZYRC1Bbnh2YmpnZ2VGaHZLQlJDRWJRZEZOU2VCZ1hPcENQcTUtYw?oc=5"
+      },
+      {
+        "category": "Geopolitical & War",
+        "title": "Iran's IRGC Navy says three tankers catch fire in Strait of Hormuz",
         "source": "Reuters",
-        "pub_date": "Fri, 30 Oct 2026 02:27:00 GMT",
-        "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOWE5IUkRJTVJvTFE5SUdOdFFCM2tVN1lKcDI3ci01cjlleVVuXzB1SjI0MDhuWkhwakZFSzl3SGNUZk9uUUYwdHNfMGJOUXExaW1RdmRRVy1Cd0tHb3RqblJCQWczeXdORDVKbVMxMGFrbnVMM3FCY2h5Xzl6T0ZoeTBtbGdnbW9jdWF6VEtqNi14ZnlFaVVpb0xZcHlGTDhtM0ZmY2RYZ2Q?oc=5"
+        "pub_date": "Fri, 30 Oct 2026 13:08:58 GMT",
+        "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPMzdWakFCLTEzM2pYaGh6ZHpxZE9KMjh2QjkzcE1ieWVwa0dmRFZZWUlOamZJUlpwN0M1ajJuZ3dNRFJ4ZzJwSmFJaGl4cGFWTEZPYmI0UllLZ1lCRzIzWVpNSlhkQnpCejl4RFltVXJvV3QtcXhqY1JiUF91TjZmSU5XYXFHM05CcE1fbzV6dVNmOFFUNEExZm1qVTFQWnhBYnVyZkUxYmlRTnEtTHlla3l0RGxncHgwbDRyVVVuMjU?oc=5"
+      },
+      {
+        "category": "Crisis & Policy",
+        "title": "How can Israel break its election deadlock?",
+        "source": "Al Jazeera",
+        "pub_date": "Fri, 30 Oct 2026 10:52:27 GMT",
+        "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQR0luVWVIZklsVGlhTmdORlREX1oxbmFHb3BiUHd3WVFYd2V5Z2g2SUJlcHMwbWZna1BHaHNqLTN1bC10SmJJd0Z1MWpZT0R1X1JQZXJfWDR0RV9lNGVwMmpQY2VhRmZCU2g5OXRnTWhucXh2eHFkdXVNR1BPNlpjcUVVYmFsanhVcXdmONIBkgFBVV95cUxOTDRUV0tDc25icVlrNUwya2hBUHNfQV9WT1NjWC1CYTVieFdCRFpONlFRcjQ2a3Jsamg3cERZXzFlSkVpdkQwVmhuUHg2UXpnSTJXbjdLNW5yM3NxRm9KM2ZPczJySUlBYjNNVUR5dXo5d3JJbjJIWlprZC1kbVoyMTctUUs1WnVpRU5GZEZQVlY2Zw?oc=5"
+      },
+      {
+        "category": "Crisis & Policy",
+        "title": "Inside Democrats\u2019 Secret Effort to Stack Alaska\u2019s Midterm Ballot With Another Dan Sullivan",
+        "source": "The New York Times",
+        "pub_date": "Wed, 28 Oct 2026 14:37:47 GMT",
+        "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNVXZoZnd5TWlac1BNQkoyZGw1UHR6RkphN3J4S3E2bkZXbFN4SFhKcWdGQkhyNXJfblNQWTJkbXBxeHZZSTBoa0RLc18xSnpxX3dJR1FiYm5hdTdER0FWVEJRRGg3T0Nwek41ZmJFX3ZFdUtjeV83T0YzUDVvN3BhZEU3d2hocWx5ZUZQdGx0SEx4Y1hu?oc=5"
       },
       {
         "category": "Crisis & Policy",
@@ -315,50 +328,36 @@
         "source": "CNBC",
         "pub_date": "Fri, 30 Oct 2026 03:28:00 GMT",
         "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOcjZLZHRxZkVSV2NDbHE3ai00Q1R6bE52bUJPUXhTSGFkNWJpRnhFeFdMS3ZZZFNod2xvLW14cnBzN1VGYXBkZDliV0MwRm5XcVE3djl6UVpqVEhVWVZGMjdyR0o5U2Jua0k5V2FkTGR1aVptSE9OX0dYQ3ZTREZnWktxamJjdXhheWJkMlpoVl9iZ9IBlwFBVV95cUxOTmJZay1naWtSSEQ5V1JFTnduMnNxMmh1NGFQOVZ1eGplRFRxall0cFd4RExKQzRBZGhCb3YxT2RRSXhqVTRaSTdzQU80NUFCNE91cUpsWnBPNFcxUTd1OEtfcHBKd0Z1Y3JJM2R5Zy1Xc09MSWVhRDBZWGdoN0VuWHhuVU5ha2kzX243NUNja1hWTEdHc093?oc=5"
-      },
-      {
-        "category": "Crisis & Policy",
-        "title": "Israel election result shows no overall majority as vote count complete",
-        "source": "Al Jazeera",
-        "pub_date": "Thu, 29 Oct 2026 20:29:43 GMT",
-        "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPdlRKcmM0b2Q5Q3I3YS1KejlBOUVUNGtpZ3k0NG0wRG1uZHlKWktycWtnd1JQLUh2dG1LWWxaTVJMRTZFTDB3OXpXaVVVQlBXQm1YUzFPeU16b2dQdDVjcU1yRWdzOXV5V0lqNVo2X0pNVFlYXzE2eEFrU3U3bEdwT1JnRmRHMlRrTW4tMDhvcVJIdHVqZEFOMjNmVXpNMWVrajhJNlRGcWh3SHljTVVHWG1EVdIBuAFBVV95cUxNTFNTejBtc3J6M1Q2aVJrVWpLSTBrNWo5RlFLUVh1a05kbFh0YUZRTTUwXzA5Wlh6WGlYUXNBbEVFVHAzMGd4c2JSSmpzZW1sdGkySThWb29DeDVteGpGbUJsMEtjTEEzY3pvMDZWSWJZQ2dITGkzUFdQWkhFR1lOZTd2TERVOW5XN1JHa0dHdWtwcEhQc3pTOENabXZESExtZnhIVy1DNFEwTlZtSm5YSWJya3lMdUZE?oc=5"
-      },
-      {
-        "category": "Crisis & Policy",
-        "title": "Israel election results: Neither Netanyahu nor opposition wins majority; what happens next?",
-        "source": "The Times of India",
-        "pub_date": "Fri, 30 Oct 2026 06:32:00 GMT",
-        "link": "https://news.google.com/rss/articles/CBMi_AFBVV95cUxOa3NZU3hOMWFQZjZvWDJWNzgxNjdGNGl0S2JKczdmNWtEdWE0MW15VlRBX0Z3ajUwR3d5MllRaU81TnJsbVVfLVdEbFJBVDBFSHVnY25MdGMwYXVnTXA5WXptSnVQVldLcDlGTkpnRWNoMzQzb1VKQk9EWXFhZVJOTEg1TjNQZEdPX1FXVzdfZ3k0YXR5Q0phRHlvcVctNlR2clFIZmlIbVZNeEluR1dIZVU4QktxVTlXU0Q5ZVBiZmdsQkFITGxXM2tMc0NRTkNKSThSOGdhNnpQMTJXS0taTDBpRkJLRlU4dHhpNGl3dE41dFJoYjN2ZTNadWzSAYICQVVfeXFMTUlpSEZ4NGEzTGViQk9rYVJEMWhIUEdVMkQzUTAyOFZDRVNMaEM1aTFVWkNlMllnOE8tZFBqZUdwOEx1bzVQNlJNQnZYVWFDenpfU1VoR09lcmJyZS12eXIwNUVXZC1hMk5zLXJCRFpyRnBaSGhLM25CRTh4ZExkcU51V0hlN3p3ZDJEQVJ4bURRaWJPNW1mQlVSTXM4SlVHV1RjVFc1SzBDVDRlYjU5cHlTZ3NwcFlMODV5dDYxQU1jekJDWHh5aHNpd1dFSjl3S3d2a2lraEhCZk9SUnZzdksyT2s0OURhYkZKc2ZqMFBra0ZXRUFnZXAwTUV0MkR6Vkh3?oc=5"
       }
     ]
   },
   "next_day_prediction": {
-    "setup_name": "Mean Reversion / Range",
-    "bias": "Rangebound Auction / Mean Reversion",
-    "confidence": "Moderate (52.6% CPR test)",
-    "historical_win_rate": "52.6% Verified (38 Sessions)",
-    "win_rate_pct": 52.6,
-    "clq": 0.5758215962441383,
+    "setup_name": "Bullish BOS",
+    "bias": "Bullish Trend Continuation",
+    "confidence": "High (67.4% Win Rate)",
+    "historical_win_rate": "67.4% Verified (46 Sessions)",
+    "win_rate_pct": 67.4,
+    "clq": 0.6948356807511737,
     "opening_gate": {
-      "condition": "Open within CPR S1-R1 band",
+      "condition": "Open >= Central Pivot (23025.43) -> Confirmed 92.5% Hit Rate",
       "gate_win_rate": "84.1% Confirmed Hit Rate",
       "invalidation_action": "If opening print violates gate, stand down (win rate drops to 37.5%)"
     },
-    "risk_reward_ratio": "1 : 1.8",
-    "primary_liquidity_target": "Central Pivot (23016.98)",
-    "secondary_target": "PDH: 23118.1 / PDL: 22905.1",
-    "invalidation_level": "Unscheduled breakout with volume expansion",
-    "cpr_structure": "Narrow CPR (10.76 pts) indicates high probability of a strong Trending Expansion Day (>1.2x ADR).",
+    "risk_reward_ratio": "1 : 2.2",
+    "primary_liquidity_target": "PDH Sweep (23118.1) & R1 (23145.76)",
+    "secondary_target": "R2: 23238.43",
+    "invalidation_level": "Break below Bottom Central Pivot (23011.6)",
+    "cpr_structure": "Narrow CPR (27.66 pts) indicates high probability of a strong Trending Expansion Day (>1.2x ADR).",
     "expected_range_adr": "307.36 pts",
-    "rationale": "Balanced rotation without structural breakout. Price settled in equilibrium (CLQ: 0.58). Expected to oscillate between support and resistance.",
-    "playbook": "Fade extremes (buy near 22915.86, sell near 23128.86). Target CPR (23016.98).",
-    "event_rule": "\ud83d\udea8 GEOPOLITICAL / CRISIS ALERT: Critical Geopolitical / Conflict Shocks Detected ('Ukraine war briefing: Outrage in Europe after Russian drone kills 14 on rail platform in Dnipro'). Elevated gap volatility risk. The 9:15 AM Opening Execution Gate is MANDATORY.",
+    "rationale": "Break of Structure (BOS): Daily close broke and held cleanly above previous high (22961.95) with strong auction settlement (CLQ: 0.69). Trend inertia remains dominant (67.4% hit rate).",
+    "playbook": "Expect shallow opening dips into Central Pivot (23025.43) to act as demand. Ride continuation momentum towards PDH (23118.1) and target R1 (23145.76).",
+    "event_rule": "\ud83d\udea8 GEOPOLITICAL / CRISIS ALERT: Critical Geopolitical / Conflict Shocks Detected ('Iran war looming? Trump airport, Mar-a-Lago golf estate get missile shield'). Elevated gap volatility risk. The 9:15 AM Opening Execution Gate is MANDATORY.",
     "overnight_synthesis": {
-      "alignment": "Breakout Catalyst",
-      "macro_bias": "Strong Global Tailwind",
-      "macro_score": 7.04,
-      "gap_expectation": "Gap-Up Favored (+40 to +80 pts)",
-      "adjustment_note": "High global momentum (+7.04) serves as external fuel to break yesterday's compression. Favors Upside breakout towards PDH."
+      "alignment": "Aligned",
+      "macro_bias": "Moderate Global Tailwind",
+      "macro_score": 2.09,
+      "gap_expectation": "Mild Gap-Up to Flat (+15 to +40 pts)",
+      "adjustment_note": "Global Tailwind (+2.09) reinforces technical bullish structure. Expected Mild Gap-Up to Flat (+15 to +40 pts) increases odds of early PDH liquidity sweep. Opening Gate confirmation probability elevated."
     }
   },
   "history": [
@@ -12714,21 +12713,21 @@
       "open": 22964.5,
       "high": 23118.1,
       "low": 22905.1,
-      "close": 23027.75,
+      "close": 23053.1,
       "volume": 0,
       "range": 213.0,
       "range_pct": 0.93,
       "prev_close": 22936.75,
       "prev_high": 22961.95,
       "prev_low": 22656.75,
-      "change": 91.0,
-      "change_pct": 0.4,
+      "change": 116.35,
+      "change_pct": 0.51,
       "gap": 27.75,
       "gap_type": "Gap Up",
-      "body": 63.25,
-      "body_pct": 29.7,
-      "clq": 0.58,
-      "upper_wick": 90.35,
+      "body": 88.6,
+      "body_pct": 41.6,
+      "clq": 0.69,
+      "upper_wick": 65.0,
       "lower_wick": 59.4,
       "is_expansion_bar": false,
       "is_pinbar": false,
@@ -12744,15 +12743,15 @@
       "pwl": 22372.0,
       "equilibrium": 22677.58,
       "zone": "Premium",
-      "pivot": 23016.98,
-      "tc": 23022.36,
+      "pivot": 23025.43,
+      "tc": 23039.26,
       "bc": 23011.6,
-      "cpr_width": 10.76,
+      "cpr_width": 27.66,
       "cpr_type": "Narrow (Trend Potential)",
-      "r1": 23128.86,
-      "s1": 22915.86,
-      "r2": 23229.98,
-      "s2": 22803.98
+      "r1": 23145.76,
+      "s1": 22932.76,
+      "r2": 23238.43,
+      "s2": 22812.43
     }
   ]
 }
