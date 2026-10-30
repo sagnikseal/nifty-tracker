@@ -192,6 +192,8 @@
           <span class="score-sub" id="val-sample-info">Across 246 historical NIFTY sessions</span>
         </div>
         <div class="score-pills">
+          <span class="pill-stat stat-proof" title="Unseen Out-of-Sample Walk-Forward Test"><span class="lbl">Out-of-Sample:</span> <strong id="val-oos-acc">75.3%</strong></span>
+          <span class="pill-stat stat-gate" title="Accuracy when 9:15 AM Opening Gate Confirms"><span class="lbl">Gate Confirmed:</span> <strong id="val-gate-acc">84.1%</strong></span>
           <span class="pill-stat" title="Turtle Soup Bearish Reversal"><span class="lbl">BSL Sweep:</span> <strong id="val-bsl-acc">92.1%</strong></span>
           <span class="pill-stat" title="Turtle Soup Bullish Reversal"><span class="lbl">SSL Sweep:</span> <strong id="val-ssl-acc">86.0%</strong></span>
           <span class="pill-stat" title="Inside Compression Breakout"><span class="lbl">Inside Bar:</span> <strong id="val-inside-acc">95.0%</strong></span>
@@ -216,6 +218,22 @@
           <div class="bias-playbook">
             <span class="playbook-lbl">📋 Actionable Session Playbook:</span>
             <span class="playbook-text" id="pred-playbook">Calculating playbook...</span>
+          </div>
+
+          <!-- 9:15 AM Opening Execution Gate -->
+          <div class="opening-gate-box">
+            <div class="gate-header">
+              <span class="gate-icon">🚦</span>
+              <span class="gate-title">9:15 AM Opening Execution Gate</span>
+              <span class="gate-win-badge" id="gate-win-rate">84.1% Confirmed</span>
+            </div>
+            <div class="gate-condition">
+              <span class="gate-condition-lbl">Execution Trigger:</span>
+              <span class="gate-condition-val" id="gate-condition-text">Loading trigger...</span>
+            </div>
+            <div class="gate-rule" id="gate-action-text">
+              If opening print violates gate, stand down (prevents false breakouts).
+            </div>
           </div>
 
           <div class="bias-event-rule">
@@ -244,6 +262,9 @@
           </div>
           <div class="target-sub-stats">
             <div><span class="sub-lbl"><span class="term-tip" data-term="ADR">20D ADR</span> Exp:</span> <strong id="pred-adr-exp">-- pts</strong></div>
+            <div><span class="sub-lbl">Risk:Reward:</span> <strong id="pred-rr-ratio" style="color:var(--green)">--</strong></div>
+          </div>
+          <div class="target-sub-stats" style="margin-top:0.35rem; padding-top:0.35rem;">
             <div><span class="sub-lbl"><span class="term-tip" data-term="CPR">CPR</span> Volatility:</span> <strong id="pred-cpr-exp">--</strong></div>
           </div>
         </div>

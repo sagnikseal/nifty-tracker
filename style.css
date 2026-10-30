@@ -1631,6 +1631,24 @@ body.theme-light .smc-prediction-card {
   color: var(--green);
 }
 
+.pill-stat.stat-proof {
+  border-color: rgba(59, 130, 246, 0.4);
+  background: var(--blue-glow);
+}
+
+.pill-stat.stat-proof strong {
+  color: var(--blue);
+}
+
+.pill-stat.stat-gate {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.pill-stat.stat-gate strong {
+  color: var(--yellow);
+}
+
 .setup-identifier {
   margin-bottom: 0.35rem;
 }
@@ -1666,6 +1684,69 @@ body.theme-light .smc-prediction-card {
 
 .playbook-text {
   color: var(--text-main);
+}
+
+/* 9:15 AM Opening Execution Gate */
+.opening-gate-box {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(16, 185, 129, 0.06) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.8rem;
+  margin-bottom: 0.65rem;
+}
+
+.gate-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.gate-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--yellow);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex: 1;
+}
+
+.gate-win-badge {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--green);
+  border: 1px solid var(--green-border);
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-full);
+}
+
+.gate-condition {
+  font-size: 0.78rem;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+.gate-condition-lbl {
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-right: 0.3rem;
+}
+
+.gate-condition-val {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--blue);
+}
+
+.gate-rule {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  line-height: 1.35;
+  font-style: italic;
 }
 
 .target-row.target-inval {
