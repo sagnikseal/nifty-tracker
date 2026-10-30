@@ -39,37 +39,37 @@
           Sync: Fetching...
         </div>
         <div class="header-actions">
-          <button id="btn-quick-mark" class="btn btn-primary" title="Add trading note / mark for today">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button id="btn-quick-mark" class="btn btn-primary btn-action-main" title="Add trading note / mark for today">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 20h9"></path>
               <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
             </svg>
-            <span>Mark Trading Info</span>
+            <span class="btn-text">Mark Info</span>
           </button>
-          <button id="btn-open-glossary" class="btn btn-outline" title="Open SMC & Trading Terminology Cheat Sheet with Full Forms & Explanations">
-            📖 <span>SMC Glossary</span>
+          <button id="btn-open-glossary" class="btn btn-outline" title="Open SMC & Trading Terminology Cheat Sheet">
+            📖 <span class="btn-text">Glossary</span>
           </button>
           <button id="btn-github-sync" class="btn btn-outline" title="Sync marks directly to your GitHub repository">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M19 18a3.5 3.5 0 0 0 0-7h-1A5 5 0 0 0 8 7.2 3.5 3.5 0 0 0 5 13a3.5 3.5 0 0 0 0 7h14z"></path>
             </svg>
-            <span id="sync-btn-label">GitHub Sync</span>
+            <span id="sync-btn-label" class="btn-text">Sync</span>
           </button>
-          <button id="btn-export-journal" class="btn btn-outline" title="Export your journal and marks">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button id="btn-export-journal" class="btn btn-outline btn-desktop-only" title="Export your journal and marks">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            <span>Export</span>
+            <span class="btn-text">Export</span>
           </button>
-          <button id="btn-import-journal" class="btn btn-outline" title="Import backup of marks">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button id="btn-import-journal" class="btn btn-outline btn-desktop-only" title="Import backup of marks">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="17 8 12 3 7 8"></polyline>
               <line x1="12" y1="3" x2="12" y2="15"></line>
             </svg>
-            <span>Import</span>
+            <span class="btn-text">Import</span>
           </button>
           <input type="file" id="import-file-input" accept=".json" style="display:none;">
           <button id="btn-theme-toggle" class="btn btn-icon" title="Toggle Dark/Light theme">
@@ -185,6 +185,21 @@
         </div>
       </div>
 
+      <!-- Statistical Historical Validation Banner -->
+      <div class="validation-score-bar">
+        <div class="score-main">
+          <span class="score-badge" id="val-overall-acc">⚡ 76.4% Verified Accuracy</span>
+          <span class="score-sub" id="val-sample-info">Across 246 historical NIFTY sessions</span>
+        </div>
+        <div class="score-pills">
+          <span class="pill-stat" title="Turtle Soup Bearish Reversal"><span class="lbl">BSL Sweep:</span> <strong id="val-bsl-acc">92.1%</strong></span>
+          <span class="pill-stat" title="Turtle Soup Bullish Reversal"><span class="lbl">SSL Sweep:</span> <strong id="val-ssl-acc">86.0%</strong></span>
+          <span class="pill-stat" title="Inside Compression Breakout"><span class="lbl">Inside Bar:</span> <strong id="val-inside-acc">95.0%</strong></span>
+          <span class="pill-stat" title="Bearish Break of Structure"><span class="lbl">Bearish BOS:</span> <strong id="val-bear-bos-acc">76.4%</strong></span>
+          <span class="pill-stat" title="Bullish Break of Structure"><span class="lbl">Bullish BOS:</span> <strong id="val-bull-bos-acc">67.4%</strong></span>
+        </div>
+      </div>
+
       <div class="smc-grid">
         <!-- Col 1: Algorithmic Direction & Momentum -->
         <div class="smc-box box-bias">
@@ -192,8 +207,17 @@
             <span>Next-Day Directional Bias</span>
             <span class="box-sub-badge" id="pred-confidence">-- Confidence</span>
           </div>
+          <div class="setup-identifier">
+            <span class="setup-tag" id="pred-setup-name">SMC Setup</span>
+          </div>
           <div class="bias-headline" id="pred-bias-text">Loading Forecast...</div>
           <div class="bias-rationale" id="pred-rationale">Analyzing candle dominance, closing acceptance, and liquidity sweep patterns...</div>
+          
+          <div class="bias-playbook">
+            <span class="playbook-lbl">📋 Actionable Session Playbook:</span>
+            <span class="playbook-text" id="pred-playbook">Calculating playbook...</span>
+          </div>
+
           <div class="bias-event-rule">
             <span class="icon-warning">⚠️</span>
             <span id="pred-event-rule">Notice: Major overnight events, breaking news, or opening gaps > 60 pts invalidate technical continuation.</span>
@@ -213,6 +237,10 @@
           <div class="target-row">
             <span class="target-tag tag-secondary">Opposing Guard</span>
             <div class="target-val" id="pred-secondary-target">--</div>
+          </div>
+          <div class="target-row target-inval">
+            <span class="target-tag tag-invalidation">Invalidation / Stop</span>
+            <div class="target-val" id="pred-invalidation">--</div>
           </div>
           <div class="target-sub-stats">
             <div><span class="sub-lbl"><span class="term-tip" data-term="ADR">20D ADR</span> Exp:</span> <strong id="pred-adr-exp">-- pts</strong></div>
@@ -303,6 +331,10 @@
             Download CSV
           </button>
         </div>
+      </div>
+
+      <div class="mobile-table-hint">
+        <span>👈 Swipe table horizontally to view all metrics 👉</span>
       </div>
 
       <div class="table-wrapper">
@@ -590,11 +622,14 @@
     </div>
   </div>
 
-  <!-- FLOATING TERM TOOLTIP (Hover Activated) -->
+  <!-- FLOATING TERM TOOLTIP (Hover & Touch Activated) -->
   <div id="term-tooltip" class="term-tooltip" style="display: none;">
     <div class="tt-header">
-      <span class="tt-term" id="tt-term">TERM</span>
-      <span class="tt-full" id="tt-full">Full Term Name</span>
+      <div style="display:flex; align-items:baseline; gap:0.5rem; flex:1;">
+        <span class="tt-term" id="tt-term">TERM</span>
+        <span class="tt-full" id="tt-full">Full Term Name</span>
+      </div>
+      <button class="tt-close-btn" id="tt-close-btn" title="Close">&times;</button>
     </div>
     <div class="tt-body" id="tt-body">Definition text goes here.</div>
     <div class="tt-smc" id="tt-smc">

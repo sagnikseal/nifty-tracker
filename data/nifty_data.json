@@ -3,23 +3,69 @@
   "ticker": "^NSEI",
   "exchange": "NSE",
   "currency": "INR",
-  "last_updated": "2026-10-30 02:35:41 IST",
-  "last_updated_iso": "2026-10-30T02:35:41.191321+00:00",
+  "last_updated": "2026-10-30 11:53:52 IST",
+  "last_updated_iso": "2026-10-30T11:53:52.649496+00:00",
   "meta": {
     "fifty_two_week_high": 26373.2,
     "fifty_two_week_low": 22179.9,
-    "adr_20": 307.42,
-    "adr_5": 311.91,
-    "total_trading_days": 247
+    "adr_20": 305.6,
+    "adr_5": 264.41,
+    "total_trading_days": 248
   },
   "latest": {
+    "date": "2026-10-30",
+    "day": "Friday",
+    "open": 22964.5,
+    "high": 23082.85,
+    "low": 22905.1,
+    "close": 23065.1,
+    "volume": 0,
+    "range": 177.75,
+    "range_pct": 0.77,
+    "prev_close": 22936.75,
+    "prev_high": 22961.95,
+    "prev_low": 22656.75,
+    "change": 128.35,
+    "change_pct": 0.56,
+    "gap": 27.75,
+    "gap_type": "Gap Up",
+    "body": 100.6,
+    "body_pct": 56.6,
+    "clq": 0.9,
+    "upper_wick": 17.75,
+    "lower_wick": 59.4,
+    "is_expansion_bar": false,
+    "is_pinbar": false,
+    "candle_type": "Bullish",
+    "is_inside_day": false,
+    "is_outside_day": false,
+    "pdh_sweep": false,
+    "pdl_sweep": false,
+    "bullish_bos": true,
+    "bearish_bos": false,
+    "smc_structure": "Bullish BOS (Expansion)",
+    "pwh": 23175.25,
+    "pwl": 22372.0,
+    "equilibrium": 22677.58,
+    "zone": "Premium",
+    "pivot": 23017.68,
+    "tc": 23041.39,
+    "bc": 22993.97,
+    "cpr_width": 47.42,
+    "cpr_type": "Average",
+    "r1": 23130.26,
+    "s1": 22952.51,
+    "r2": 23195.43,
+    "s2": 22839.93
+  },
+  "prev_day": {
     "date": "2026-10-29",
     "day": "Thursday",
     "open": 22690.65,
     "high": 22961.95,
     "low": 22656.75,
     "close": 22936.75,
-    "volume": 0,
+    "volume": 344000,
     "range": 305.2,
     "range_pct": 1.35,
     "prev_close": 22698.85,
@@ -31,6 +77,7 @@
     "gap_type": "Flat",
     "body": 246.1,
     "body_pct": 80.6,
+    "clq": 0.92,
     "upper_wick": 25.2,
     "lower_wick": 33.9,
     "is_expansion_bar": true,
@@ -55,62 +102,74 @@
     "r1": 23046.89,
     "s1": 22741.69,
     "r2": 23157.02,
-    "s2": 22546.62
+    "s2": 22546.62,
+    "historical_setup": "Bullish BOS",
+    "expected_target": "PDH Sweep & R1 Expansion",
+    "prediction_verified": true,
+    "verification_detail": "Swept PDH (High 23082.85 >= 22961.95)"
   },
-  "prev_day": {
-    "date": "2026-10-28",
-    "day": "Wednesday",
-    "open": 22678.0,
-    "high": 22778.05,
-    "low": 22497.7,
-    "close": 22698.85,
-    "volume": 295000,
-    "range": 280.35,
-    "range_pct": 1.24,
-    "prev_close": 22749.75,
-    "prev_high": 22829.75,
-    "prev_low": 22636.85,
-    "change": -50.9,
-    "change_pct": -0.22,
-    "gap": -71.75,
-    "gap_type": "Gap Down",
-    "body": 20.85,
-    "body_pct": 7.4,
-    "upper_wick": 79.2,
-    "lower_wick": 180.3,
-    "is_expansion_bar": false,
-    "is_pinbar": true,
-    "candle_type": "Bullish",
-    "is_inside_day": false,
-    "is_outside_day": false,
-    "pdh_sweep": false,
-    "pdl_sweep": true,
-    "bullish_bos": false,
-    "bearish_bos": false,
-    "smc_structure": "SSL Sweep (Bullish Grab)",
-    "pwh": 23175.25,
-    "pwl": 22372.0,
-    "equilibrium": 22677.58,
-    "zone": "Premium",
-    "pivot": 22658.2,
-    "tc": 22678.52,
-    "bc": 22637.88,
-    "cpr_width": 40.64,
-    "cpr_type": "Average",
-    "r1": 22818.7,
-    "s1": 22538.35,
-    "r2": 22938.55,
-    "s2": 22377.85
+  "validation_scorecard": {
+    "total_sessions_evaluated": 246,
+    "total_verified_hits": 188,
+    "overall_accuracy_pct": 76.4,
+    "setups": {
+      "Bearish BOS": {
+        "count": 55,
+        "verified": 42,
+        "win_rate_pct": 76.4
+      },
+      "SSL Sweep Reversal": {
+        "count": 43,
+        "verified": 37,
+        "win_rate_pct": 86.0
+      },
+      "Mean Reversion / Range": {
+        "count": 38,
+        "verified": 20,
+        "win_rate_pct": 52.6
+      },
+      "Bullish BOS": {
+        "count": 46,
+        "verified": 31,
+        "win_rate_pct": 67.4
+      },
+      "BSL Sweep Reversal": {
+        "count": 38,
+        "verified": 35,
+        "win_rate_pct": 92.1
+      },
+      "Inside Compression": {
+        "count": 20,
+        "verified": 19,
+        "win_rate_pct": 95.0
+      },
+      "Bullish Momentum": {
+        "count": 3,
+        "verified": 3,
+        "win_rate_pct": 100.0
+      },
+      "Bearish Momentum": {
+        "count": 3,
+        "verified": 1,
+        "win_rate_pct": 33.3
+      }
+    }
   },
   "next_day_prediction": {
+    "setup_name": "Bullish BOS",
     "bias": "Bullish Trend Continuation",
-    "confidence": "High",
-    "primary_liquidity_target": "Higher Buy-Side Liquidity Pool / R1: 23046.89",
-    "secondary_target": "PDL: 22656.75",
-    "cpr_structure": "Average range expected",
-    "expected_range_adr": "307.42 pts",
-    "rationale": "Break of Structure (BOS): Daily close held cleanly above previous high (22778.05). Trend inertia remains dominant.",
-    "event_rule": "Notice: Any unscheduled macro event or opening gap > 60 pts supersedes technical continuation."
+    "confidence": "High (67.4% Win Rate)",
+    "historical_win_rate": "67.4% Verified (46 Sessions)",
+    "win_rate_pct": 67.4,
+    "clq": 0.90014064697609,
+    "primary_liquidity_target": "PDH Sweep (23082.85) & R1 (23130.26)",
+    "secondary_target": "R2: 23195.43",
+    "invalidation_level": "Break below today's Bottom Central Pivot (22993.97)",
+    "cpr_structure": "Average CPR (47.42 pts). Expect balanced auction around Pivot (23017.68).",
+    "expected_range_adr": "305.6 pts",
+    "rationale": "Break of Structure (BOS): Daily close broke and held cleanly above previous high (22961.95) with strong auction settlement (CLQ: 0.90). Trend inertia remains dominant (67.4% hit rate).",
+    "playbook": "Expect shallow opening dips into Central Pivot (23017.68) to act as demand. Ride continuation momentum towards PDH (23082.85) and target R1 (23130.26).",
+    "event_rule": "Notice: Any unscheduled macro event, overnight global shock, or opening gap > 60 pts supersedes technical continuation."
   },
   "history": [
     {
@@ -132,6 +191,7 @@
       "gap_type": "Flat",
       "body": 71.9,
       "body_pct": 52.3,
+      "clq": 0.68,
       "upper_wick": 43.95,
       "lower_wick": 21.7,
       "is_expansion_bar": false,
@@ -146,7 +206,7 @@
       "smc_structure": "Normal",
       "pwh": null,
       "pwl": null,
-      "equilibrium": 26029.08,
+      "equilibrium": 26029.07,
       "zone": "Premium",
       "pivot": 26037.35,
       "tc": 26045.63,
@@ -177,6 +237,7 @@
       "gap_type": "Gap Down",
       "body": 106.55,
       "body_pct": 57.0,
+      "clq": 0.17,
       "upper_wick": 47.65,
       "lower_wick": 32.6,
       "is_expansion_bar": false,
@@ -201,7 +262,11 @@
       "r1": 25991.51,
       "s1": 25804.71,
       "r2": 26105.18,
-      "s2": 25731.58
+      "s2": 25731.58,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25711.2 <= 25845.25)"
     },
     {
       "date": "2025-10-31",
@@ -222,6 +287,7 @@
       "gap_type": "Flat",
       "body": 141.7,
       "body_pct": 58.4,
+      "clq": 0.04,
       "upper_wick": 89.95,
       "lower_wick": 10.9,
       "is_expansion_bar": false,
@@ -246,7 +312,11 @@
       "r1": 25880.16,
       "s1": 25637.61,
       "r2": 26038.23,
-      "s2": 25553.13
+      "s2": 25553.13,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25645.5 <= 25711.2)"
     },
     {
       "date": "2025-11-03",
@@ -267,6 +337,7 @@
       "gap_type": "Gap Down",
       "body": 66.5,
       "body_pct": 42.2,
+      "clq": 0.75,
       "upper_wick": 39.75,
       "lower_wick": 51.35,
       "is_expansion_bar": false,
@@ -291,7 +362,11 @@
       "r1": 25829.14,
       "s1": 25671.54,
       "r2": 25894.92,
-      "s2": 25579.72
+      "s2": 25579.72,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 25787.4 >= 25737.32)"
     },
     {
       "date": "2025-11-04",
@@ -312,6 +387,7 @@
       "gap_type": "Flat",
       "body": 147.1,
       "body_pct": 70.4,
+      "clq": 0.09,
       "upper_wick": 42.65,
       "lower_wick": 19.25,
       "is_expansion_bar": true,
@@ -326,7 +402,7 @@
       "smc_structure": "Bearish BOS (Expansion)",
       "pwh": 26097.85,
       "pwl": 25711.2,
-      "equilibrium": 25838.12,
+      "equilibrium": 25838.13,
       "zone": "Discount",
       "pivot": 25654.48,
       "tc": 25626.06,
@@ -336,7 +412,11 @@
       "r1": 25730.56,
       "s1": 25521.56,
       "r2": 25863.48,
-      "s2": 25445.48
+      "s2": 25445.48,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25491.55 <= 25578.4)"
     },
     {
       "date": "2025-11-06",
@@ -357,6 +437,7 @@
       "gap_type": "Flat",
       "body": 83.65,
       "body_pct": 44.6,
+      "clq": 0.1,
       "upper_wick": 85.8,
       "lower_wick": 18.15,
       "is_expansion_bar": false,
@@ -381,7 +462,11 @@
       "r1": 25628.71,
       "s1": 25441.11,
       "r2": 25747.73,
-      "s2": 25372.53
+      "s2": 25372.53,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25318.45 <= 25491.55)"
     },
     {
       "date": "2025-11-07",
@@ -402,6 +487,7 @@
       "gap_type": "Gap Down",
       "body": 58.5,
       "body_pct": 25.1,
+      "clq": 0.75,
       "upper_wick": 58.95,
       "lower_wick": 115.35,
       "is_expansion_bar": false,
@@ -426,7 +512,11 @@
       "r1": 25589.55,
       "s1": 25356.75,
       "r2": 25686.8,
-      "s2": 25221.2
+      "s2": 25221.2,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 25653.45 >= 25454.0)"
     },
     {
       "date": "2025-11-10",
@@ -447,6 +537,7 @@
       "gap_type": "Flat",
       "body": 70.85,
       "body_pct": 47.2,
+      "clq": 0.47,
       "upper_wick": 79.1,
       "lower_wick": 0.0,
       "is_expansion_bar": false,
@@ -456,9 +547,9 @@
       "is_outside_day": false,
       "pdh_sweep": false,
       "pdl_sweep": false,
-      "bullish_bos": true,
+      "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "Bullish BOS (Expansion)",
+      "smc_structure": "Range Auction",
       "pwh": 25803.1,
       "pwl": 25318.45,
       "equilibrium": 25708.15,
@@ -471,7 +562,11 @@
       "r1": 25650.7,
       "s1": 25500.75,
       "r2": 25727.05,
-      "s2": 25427.15
+      "s2": 25427.15,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2025-11-11",
@@ -492,6 +587,7 @@
       "gap_type": "Gap Up",
       "body": 77.95,
       "body_pct": 29.2,
+      "clq": 0.92,
       "upper_wick": 20.85,
       "lower_wick": 167.75,
       "is_expansion_bar": false,
@@ -516,7 +612,11 @@
       "r1": 25790.75,
       "s1": 25524.2,
       "r2": 25886.55,
-      "s2": 25353.45
+      "s2": 25353.45,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 25934.55 >= 25620.0)"
     },
     {
       "date": "2025-11-12",
@@ -537,6 +637,7 @@
       "gap_type": "Gap Up",
       "body": 41.5,
       "body_pct": 27.1,
+      "clq": 0.62,
       "upper_wick": 58.75,
       "lower_wick": 53.15,
       "is_expansion_bar": false,
@@ -561,7 +662,11 @@
       "r1": 25946.51,
       "s1": 25793.11,
       "r2": 26017.23,
-      "s2": 25710.43
+      "s2": 25710.43,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 26010.7 >= 25934.55)"
     },
     {
       "date": "2025-11-13",
@@ -582,6 +687,7 @@
       "gap_type": "Gap Up",
       "body": 26.95,
       "body_pct": 13.3,
+      "clq": 0.35,
       "upper_wick": 104.6,
       "lower_wick": 70.75,
       "is_expansion_bar": false,
@@ -606,7 +712,11 @@
       "r1": 25990.44,
       "s1": 25788.14,
       "r2": 26101.72,
-      "s2": 25697.12
+      "s2": 25697.12,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 25740.8 <= 25899.42)"
     },
     {
       "date": "2025-11-14",
@@ -627,6 +737,7 @@
       "gap_type": "Gap Down",
       "body": 142.15,
       "body_pct": 71.3,
+      "clq": 0.85,
       "upper_wick": 30.15,
       "lower_wick": 27.1,
       "is_expansion_bar": true,
@@ -651,7 +762,11 @@
       "r1": 25986.56,
       "s1": 25787.16,
       "r2": 26063.08,
-      "s2": 25664.28
+      "s2": 25664.28,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 26024.2 >= 25863.68)"
     },
     {
       "date": "2025-11-17",
@@ -672,6 +787,7 @@
       "gap_type": "Gap Up",
       "body": 65.25,
       "body_pct": 55.4,
+      "clq": 0.91,
       "upper_wick": 10.75,
       "lower_wick": 41.85,
       "is_expansion_bar": false,
@@ -696,7 +812,11 @@
       "r1": 26056.31,
       "s1": 25938.46,
       "r2": 26099.18,
-      "s2": 25863.48
+      "s2": 25863.48,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 26029.85 >= 26024.2)"
     },
     {
       "date": "2025-11-18",
@@ -717,6 +837,7 @@
       "gap_type": "Flat",
       "body": 111.75,
       "body_pct": 72.9,
+      "clq": 0.22,
       "upper_wick": 8.05,
       "lower_wick": 33.55,
       "is_expansion_bar": true,
@@ -741,7 +862,11 @@
       "r1": 26001.1,
       "s1": 25847.75,
       "r2": 26092.15,
-      "s2": 25785.45
+      "s2": 25785.45,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 25856.2 <= 25938.8)"
     },
     {
       "date": "2025-11-19",
@@ -762,11 +887,12 @@
       "gap_type": "Flat",
       "body": 134.55,
       "body_pct": 61.6,
+      "clq": 0.9,
       "upper_wick": 22.0,
       "lower_wick": 61.9,
-      "is_expansion_bar": false,
+      "is_expansion_bar": true,
       "is_pinbar": false,
-      "candle_type": "Bullish",
+      "candle_type": "Strong Bullish Expansion",
       "is_inside_day": false,
       "is_outside_day": true,
       "pdh_sweep": false,
@@ -786,7 +912,11 @@
       "r1": 26132.8,
       "s1": 25914.35,
       "r2": 26212.95,
-      "s2": 25776.05
+      "s2": 25776.05,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 26246.65 >= 25994.5)"
     },
     {
       "date": "2025-11-20",
@@ -807,6 +937,7 @@
       "gap_type": "Gap Up",
       "body": 60.05,
       "body_pct": 32.7,
+      "clq": 0.7,
       "upper_wick": 54.5,
       "lower_wick": 68.9,
       "is_expansion_bar": false,
@@ -831,7 +962,11 @@
       "r1": 26271.46,
       "s1": 26088.01,
       "r2": 26350.78,
-      "s2": 25983.88
+      "s2": 25983.88,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDH"
     },
     {
       "date": "2025-11-21",
@@ -852,6 +987,7 @@
       "gap_type": "Gap Down",
       "body": 41.4,
       "body_pct": 32.6,
+      "clq": 0.13,
       "upper_wick": 69.65,
       "lower_wick": 15.95,
       "is_expansion_bar": false,
@@ -860,10 +996,10 @@
       "is_inside_day": false,
       "is_outside_day": false,
       "pdh_sweep": false,
-      "pdl_sweep": true,
+      "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "SSL Sweep (Bullish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 26010.7,
       "pwl": 25449.25,
       "equilibrium": 25782.55,
@@ -876,7 +1012,11 @@
       "r1": 26147.5,
       "s1": 26020.5,
       "r2": 26226.85,
-      "s2": 25972.85
+      "s2": 25972.85,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2025-11-24",
@@ -897,6 +1037,7 @@
       "gap_type": "Gap Up",
       "body": 163.3,
       "body_pct": 70.8,
+      "clq": 0.21,
       "upper_wick": 20.0,
       "lower_wick": 47.35,
       "is_expansion_bar": true,
@@ -921,7 +1062,11 @@
       "r1": 26097.49,
       "s1": 25866.84,
       "r2": 26235.47,
-      "s2": 25774.17
+      "s2": 25774.17,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25857.5 <= 25912.15)"
     },
     {
       "date": "2025-11-25",
@@ -942,11 +1087,12 @@
       "gap_type": "Gap Up",
       "body": 113.7,
       "body_pct": 64.9,
+      "clq": 0.16,
       "upper_wick": 34.1,
       "lower_wick": 27.3,
-      "is_expansion_bar": false,
+      "is_expansion_bar": true,
       "is_pinbar": false,
-      "candle_type": "Bearish",
+      "candle_type": "Strong Bearish Expansion",
       "is_inside_day": false,
       "is_outside_day": false,
       "pdh_sweep": false,
@@ -966,7 +1112,11 @@
       "r1": 25992.44,
       "s1": 25817.34,
       "r2": 26100.07,
-      "s2": 25749.87
+      "s2": 25749.87,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25842.95 <= 25857.5)"
     },
     {
       "date": "2025-11-26",
@@ -987,6 +1137,7 @@
       "gap_type": "Gap Down",
       "body": 362.35,
       "body_pct": 97.4,
+      "clq": 0.97,
       "upper_wick": 9.85,
       "lower_wick": 0.0,
       "is_expansion_bar": true,
@@ -1011,7 +1162,11 @@
       "r1": 26332.65,
       "s1": 25960.45,
       "r2": 26460.0,
-      "s2": 25715.6
+      "s2": 25715.6,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 26310.45 >= 26087.8)"
     },
     {
       "date": "2025-11-27",
@@ -1032,6 +1187,7 @@
       "gap_type": "Gap Up",
       "body": 45.7,
       "body_pct": 27.1,
+      "clq": 0.44,
       "upper_wick": 49.2,
       "lower_wick": 73.65,
       "is_expansion_bar": false,
@@ -1041,9 +1197,9 @@
       "is_outside_day": false,
       "pdh_sweep": false,
       "pdl_sweep": false,
-      "bullish_bos": true,
+      "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "Bullish BOS (Expansion)",
+      "smc_structure": "Range Auction",
       "pwh": 26246.65,
       "pwl": 25856.2,
       "equilibrium": 25814.45,
@@ -1056,7 +1212,11 @@
       "r1": 26303.36,
       "s1": 26134.81,
       "r2": 26391.18,
-      "s2": 26054.08
+      "s2": 26054.08,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2025-11-28",
@@ -1077,6 +1237,7 @@
       "gap_type": "Flat",
       "body": 34.5,
       "body_pct": 31.8,
+      "clq": 0.28,
       "upper_wick": 43.3,
       "lower_wick": 30.55,
       "is_expansion_bar": false,
@@ -1101,7 +1262,11 @@
       "r1": 26265.0,
       "s1": 26156.65,
       "r2": 26327.05,
-      "s2": 26110.35
+      "s2": 26110.35,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke High on next day"
     },
     {
       "date": "2025-12-01",
@@ -1122,6 +1287,7 @@
       "gap_type": "Gap Up",
       "body": 150.05,
       "body_pct": 74.4,
+      "clq": 0.26,
       "upper_wick": 0.0,
       "lower_wick": 51.55,
       "is_expansion_bar": true,
@@ -1146,7 +1312,11 @@
       "r1": 26292.96,
       "s1": 26091.36,
       "r2": 26410.18,
-      "s2": 26006.98
+      "s2": 26006.98,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 25997.85 <= 26208.58)"
     },
     {
       "date": "2025-12-02",
@@ -1167,6 +1337,7 @@
       "gap_type": "Gap Down",
       "body": 55.75,
       "body_pct": 35.6,
+      "clq": 0.22,
       "upper_wick": 66.65,
       "lower_wick": 34.35,
       "is_expansion_bar": false,
@@ -1191,7 +1362,11 @@
       "r1": 26125.25,
       "s1": 25968.5,
       "r2": 26218.3,
-      "s2": 25904.8
+      "s2": 25904.8,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25891.0 <= 25997.85)"
     },
     {
       "date": "2025-12-03",
@@ -1212,6 +1387,7 @@
       "gap_type": "Gap Down",
       "body": 18.9,
       "body_pct": 10.8,
+      "clq": 0.54,
       "upper_wick": 61.55,
       "lower_wick": 95.0,
       "is_expansion_bar": false,
@@ -1222,8 +1398,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 26310.45,
       "pwl": 25842.95,
       "equilibrium": 25822.12,
@@ -1236,7 +1412,11 @@
       "r1": 26071.3,
       "s1": 25895.85,
       "r2": 26156.6,
-      "s2": 25805.7
+      "s2": 25805.7,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2025-12-04",
@@ -1257,6 +1437,7 @@
       "gap_type": "Flat",
       "body": 51.9,
       "body_pct": 32.6,
+      "clq": 0.6,
       "upper_wick": 64.5,
       "lower_wick": 42.9,
       "is_expansion_bar": false,
@@ -1264,11 +1445,11 @@
       "candle_type": "Bullish",
       "is_inside_day": false,
       "is_outside_day": false,
-      "pdh_sweep": true,
+      "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "BSL Sweep (Bearish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 26310.45,
       "pwl": 25842.95,
       "equilibrium": 25822.12,
@@ -1281,7 +1462,11 @@
       "r1": 26108.35,
       "s1": 25949.05,
       "r2": 26182.95,
-      "s2": 25864.35
+      "s2": 25864.35,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2025-12-05",
@@ -1302,6 +1487,7 @@
       "gap_type": "Gap Down",
       "body": 186.65,
       "body_pct": 85.9,
+      "clq": 0.93,
       "upper_wick": 16.15,
       "lower_wick": 14.45,
       "is_expansion_bar": true,
@@ -1326,7 +1512,11 @@
       "r1": 26264.25,
       "s1": 26047.0,
       "r2": 26342.05,
-      "s2": 25907.55
+      "s2": 25907.55,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDH"
     },
     {
       "date": "2025-12-08",
@@ -1347,6 +1537,7 @@
       "gap_type": "Gap Down",
       "body": 199.25,
       "body_pct": 69.6,
+      "clq": 0.24,
       "upper_wick": 18.9,
       "lower_wick": 68.3,
       "is_expansion_bar": true,
@@ -1371,7 +1562,11 @@
       "r1": 26128.75,
       "s1": 25842.3,
       "r2": 26296.95,
-      "s2": 25724.05
+      "s2": 25724.05,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25728.0 <= 25892.25)"
     },
     {
       "date": "2025-12-09",
@@ -1392,6 +1587,7 @@
       "gap_type": "Gap Down",
       "body": 27.45,
       "body_pct": 14.0,
+      "clq": 0.57,
       "upper_wick": 56.55,
       "lower_wick": 111.65,
       "is_expansion_bar": false,
@@ -1402,8 +1598,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 26325.8,
       "pwl": 25891.0,
       "equilibrium": 26026.9,
@@ -1416,7 +1612,11 @@
       "r1": 25932.86,
       "s1": 25737.21,
       "r2": 26026.08,
-      "s2": 25634.78
+      "s2": 25634.78,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2025-12-10",
@@ -1437,6 +1637,7 @@
       "gap_type": "Flat",
       "body": 106.05,
       "body_pct": 49.8,
+      "clq": 0.11,
       "upper_wick": 83.6,
       "lower_wick": 23.45,
       "is_expansion_bar": false,
@@ -1461,7 +1662,11 @@
       "r1": 25892.25,
       "s1": 25679.15,
       "r2": 26026.5,
-      "s2": 25600.3
+      "s2": 25600.3,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 25693.25 <= 25813.4)"
     },
     {
       "date": "2025-12-11",
@@ -1482,6 +1687,7 @@
       "gap_type": "Flat",
       "body": 127.15,
       "body_pct": 55.4,
+      "clq": 0.89,
       "upper_wick": 24.25,
       "lower_wick": 78.15,
       "is_expansion_bar": false,
@@ -1506,7 +1712,11 @@
       "r1": 25983.15,
       "s1": 25753.6,
       "r2": 26067.75,
-      "s2": 25608.65
+      "s2": 25608.65,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 26057.6 >= 25838.2)"
     },
     {
       "date": "2025-12-12",
@@ -1527,6 +1737,7 @@
       "gap_type": "Gap Up",
       "body": 75.75,
       "body_pct": 63.6,
+      "clq": 0.91,
       "upper_wick": 10.65,
       "lower_wick": 32.75,
       "is_expansion_bar": false,
@@ -1551,7 +1762,11 @@
       "r1": 26090.21,
       "s1": 25971.06,
       "r2": 26133.48,
-      "s2": 25895.18
+      "s2": 25895.18,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDH"
     },
     {
       "date": "2025-12-15",
@@ -1572,6 +1787,7 @@
       "gap_type": "Gap Down",
       "body": 97.25,
       "body_pct": 68.3,
+      "clq": 0.86,
       "upper_wick": 19.85,
       "lower_wick": 25.3,
       "is_expansion_bar": true,
@@ -1596,7 +1812,11 @@
       "r1": 26081.39,
       "s1": 25938.99,
       "r2": 26135.47,
-      "s2": 25850.67
+      "s2": 25850.67,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": false,
+      "verification_detail": "Did not bounce to CPR"
     },
     {
       "date": "2025-12-16",
@@ -1617,11 +1837,12 @@
       "gap_type": "Gap Down",
       "body": 91.4,
       "body_pct": 62.4,
+      "clq": 0.18,
       "upper_wick": 29.25,
       "lower_wick": 25.75,
-      "is_expansion_bar": false,
+      "is_expansion_bar": true,
       "is_pinbar": false,
-      "candle_type": "Bearish",
+      "candle_type": "Strong Bearish Expansion",
       "is_inside_day": false,
       "is_outside_day": false,
       "pdh_sweep": false,
@@ -1641,7 +1862,11 @@
       "r1": 25949.11,
       "s1": 25802.71,
       "r2": 26038.13,
-      "s2": 25745.33
+      "s2": 25745.33,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25770.35 <= 25834.35)"
     },
     {
       "date": "2025-12-17",
@@ -1662,6 +1887,7 @@
       "gap_type": "Gap Up",
       "body": 83.85,
       "body_pct": 52.8,
+      "clq": 0.3,
       "upper_wick": 26.75,
       "lower_wick": 48.2,
       "is_expansion_bar": false,
@@ -1686,7 +1912,11 @@
       "r1": 25908.35,
       "s1": 25749.55,
       "r2": 25998.15,
-      "s2": 25680.55
+      "s2": 25680.55,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25726.3 <= 25770.35)"
     },
     {
       "date": "2025-12-18",
@@ -1707,6 +1937,7 @@
       "gap_type": "Gap Down",
       "body": 50.85,
       "body_pct": 28.9,
+      "clq": 0.51,
       "upper_wick": 86.8,
       "lower_wick": 38.4,
       "is_expansion_bar": false,
@@ -1715,10 +1946,10 @@
       "is_inside_day": false,
       "is_outside_day": false,
       "pdh_sweep": false,
-      "pdl_sweep": true,
+      "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "SSL Sweep (Bullish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 26178.7,
       "pwl": 25693.25,
       "equilibrium": 26009.53,
@@ -1731,7 +1962,11 @@
       "r1": 25903.16,
       "s1": 25727.11,
       "r2": 25990.78,
-      "s2": 25638.68
+      "s2": 25638.68,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2025-12-19",
@@ -1752,6 +1987,7 @@
       "gap_type": "Gap Up",
       "body": 54.9,
       "body_pct": 48.6,
+      "clq": 0.76,
       "upper_wick": 26.95,
       "lower_wick": 31.05,
       "is_expansion_bar": false,
@@ -1776,7 +2012,11 @@
       "r1": 26013.01,
       "s1": 25900.11,
       "r2": 26059.63,
-      "s2": 25833.83
+      "s2": 25833.83,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 26180.7 >= 25993.35)"
     },
     {
       "date": "2025-12-22",
@@ -1797,6 +2037,7 @@
       "gap_type": "Gap Up",
       "body": 116.55,
       "body_pct": 87.7,
+      "clq": 0.94,
       "upper_wick": 8.3,
       "lower_wick": 8.05,
       "is_expansion_bar": true,
@@ -1821,7 +2062,11 @@
       "r1": 26219.46,
       "s1": 26086.56,
       "r2": 26266.53,
-      "s2": 26000.73
+      "s2": 26000.73,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 26233.55 >= 26180.7)"
     },
     {
       "date": "2025-12-23",
@@ -1842,6 +2087,7 @@
       "gap_type": "Gap Up",
       "body": 28.05,
       "body_pct": 24.5,
+      "clq": 0.51,
       "upper_wick": 28.35,
       "lower_wick": 58.1,
       "is_expansion_bar": false,
@@ -1849,11 +2095,11 @@
       "candle_type": "Bearish",
       "is_inside_day": false,
       "is_outside_day": false,
-      "pdh_sweep": true,
+      "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "BSL Sweep (Bearish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 26047.15,
       "pwl": 25726.3,
       "equilibrium": 26009.53,
@@ -1866,7 +2112,11 @@
       "r1": 26234.11,
       "s1": 26119.61,
       "r2": 26291.08,
-      "s2": 26062.08
+      "s2": 26062.08,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2025-12-24",
@@ -1887,6 +2137,7 @@
       "gap_type": "Flat",
       "body": 28.55,
       "body_pct": 25.2,
+      "clq": 0.17,
       "upper_wick": 65.75,
       "lower_wick": 19.1,
       "is_expansion_bar": false,
@@ -1911,7 +2162,11 @@
       "r1": 26211.34,
       "s1": 26097.94,
       "r2": 26280.57,
-      "s2": 26053.77
+      "s2": 26053.77,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 26008.6 <= 26167.17)"
     },
     {
       "date": "2025-12-26",
@@ -1932,6 +2187,7 @@
       "gap_type": "Flat",
       "body": 78.95,
       "body_pct": 58.2,
+      "clq": 0.25,
       "upper_wick": 22.95,
       "lower_wick": 33.7,
       "is_expansion_bar": false,
@@ -1956,7 +2212,11 @@
       "r1": 26121.46,
       "s1": 25985.86,
       "r2": 26200.63,
-      "s2": 25929.43
+      "s2": 25929.43,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25920.3 <= 26008.6)"
     },
     {
       "date": "2025-12-29",
@@ -1977,6 +2237,7 @@
       "gap_type": "Flat",
       "body": 121.25,
       "body_pct": 65.0,
+      "clq": 0.12,
       "upper_wick": 43.45,
       "lower_wick": 21.8,
       "is_expansion_bar": true,
@@ -2001,7 +2262,11 @@
       "r1": 26059.16,
       "s1": 25872.66,
       "r2": 26176.23,
-      "s2": 25803.23
+      "s2": 25803.23,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25878.0 <= 25920.3)"
     },
     {
       "date": "2025-12-30",
@@ -2022,6 +2287,7 @@
       "gap_type": "Flat",
       "body": 2.05,
       "body_pct": 2.1,
+      "clq": 0.62,
       "upper_wick": 35.85,
       "lower_wick": 60.85,
       "is_expansion_bar": false,
@@ -2046,7 +2312,11 @@
       "r1": 25984.4,
       "s1": 25885.65,
       "r2": 26029.95,
-      "s2": 25832.45
+      "s2": 25832.45,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 26187.95 >= 25931.2)"
     },
     {
       "date": "2025-12-31",
@@ -2067,6 +2337,7 @@
       "gap_type": "Gap Up",
       "body": 158.55,
       "body_pct": 72.4,
+      "clq": 0.73,
       "upper_wick": 58.35,
       "lower_wick": 2.05,
       "is_expansion_bar": true,
@@ -2091,7 +2362,11 @@
       "r1": 26222.04,
       "s1": 26003.09,
       "r2": 26314.47,
-      "s2": 25876.57
+      "s2": 25876.57,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 26197.55 >= 26187.95)"
     },
     {
       "date": "2026-01-01",
@@ -2112,6 +2387,7 @@
       "gap_type": "Gap Up",
       "body": 26.75,
       "body_pct": 31.8,
+      "clq": 0.39,
       "upper_wick": 24.25,
       "lower_wick": 33.15,
       "is_expansion_bar": false,
@@ -2136,7 +2412,11 @@
       "r1": 26191.6,
       "s1": 26107.45,
       "r2": 26236.65,
-      "s2": 26068.35
+      "s2": 26068.35,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 26118.4 <= 26152.5)"
     },
     {
       "date": "2026-01-02",
@@ -2157,6 +2437,7 @@
       "gap_type": "Flat",
       "body": 173.45,
       "body_pct": 78.3,
+      "clq": 0.95,
       "upper_wick": 11.45,
       "lower_wick": 36.7,
       "is_expansion_bar": true,
@@ -2181,7 +2462,11 @@
       "r1": 26406.24,
       "s1": 26184.64,
       "r2": 26483.92,
-      "s2": 26040.72
+      "s2": 26040.72,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 26373.2 >= 26340.0)"
     },
     {
       "date": "2026-01-05",
@@ -2202,6 +2487,7 @@
       "gap_type": "Flat",
       "body": 83.4,
       "body_pct": 51.1,
+      "clq": 0.25,
       "upper_wick": 39.5,
       "lower_wick": 40.25,
       "is_expansion_bar": false,
@@ -2226,7 +2512,11 @@
       "r1": 26345.65,
       "s1": 26182.5,
       "r2": 26441.0,
-      "s2": 26114.7
+      "s2": 26114.7,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 26124.75 <= 26277.85)"
     },
     {
       "date": "2026-01-06",
@@ -2247,6 +2537,7 @@
       "gap_type": "Gap Down",
       "body": 11.0,
       "body_pct": 7.4,
+      "clq": 0.36,
       "upper_wick": 84.25,
       "lower_wick": 53.95,
       "is_expansion_bar": false,
@@ -2271,7 +2562,11 @@
       "r1": 26260.19,
       "s1": 26110.99,
       "r2": 26341.67,
-      "s2": 26043.27
+      "s2": 26043.27,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 26067.9 <= 26124.75)"
     },
     {
       "date": "2026-01-07",
@@ -2292,6 +2587,7 @@
       "gap_type": "Gap Down",
       "body": 2.35,
       "body_pct": 2.0,
+      "clq": 0.61,
       "upper_wick": 44.05,
       "lower_wick": 72.85,
       "is_expansion_bar": false,
@@ -2316,7 +2612,11 @@
       "r1": 26195.96,
       "s1": 26076.71,
       "r2": 26251.18,
-      "s2": 26012.68
+      "s2": 26012.68,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 26133.2 >= 26131.93)"
     },
     {
       "date": "2026-01-08",
@@ -2337,6 +2637,7 @@
       "gap_type": "Gap Down",
       "body": 229.65,
       "body_pct": 83.6,
+      "clq": 0.07,
       "upper_wick": 26.7,
       "lower_wick": 18.4,
       "is_expansion_bar": true,
@@ -2361,7 +2662,11 @@
       "r1": 26053.89,
       "s1": 25779.14,
       "r2": 26230.92,
-      "s2": 25681.42
+      "s2": 25681.42,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25623.0 <= 25858.45)"
     },
     {
       "date": "2026-01-09",
@@ -2382,6 +2687,7 @@
       "gap_type": "Gap Down",
       "body": 157.1,
       "body_pct": 49.5,
+      "clq": 0.19,
       "upper_wick": 100.2,
       "lower_wick": 60.3,
       "is_expansion_bar": false,
@@ -2406,7 +2712,11 @@
       "r1": 25874.94,
       "s1": 25557.34,
       "r2": 26066.57,
-      "s2": 25431.37
+      "s2": 25431.37,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25473.4 <= 25623.0)"
     },
     {
       "date": "2026-01-12",
@@ -2427,6 +2737,7 @@
       "gap_type": "Flat",
       "body": 121.2,
       "body_pct": 35.7,
+      "clq": 0.93,
       "upper_wick": 22.9,
       "lower_wick": 195.65,
       "is_expansion_bar": false,
@@ -2451,7 +2762,11 @@
       "r1": 25911.14,
       "s1": 25571.39,
       "r2": 26032.02,
-      "s2": 25352.52
+      "s2": 25352.52,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 25899.8 >= 25692.27)"
     },
     {
       "date": "2026-01-13",
@@ -2472,6 +2787,7 @@
       "gap_type": "Gap Up",
       "body": 165.05,
       "body_pct": 55.7,
+      "clq": 0.44,
       "upper_wick": 2.45,
       "lower_wick": 129.0,
       "is_expansion_bar": false,
@@ -2496,7 +2812,11 @@
       "r1": 25886.96,
       "s1": 25590.46,
       "r2": 26041.63,
-      "s2": 25448.63
+      "s2": 25448.63,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 25603.95 <= 25745.13)"
     },
     {
       "date": "2026-01-14",
@@ -2517,6 +2837,7 @@
       "gap_type": "Gap Down",
       "body": 17.05,
       "body_pct": 9.1,
+      "clq": 0.33,
       "upper_wick": 126.15,
       "lower_wick": 44.6,
       "is_expansion_bar": false,
@@ -2541,7 +2862,11 @@
       "r1": 25770.25,
       "s1": 25582.45,
       "r2": 25874.9,
-      "s2": 25499.3
+      "s2": 25499.3,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke High on next day"
     },
     {
       "date": "2026-01-16",
@@ -2562,6 +2887,7 @@
       "gap_type": "Gap Up",
       "body": 1.7,
       "body_pct": 0.8,
+      "clq": 0.15,
       "upper_wick": 177.45,
       "lower_wick": 31.95,
       "is_expansion_bar": false,
@@ -2586,7 +2912,11 @@
       "r1": 25824.44,
       "s1": 25613.34,
       "r2": 25954.52,
-      "s2": 25532.32
+      "s2": 25532.32,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 25494.35 <= 25743.42)"
     },
     {
       "date": "2026-01-19",
@@ -2607,6 +2937,7 @@
       "gap_type": "Gap Down",
       "body": 67.6,
       "body_pct": 42.5,
+      "clq": 0.57,
       "upper_wick": 0.2,
       "lower_wick": 91.15,
       "is_expansion_bar": false,
@@ -2617,8 +2948,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 25899.8,
       "pwl": 25473.4,
       "equilibrium": 25923.3,
@@ -2631,7 +2962,11 @@
       "r1": 25661.09,
       "s1": 25502.14,
       "r2": 25736.67,
-      "s2": 25418.77
+      "s2": 25418.77,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2026-01-20",
@@ -2652,6 +2987,7 @@
       "gap_type": "Flat",
       "body": 347.8,
       "body_pct": 84.1,
+      "clq": 0.15,
       "upper_wick": 4.7,
       "lower_wick": 61.15,
       "is_expansion_bar": true,
@@ -2676,7 +3012,11 @@
       "r1": 25487.89,
       "s1": 25074.24,
       "r2": 25743.27,
-      "s2": 24915.97
+      "s2": 24915.97,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 24919.8 <= 25171.35)"
     },
     {
       "date": "2026-01-21",
@@ -2697,6 +3037,7 @@
       "gap_type": "Gap Down",
       "body": 16.5,
       "body_pct": 4.3,
+      "clq": 0.62,
       "upper_wick": 143.45,
       "lower_wick": 221.2,
       "is_expansion_bar": false,
@@ -2707,8 +3048,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 25899.8,
       "pwl": 25473.4,
       "equilibrium": 25646.5,
@@ -2721,7 +3062,11 @@
       "r1": 25332.36,
       "s1": 24951.21,
       "r2": 25507.23,
-      "s2": 24744.93
+      "s2": 24744.93,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-01-22",
@@ -2742,6 +3087,7 @@
       "gap_type": "Gap Up",
       "body": 54.25,
       "body_pct": 20.3,
+      "clq": 0.45,
       "upper_wick": 91.6,
       "lower_wick": 121.4,
       "is_expansion_bar": false,
@@ -2766,7 +3112,11 @@
       "r1": 25427.6,
       "s1": 25160.35,
       "r2": 25565.3,
-      "s2": 25030.8
+      "s2": 25030.8,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 25025.3 <= 25298.05)"
     },
     {
       "date": "2026-01-23",
@@ -2787,6 +3137,7 @@
       "gap_type": "Gap Up",
       "body": 295.95,
       "body_pct": 91.7,
+      "clq": 0.07,
       "upper_wick": 3.35,
       "lower_wick": 23.35,
       "is_expansion_bar": true,
@@ -2811,7 +3162,11 @@
       "r1": 25255.96,
       "s1": 24933.31,
       "r2": 25463.28,
-      "s2": 24817.98
+      "s2": 24817.98,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 24932.55 <= 25025.3)"
     },
     {
       "date": "2026-01-27",
@@ -2832,6 +3187,7 @@
       "gap_type": "Flat",
       "body": 112.05,
       "body_pct": 35.7,
+      "clq": 0.77,
       "upper_wick": 71.25,
       "lower_wick": 130.8,
       "is_expansion_bar": false,
@@ -2856,7 +3212,11 @@
       "r1": 25303.85,
       "s1": 24989.75,
       "r2": 25432.3,
-      "s2": 24804.1
+      "s2": 24804.1,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 25372.1 >= 25118.2)"
     },
     {
       "date": "2026-01-28",
@@ -2877,6 +3237,7 @@
       "gap_type": "Gap Up",
       "body": 83.9,
       "body_pct": 45.5,
+      "clq": 0.84,
       "upper_wick": 29.35,
       "lower_wick": 71.2,
       "is_expansion_bar": false,
@@ -2901,7 +3262,11 @@
       "r1": 25414.01,
       "s1": 25229.56,
       "r2": 25485.28,
-      "s2": 25116.38
+      "s2": 25116.38,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 25458.15 >= 25372.1)"
     },
     {
       "date": "2026-01-29",
@@ -2922,6 +3287,7 @@
       "gap_type": "Flat",
       "body": 73.9,
       "body_pct": 24.8,
+      "clq": 0.87,
       "upper_wick": 39.25,
       "lower_wick": 185.2,
       "is_expansion_bar": false,
@@ -2946,7 +3312,11 @@
       "r1": 25531.44,
       "s1": 25233.09,
       "r2": 25643.97,
-      "s2": 25047.27
+      "s2": 25047.27,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 25370.7 >= 25345.62)"
     },
     {
       "date": "2026-01-30",
@@ -2967,6 +3337,7 @@
       "gap_type": "Gap Down",
       "body": 73.1,
       "body_pct": 46.5,
+      "clq": 0.68,
       "upper_wick": 50.05,
       "lower_wick": 33.9,
       "is_expansion_bar": false,
@@ -2991,7 +3362,11 @@
       "r1": 25389.69,
       "s1": 25232.64,
       "r2": 25458.72,
-      "s2": 25144.62
+      "s2": 25144.62,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke Low on next day"
     },
     {
       "date": "2026-02-02",
@@ -3012,6 +3387,7 @@
       "gap_type": "Gap Down",
       "body": 291.9,
       "body_pct": 68.1,
+      "clq": 0.95,
       "upper_wick": 19.7,
       "lower_wick": 117.1,
       "is_expansion_bar": true,
@@ -3022,8 +3398,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 25458.15,
       "pwl": 24932.55,
       "equilibrium": 25526.3,
@@ -3036,7 +3412,11 @@
       "r1": 25237.86,
       "s1": 24809.16,
       "r2": 25387.33,
-      "s2": 24529.93
+      "s2": 24529.93,
+      "historical_setup": "Bullish Momentum",
+      "expected_target": "PDH Test & Continuation",
+      "prediction_verified": true,
+      "verification_detail": "Tested PDH (High 26341.2 >= 25108.1)"
     },
     {
       "date": "2026-02-03",
@@ -3057,6 +3437,7 @@
       "gap_type": "Gap Up",
       "body": 580.5,
       "body_pct": 82.9,
+      "clq": 0.12,
       "upper_wick": 33.15,
       "lower_wick": 86.25,
       "is_expansion_bar": true,
@@ -3066,9 +3447,9 @@
       "is_outside_day": false,
       "pdh_sweep": false,
       "pdl_sweep": false,
-      "bullish_bos": true,
+      "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "Bullish BOS (Expansion)",
+      "smc_structure": "Range Auction",
       "pwh": 25458.15,
       "pwl": 24932.55,
       "equilibrium": 25526.3,
@@ -3081,7 +3462,11 @@
       "r1": 26165.4,
       "s1": 25465.5,
       "r2": 26603.25,
-      "s2": 25203.45
+      "s2": 25203.45,
+      "historical_setup": "Bearish Momentum",
+      "expected_target": "PDL Test & Continuation",
+      "prediction_verified": true,
+      "verification_detail": "Tested PDL (Low 25563.95 <= 25641.3)"
     },
     {
       "date": "2026-02-04",
@@ -3102,6 +3487,7 @@
       "gap_type": "Gap Down",
       "body": 100.95,
       "body_pct": 39.7,
+      "clq": 0.83,
       "upper_wick": 42.55,
       "lower_wick": 111.1,
       "is_expansion_bar": false,
@@ -3126,7 +3512,11 @@
       "r1": 25875.05,
       "s1": 25620.45,
       "r2": 25974.1,
-      "s2": 25464.9
+      "s2": 25464.9,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 25757.65 >= 25719.5)"
     },
     {
       "date": "2026-02-05",
@@ -3147,11 +3537,12 @@
       "gap_type": "Flat",
       "body": 113.1,
       "body_pct": 63.5,
+      "clq": 0.36,
       "upper_wick": 1.75,
       "lower_wick": 63.3,
-      "is_expansion_bar": false,
+      "is_expansion_bar": true,
       "is_pinbar": false,
-      "candle_type": "Bearish",
+      "candle_type": "Strong Bearish Expansion",
       "is_inside_day": true,
       "is_outside_day": false,
       "pdh_sweep": false,
@@ -3171,7 +3562,11 @@
       "r1": 25740.46,
       "s1": 25562.31,
       "r2": 25838.13,
-      "s2": 25481.83
+      "s2": 25481.83,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke Low on next day"
     },
     {
       "date": "2026-02-06",
@@ -3192,6 +3587,7 @@
       "gap_type": "Gap Down",
       "body": 87.9,
       "body_pct": 41.5,
+      "clq": 0.95,
       "upper_wick": 10.25,
       "lower_wick": 113.9,
       "is_expansion_bar": false,
@@ -3216,7 +3612,11 @@
       "r1": 25767.8,
       "s1": 25555.75,
       "r2": 25841.9,
-      "s2": 25417.8
+      "s2": 25417.8,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 25922.25 >= 25629.85)"
     },
     {
       "date": "2026-02-09",
@@ -3237,6 +3637,7 @@
       "gap_type": "Gap Up",
       "body": 21.4,
       "body_pct": 15.1,
+      "clq": 0.61,
       "upper_wick": 33.55,
       "lower_wick": 86.4,
       "is_expansion_bar": false,
@@ -3261,7 +3662,11 @@
       "r1": 25932.74,
       "s1": 25791.39,
       "r2": 25998.17,
-      "s2": 25715.47
+      "s2": 25715.47,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 25989.45 >= 25922.25)"
     },
     {
       "date": "2026-02-10",
@@ -3282,6 +3687,7 @@
       "gap_type": "Gap Up",
       "body": 12.5,
       "body_pct": 10.5,
+      "clq": 0.54,
       "upper_wick": 54.3,
       "lower_wick": 52.2,
       "is_expansion_bar": false,
@@ -3291,9 +3697,9 @@
       "is_outside_day": false,
       "pdh_sweep": false,
       "pdl_sweep": false,
-      "bullish_bos": true,
+      "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "Bullish BOS (Expansion)",
+      "smc_structure": "Range Auction",
       "pwh": 26341.2,
       "pwl": 24679.4,
       "equilibrium": 25510.3,
@@ -3306,7 +3712,11 @@
       "r1": 25992.91,
       "s1": 25873.91,
       "r2": 26050.68,
-      "s2": 25812.68
+      "s2": 25812.68,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2026-02-11",
@@ -3327,6 +3737,7 @@
       "gap_type": "Gap Up",
       "body": 43.6,
       "body_pct": 39.8,
+      "clq": 0.49,
       "upper_wick": 11.95,
       "lower_wick": 54.05,
       "is_expansion_bar": false,
@@ -3334,11 +3745,11 @@
       "candle_type": "Bearish",
       "is_inside_day": false,
       "is_outside_day": false,
-      "pdh_sweep": true,
+      "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "BSL Sweep (Bearish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 26341.2,
       "pwl": 24679.4,
       "equilibrium": 25510.3,
@@ -3351,7 +3762,11 @@
       "r1": 26008.9,
       "s1": 25899.3,
       "r2": 26063.95,
-      "s2": 25844.75
+      "s2": 25844.75,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-02-12",
@@ -3372,11 +3787,12 @@
       "gap_type": "Gap Down",
       "body": 99.5,
       "body_pct": 64.5,
+      "clq": 0.36,
       "upper_wick": 0.0,
       "lower_wick": 54.8,
-      "is_expansion_bar": false,
+      "is_expansion_bar": true,
       "is_pinbar": false,
-      "candle_type": "Bearish",
+      "candle_type": "Strong Bearish Expansion",
       "is_inside_day": false,
       "is_outside_day": false,
       "pdh_sweep": false,
@@ -3396,7 +3812,11 @@
       "r1": 25891.8,
       "s1": 25737.5,
       "r2": 25976.4,
-      "s2": 25667.8
+      "s2": 25667.8,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25444.3 <= 25752.4)"
     },
     {
       "date": "2026-02-13",
@@ -3417,6 +3837,7 @@
       "gap_type": "Gap Down",
       "body": 100.05,
       "body_pct": 53.8,
+      "clq": 0.14,
       "upper_wick": 59.2,
       "lower_wick": 26.8,
       "is_expansion_bar": false,
@@ -3441,7 +3862,11 @@
       "r1": 25586.2,
       "s1": 25400.15,
       "r2": 25701.3,
-      "s2": 25329.2
+      "s2": 25329.2,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 25372.7 <= 25444.3)"
     },
     {
       "date": "2026-02-16",
@@ -3462,6 +3887,7 @@
       "gap_type": "Gap Down",
       "body": 259.15,
       "body_pct": 79.9,
+      "clq": 0.96,
       "upper_wick": 14.25,
       "lower_wick": 50.9,
       "is_expansion_bar": true,
@@ -3486,7 +3912,11 @@
       "r1": 25795.6,
       "s1": 25471.3,
       "r2": 25908.45,
-      "s2": 25259.85
+      "s2": 25259.85,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 25764.4 >= 25584.15)"
     },
     {
       "date": "2026-02-17",
@@ -3507,6 +3937,7 @@
       "gap_type": "Gap Down",
       "body": 87.45,
       "body_pct": 45.1,
+      "clq": 0.8,
       "upper_wick": 39.0,
       "lower_wick": 67.65,
       "is_expansion_bar": false,
@@ -3531,7 +3962,11 @@
       "r1": 25803.1,
       "s1": 25609.0,
       "r2": 25880.8,
-      "s2": 25492.6
+      "s2": 25492.6,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 25828.05 >= 25764.4)"
     },
     {
       "date": "2026-02-18",
@@ -3552,6 +3987,7 @@
       "gap_type": "Gap Up",
       "body": 66.7,
       "body_pct": 36.5,
+      "clq": 0.95,
       "upper_wick": 8.7,
       "lower_wick": 107.5,
       "is_expansion_bar": false,
@@ -3576,7 +4012,11 @@
       "r1": 25883.21,
       "s1": 25700.31,
       "r2": 25947.08,
-      "s2": 25581.28
+      "s2": 25581.28,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 25885.3 >= 25828.05)"
     },
     {
       "date": "2026-02-19",
@@ -3597,6 +4037,7 @@
       "gap_type": "Gap Up",
       "body": 419.0,
       "body_pct": 84.4,
+      "clq": 0.13,
       "upper_wick": 11.95,
       "lower_wick": 65.6,
       "is_expansion_bar": true,
@@ -3621,7 +4062,11 @@
       "r1": 25763.51,
       "s1": 25266.96,
       "r2": 26072.68,
-      "s2": 25079.58
+      "s2": 25079.58,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 25379.75 <= 25576.13)"
     },
     {
       "date": "2026-02-20",
@@ -3642,6 +4087,7 @@
       "gap_type": "Gap Down",
       "body": 164.7,
       "body_pct": 58.0,
+      "clq": 0.67,
       "upper_wick": 92.3,
       "lower_wick": 26.8,
       "is_expansion_bar": false,
@@ -3666,7 +4112,11 @@
       "r1": 25696.61,
       "s1": 25412.81,
       "r2": 25821.98,
-      "s2": 25254.38
+      "s2": 25254.38,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 25771.45 >= 25538.18)"
     },
     {
       "date": "2026-02-23",
@@ -3687,6 +4137,7 @@
       "gap_type": "Gap Up",
       "body": 34.6,
       "body_pct": 21.3,
+      "clq": 0.64,
       "upper_wick": 58.45,
       "lower_wick": 69.05,
       "is_expansion_bar": false,
@@ -3711,7 +4162,11 @@
       "r1": 25786.51,
       "s1": 25624.41,
       "r2": 25860.03,
-      "s2": 25535.83
+      "s2": 25535.83,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDH"
     },
     {
       "date": "2026-02-24",
@@ -3732,6 +4187,7 @@
       "gap_type": "Gap Down",
       "body": 217.15,
       "body_pct": 69.1,
+      "clq": 0.31,
       "upper_wick": 0.0,
       "lower_wick": 97.05,
       "is_expansion_bar": true,
@@ -3756,7 +4212,11 @@
       "r1": 25601.76,
       "s1": 25287.56,
       "r2": 25778.88,
-      "s2": 25150.48
+      "s2": 25150.48,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDL"
     },
     {
       "date": "2026-02-25",
@@ -3777,6 +4237,7 @@
       "gap_type": "Gap Up",
       "body": 30.1,
       "body_pct": 13.4,
+      "clq": 0.24,
       "upper_wick": 140.0,
       "lower_wick": 54.3,
       "is_expansion_bar": false,
@@ -3801,7 +4262,11 @@
       "r1": 25614.0,
       "s1": 25389.6,
       "r2": 25745.5,
-      "s2": 25296.7
+      "s2": 25296.7,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 25400.95 <= 25521.1)"
     },
     {
       "date": "2026-02-26",
@@ -3822,6 +4287,7 @@
       "gap_type": "Gap Up",
       "body": 59.75,
       "body_pct": 34.7,
+      "clq": 0.56,
       "upper_wick": 16.65,
       "lower_wick": 95.6,
       "is_expansion_bar": false,
@@ -3846,7 +4312,11 @@
       "r1": 25579.35,
       "s1": 25407.35,
       "r2": 25662.15,
-      "s2": 25318.15
+      "s2": 25318.15,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": false,
+      "verification_detail": "Did not bounce to CPR"
     },
     {
       "date": "2026-02-27",
@@ -3867,6 +4337,7 @@
       "gap_type": "Gap Down",
       "body": 281.2,
       "body_pct": 83.9,
+      "clq": 0.11,
       "upper_wick": 16.55,
       "lower_wick": 37.35,
       "is_expansion_bar": true,
@@ -3891,7 +4362,11 @@
       "r1": 25389.6,
       "s1": 25054.5,
       "r2": 25600.55,
-      "s2": 24930.35
+      "s2": 24930.35,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 24603.5 <= 25141.3)"
     },
     {
       "date": "2026-03-02",
@@ -3912,6 +4387,7 @@
       "gap_type": "Gap Down",
       "body": 206.45,
       "body_pct": 53.5,
+      "clq": 0.68,
       "upper_wick": 123.65,
       "lower_wick": 55.75,
       "is_expansion_bar": false,
@@ -3922,8 +4398,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 25771.45,
       "pwl": 25141.3,
       "equilibrium": 25472.35,
@@ -3936,7 +4412,11 @@
       "r1": 25035.54,
       "s1": 24649.69,
       "r2": 25205.37,
-      "s2": 24433.67
+      "s2": 24433.67,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-03-04",
@@ -3957,6 +4437,7 @@
       "gap_type": "Gap Down",
       "body": 91.7,
       "body_pct": 30.9,
+      "clq": 0.59,
       "upper_wick": 121.95,
       "lower_wick": 83.4,
       "is_expansion_bar": false,
@@ -3967,8 +4448,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 25771.45,
       "pwl": 25141.3,
       "equilibrium": 25157.4,
@@ -3981,7 +4462,11 @@
       "r1": 24620.16,
       "s1": 24323.11,
       "r2": 24759.83,
-      "s2": 24165.73
+      "s2": 24165.73,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-03-05",
@@ -4002,6 +4487,7 @@
       "gap_type": "Gap Up",
       "body": 149.95,
       "body_pct": 46.2,
+      "clq": 0.73,
       "upper_wick": 88.3,
       "lower_wick": 86.55,
       "is_expansion_bar": false,
@@ -4026,7 +4512,11 @@
       "r1": 24903.6,
       "s1": 24578.8,
       "r2": 25041.3,
-      "s2": 24391.7
+      "s2": 24391.7,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDH"
     },
     {
       "date": "2026-03-06",
@@ -4047,6 +4537,7 @@
       "gap_type": "Gap Down",
       "body": 205.95,
       "body_pct": 72.2,
+      "clq": 0.12,
       "upper_wick": 44.5,
       "lower_wick": 34.7,
       "is_expansion_bar": true,
@@ -4071,7 +4562,11 @@
       "r1": 24628.99,
       "s1": 24343.84,
       "r2": 24807.52,
-      "s2": 24237.22
+      "s2": 24237.22,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 23697.8 <= 24415.75)"
     },
     {
       "date": "2026-03-09",
@@ -4092,6 +4587,7 @@
       "gap_type": "Gap Down",
       "body": 160.0,
       "body_pct": 42.1,
+      "clq": 0.87,
       "upper_wick": 50.1,
       "lower_wick": 170.25,
       "is_expansion_bar": false,
@@ -4102,8 +4598,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 24989.35,
       "pwl": 24305.4,
       "equilibrium": 24853.6,
@@ -4116,7 +4612,11 @@
       "r1": 24171.54,
       "s1": 23791.19,
       "r2": 24315.02,
-      "s2": 23554.32
+      "s2": 23554.32,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-03-10",
@@ -4137,6 +4637,7 @@
       "gap_type": "Gap Up",
       "body": 19.2,
       "body_pct": 8.6,
+      "clq": 0.81,
       "upper_wick": 23.0,
       "lower_wick": 181.65,
       "is_expansion_bar": false,
@@ -4161,7 +4662,11 @@
       "r1": 24350.29,
       "s1": 24126.44,
       "r2": 24438.97,
-      "s2": 23991.27
+      "s2": 23991.27,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDH"
     },
     {
       "date": "2026-03-11",
@@ -4182,6 +4687,7 @@
       "gap_type": "Gap Down",
       "body": 365.0,
       "body_pct": 78.5,
+      "clq": 0.07,
       "upper_wick": 67.15,
       "lower_wick": 32.55,
       "is_expansion_bar": true,
@@ -4206,7 +4712,11 @@
       "r1": 24165.8,
       "s1": 23701.1,
       "r2": 24464.75,
-      "s2": 23535.35
+      "s2": 23535.35,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 23556.3 <= 23834.3)"
     },
     {
       "date": "2026-03-12",
@@ -4227,6 +4737,7 @@
       "gap_type": "Gap Down",
       "body": 35.7,
       "body_pct": 12.9,
+      "clq": 0.3,
       "upper_wick": 158.3,
       "lower_wick": 82.85,
       "is_expansion_bar": false,
@@ -4251,7 +4762,11 @@
       "r1": 23796.1,
       "s1": 23519.25,
       "r2": 23953.05,
-      "s2": 23399.35
+      "s2": 23399.35,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 23112.0 <= 23556.3)"
     },
     {
       "date": "2026-03-13",
@@ -4272,6 +4787,7 @@
       "gap_type": "Gap Down",
       "body": 311.4,
       "body_pct": 81.9,
+      "clq": 0.1,
       "upper_wick": 29.9,
       "lower_wick": 39.1,
       "is_expansion_bar": true,
@@ -4296,7 +4812,11 @@
       "r1": 23391.66,
       "s1": 23011.26,
       "r2": 23632.23,
-      "s2": 22871.43
+      "s2": 22871.43,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 22955.25 <= 23112.0)"
     },
     {
       "date": "2026-03-16",
@@ -4317,6 +4837,7 @@
       "gap_type": "Gap Down",
       "body": 292.7,
       "body_pct": 53.5,
+      "clq": 0.83,
       "upper_wick": 93.2,
       "lower_wick": 160.85,
       "is_expansion_bar": false,
@@ -4324,11 +4845,11 @@
       "candle_type": "Bullish",
       "is_inside_day": false,
       "is_outside_day": true,
-      "pdh_sweep": true,
-      "pdl_sweep": false,
+      "pdh_sweep": false,
+      "pdl_sweep": true,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "BSL Sweep (Bearish Grab)",
+      "smc_structure": "SSL Sweep (Bullish Grab)",
       "pwh": 24303.8,
       "pwl": 23112.0,
       "equilibrium": 24420.28,
@@ -4341,7 +4862,11 @@
       "r1": 23622.11,
       "s1": 23075.36,
       "r2": 23835.43,
-      "s2": 22741.93
+      "s2": 22741.93,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 23656.8 >= 23288.68)"
     },
     {
       "date": "2026-03-17",
@@ -4362,6 +4887,7 @@
       "gap_type": "Gap Up",
       "body": 87.95,
       "body_pct": 28.4,
+      "clq": 0.76,
       "upper_wick": 75.65,
       "lower_wick": 146.6,
       "is_expansion_bar": false,
@@ -4386,7 +4912,11 @@
       "r1": 23709.76,
       "s1": 23399.56,
       "r2": 23838.38,
-      "s2": 23217.98
+      "s2": 23217.98,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 23862.25 >= 23656.8)"
     },
     {
       "date": "2026-03-18",
@@ -4407,6 +4937,7 @@
       "gap_type": "Gap Up",
       "body": 144.9,
       "body_pct": 59.4,
+      "clq": 0.65,
       "upper_wick": 84.45,
       "lower_wick": 14.45,
       "is_expansion_bar": false,
@@ -4431,7 +4962,11 @@
       "r1": 23887.21,
       "s1": 23643.41,
       "r2": 23996.63,
-      "s2": 23509.03
+      "s2": 23509.03,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDH"
     },
     {
       "date": "2026-03-19",
@@ -4452,6 +4987,7 @@
       "gap_type": "Gap Down",
       "body": 195.6,
       "body_pct": 43.6,
+      "clq": 0.16,
       "upper_wick": 180.95,
       "lower_wick": 71.8,
       "is_expansion_bar": false,
@@ -4476,7 +5012,11 @@
       "r1": 23277.11,
       "s1": 22828.76,
       "r2": 23552.08,
-      "s2": 22655.38
+      "s2": 22655.38,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDL"
     },
     {
       "date": "2026-03-20",
@@ -4497,6 +5037,7 @@
       "gap_type": "Gap Up",
       "body": 4.35,
       "body_pct": 1.6,
+      "clq": 0.17,
       "upper_wick": 230.65,
       "lower_wick": 42.55,
       "is_expansion_bar": false,
@@ -4521,7 +5062,11 @@
       "r1": 23283.9,
       "s1": 23006.35,
       "r2": 23453.3,
-      "s2": 22898.2
+      "s2": 22898.2,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke Low on next day"
     },
     {
       "date": "2026-03-23",
@@ -4542,6 +5087,7 @@
       "gap_type": "Gap Down",
       "body": 311.7,
       "body_pct": 81.9,
+      "clq": 0.11,
       "upper_wick": 27.35,
       "lower_wick": 41.4,
       "is_expansion_bar": true,
@@ -4566,7 +5112,11 @@
       "r1": 22752.49,
       "s1": 22372.04,
       "r2": 22992.32,
-      "s2": 22231.42
+      "s2": 22231.42,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDL"
     },
     {
       "date": "2026-03-24",
@@ -4587,6 +5137,7 @@
       "gap_type": "Gap Up",
       "body": 33.95,
       "body_pct": 7.8,
+      "clq": 0.67,
       "upper_wick": 144.9,
       "lower_wick": 254.25,
       "is_expansion_bar": false,
@@ -4611,7 +5162,11 @@
       "r1": 23105.06,
       "s1": 22671.96,
       "r2": 23297.73,
-      "s2": 22431.53
+      "s2": 22431.53,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 23465.35 >= 23057.3)"
     },
     {
       "date": "2026-03-25",
@@ -4632,11 +5187,12 @@
       "gap_type": "Gap Up",
       "body": 242.05,
       "body_pct": 60.2,
+      "clq": 0.6,
       "upper_wick": 158.9,
       "lower_wick": 1.2,
-      "is_expansion_bar": false,
+      "is_expansion_bar": true,
       "is_pinbar": false,
-      "candle_type": "Bullish",
+      "candle_type": "Strong Bullish Expansion",
       "is_inside_day": false,
       "is_outside_day": false,
       "pdh_sweep": false,
@@ -4656,7 +5212,11 @@
       "r1": 23493.46,
       "s1": 23091.31,
       "r2": 23680.48,
-      "s2": 22876.18
+      "s2": 22876.18,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDH"
     },
     {
       "date": "2026-03-27",
@@ -4677,6 +5237,7 @@
       "gap_type": "Gap Down",
       "body": 353.95,
       "body_pct": 92.8,
+      "clq": 0.04,
       "upper_wick": 12.55,
       "lower_wick": 15.05,
       "is_expansion_bar": true,
@@ -4701,7 +5262,11 @@
       "r1": 23068.95,
       "s1": 22687.4,
       "r2": 23318.3,
-      "s2": 22555.2
+      "s2": 22555.2,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 22283.85 <= 22804.55)"
     },
     {
       "date": "2026-03-30",
@@ -4722,6 +5287,7 @@
       "gap_type": "Gap Down",
       "body": 218.25,
       "body_pct": 50.7,
+      "clq": 0.11,
       "upper_wick": 164.45,
       "lower_wick": 47.55,
       "is_expansion_bar": false,
@@ -4746,7 +5312,11 @@
       "r1": 22602.39,
       "s1": 22172.14,
       "r2": 22873.37,
-      "s2": 22012.87
+      "s2": 22012.87,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDL"
     },
     {
       "date": "2026-04-01",
@@ -4767,6 +5337,7 @@
       "gap_type": "Gap Up",
       "body": 219.6,
       "body_pct": 68.1,
+      "clq": 0.19,
       "upper_wick": 42.3,
       "lower_wick": 60.8,
       "is_expansion_bar": true,
@@ -4791,7 +5362,11 @@
       "r1": 22874.26,
       "s1": 22551.56,
       "r2": 23069.13,
-      "s2": 22423.73
+      "s2": 22423.73,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 22182.55 <= 22746.43)"
     },
     {
       "date": "2026-04-02",
@@ -4812,6 +5387,7 @@
       "gap_type": "Gap Down",
       "body": 329.7,
       "body_pct": 55.0,
+      "clq": 0.88,
       "upper_wick": 69.2,
       "lower_wick": 200.85,
       "is_expansion_bar": false,
@@ -4836,7 +5412,11 @@
       "r1": 22936.09,
       "s1": 22336.34,
       "r2": 23159.07,
-      "s2": 21959.57
+      "s2": 21959.57,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 22998.35 >= 22559.32)"
     },
     {
       "date": "2026-04-06",
@@ -4857,6 +5437,7 @@
       "gap_type": "Gap Up",
       "body": 187.95,
       "body_pct": 41.3,
+      "clq": 0.93,
       "upper_wick": 30.1,
       "lower_wick": 237.35,
       "is_expansion_bar": false,
@@ -4881,7 +5462,11 @@
       "r1": 23130.09,
       "s1": 22674.69,
       "r2": 23291.92,
-      "s2": 22381.12
+      "s2": 22381.12,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 23153.85 >= 22998.35)"
     },
     {
       "date": "2026-04-07",
@@ -4902,6 +5487,7 @@
       "gap_type": "Gap Down",
       "body": 284.95,
       "body_pct": 65.6,
+      "clq": 0.93,
       "upper_wick": 30.2,
       "lower_wick": 119.4,
       "is_expansion_bar": true,
@@ -4926,7 +5512,11 @@
       "r1": 23278.56,
       "s1": 22844.01,
       "r2": 23433.48,
-      "s2": 22564.38
+      "s2": 22564.38,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 24025.15 >= 23153.85)"
     },
     {
       "date": "2026-04-08",
@@ -4947,6 +5537,7 @@
       "gap_type": "Gap Up",
       "body": 142.2,
       "body_pct": 72.3,
+      "clq": 0.86,
       "upper_wick": 27.8,
       "lower_wick": 26.65,
       "is_expansion_bar": true,
@@ -4971,7 +5562,11 @@
       "r1": 24072.16,
       "s1": 23875.51,
       "r2": 24146.98,
-      "s2": 23753.68
+      "s2": 23753.68,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDH"
     },
     {
       "date": "2026-04-09",
@@ -4992,6 +5587,7 @@
       "gap_type": "Gap Down",
       "body": 133.95,
       "body_pct": 43.5,
+      "clq": 0.3,
       "upper_wick": 81.7,
       "lower_wick": 92.3,
       "is_expansion_bar": false,
@@ -5016,7 +5612,11 @@
       "r1": 23949.64,
       "s1": 23641.69,
       "r2": 24124.17,
-      "s2": 23508.27
+      "s2": 23508.27,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDL"
     },
     {
       "date": "2026-04-10",
@@ -5037,6 +5637,7 @@
       "gap_type": "Gap Up",
       "body": 170.05,
       "body_pct": 78.1,
+      "clq": 0.89,
       "upper_wick": 23.45,
       "lower_wick": 24.2,
       "is_expansion_bar": true,
@@ -5061,7 +5662,11 @@
       "r1": 24130.99,
       "s1": 23913.29,
       "r2": 24211.37,
-      "s2": 23775.97
+      "s2": 23775.97,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDH"
     },
     {
       "date": "2026-04-13",
@@ -5082,6 +5687,7 @@
       "gap_type": "Gap Down",
       "body": 253.05,
       "body_pct": 71.9,
+      "clq": 0.82,
       "upper_wick": 64.75,
       "lower_wick": 34.0,
       "is_expansion_bar": true,
@@ -5092,8 +5698,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 24074.05,
       "pwl": 22542.95,
       "equilibrium": 23128.3,
@@ -5106,7 +5712,11 @@
       "r1": 23981.5,
       "s1": 23629.7,
       "r2": 24120.35,
-      "s2": 23416.75
+      "s2": 23416.75,
+      "historical_setup": "Bullish Momentum",
+      "expected_target": "PDH Test & Continuation",
+      "prediction_verified": true,
+      "verification_detail": "Tested PDH (High 24280.9 >= 23907.4)"
     },
     {
       "date": "2026-04-15",
@@ -5127,6 +5737,7 @@
       "gap_type": "Gap Up",
       "body": 67.5,
       "body_pct": 50.0,
+      "clq": 0.63,
       "upper_wick": 49.6,
       "lower_wick": 18.0,
       "is_expansion_bar": false,
@@ -5151,7 +5762,11 @@
       "r1": 24292.86,
       "s1": 24157.76,
       "r2": 24354.43,
-      "s2": 24084.23
+      "s2": 24084.23,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 24400.95 >= 24280.9)"
     },
     {
       "date": "2026-04-16",
@@ -5172,11 +5787,12 @@
       "gap_type": "Gap Up",
       "body": 188.45,
       "body_pct": 63.2,
+      "clq": 0.32,
       "upper_wick": 15.75,
       "lower_wick": 93.95,
-      "is_expansion_bar": false,
+      "is_expansion_bar": true,
       "is_pinbar": false,
-      "candle_type": "Bearish",
+      "candle_type": "Strong Bearish Expansion",
       "is_inside_day": false,
       "is_outside_day": true,
       "pdh_sweep": true,
@@ -5196,7 +5812,11 @@
       "r1": 24364.2,
       "s1": 24066.05,
       "r2": 24531.65,
-      "s2": 23935.35
+      "s2": 23935.35,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 24096.05 <= 24233.5)"
     },
     {
       "date": "2026-04-17",
@@ -5217,6 +5837,7 @@
       "gap_type": "Gap Down",
       "body": 187.65,
       "body_pct": 68.0,
+      "clq": 0.93,
       "upper_wick": 18.35,
       "lower_wick": 69.85,
       "is_expansion_bar": true,
@@ -5241,7 +5862,11 @@
       "r1": 24451.61,
       "s1": 24175.76,
       "r2": 24549.68,
-      "s2": 23997.98
+      "s2": 23997.98,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 24480.65 >= 24273.83)"
     },
     {
       "date": "2026-04-20",
@@ -5262,6 +5887,7 @@
       "gap_type": "Gap Up",
       "body": 26.65,
       "body_pct": 11.1,
+      "clq": 0.52,
       "upper_wick": 89.15,
       "lower_wick": 123.6,
       "is_expansion_bar": false,
@@ -5269,11 +5895,11 @@
       "candle_type": "Bearish",
       "is_inside_day": false,
       "is_outside_day": false,
-      "pdh_sweep": true,
+      "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "BSL Sweep (Bearish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 24400.95,
       "pwl": 23555.6,
       "equilibrium": 23331.6,
@@ -5286,7 +5912,11 @@
       "r1": 24483.25,
       "s1": 24243.85,
       "r2": 24601.65,
-      "s2": 24122.85
+      "s2": 24122.85,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2026-04-21",
@@ -5307,6 +5937,7 @@
       "gap_type": "Flat",
       "body": 202.05,
       "body_pct": 81.9,
+      "clq": 0.9,
       "upper_wick": 25.1,
       "lower_wick": 19.65,
       "is_expansion_bar": true,
@@ -5331,7 +5962,11 @@
       "r1": 24667.24,
       "s1": 24420.44,
       "r2": 24757.87,
-      "s2": 24264.27
+      "s2": 24264.27,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDH"
     },
     {
       "date": "2026-04-22",
@@ -5352,6 +5987,7 @@
       "gap_type": "Gap Down",
       "body": 92.75,
       "body_pct": 56.9,
+      "clq": 0.15,
       "upper_wick": 45.1,
       "lower_wick": 25.2,
       "is_expansion_bar": false,
@@ -5360,10 +5996,10 @@
       "is_inside_day": false,
       "is_outside_day": false,
       "pdh_sweep": false,
-      "pdl_sweep": true,
+      "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "SSL Sweep (Bullish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 24400.95,
       "pwl": 23555.6,
       "equilibrium": 23392.12,
@@ -5376,7 +6012,11 @@
       "r1": 24478.4,
       "s1": 24315.35,
       "r2": 24578.7,
-      "s2": 24252.6
+      "s2": 24252.6,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-04-23",
@@ -5397,6 +6037,7 @@
       "gap_type": "Gap Down",
       "body": 29.3,
       "body_pct": 16.7,
+      "clq": 0.22,
       "upper_wick": 107.85,
       "lower_wick": 38.25,
       "is_expansion_bar": false,
@@ -5421,7 +6062,11 @@
       "r1": 24277.24,
       "s1": 24101.84,
       "r2": 24381.42,
-      "s2": 24030.62
+      "s2": 24030.62,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 23813.65 <= 24134.8)"
     },
     {
       "date": "2026-04-24",
@@ -5442,6 +6087,7 @@
       "gap_type": "Gap Down",
       "body": 202.6,
       "body_pct": 51.6,
+      "clq": 0.21,
       "upper_wick": 105.45,
       "lower_wick": 84.3,
       "is_expansion_bar": false,
@@ -5466,7 +6112,11 @@
       "r1": 24131.41,
       "s1": 23739.06,
       "r2": 24364.88,
-      "s2": 23580.18
+      "s2": 23580.18,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDL"
     },
     {
       "date": "2026-04-27",
@@ -5487,6 +6137,7 @@
       "gap_type": "Gap Up",
       "body": 147.25,
       "body_pct": 75.7,
+      "clq": 0.8,
       "upper_wick": 38.0,
       "lower_wick": 9.25,
       "is_expansion_bar": true,
@@ -5511,7 +6162,11 @@
       "r1": 24170.2,
       "s1": 23975.7,
       "r2": 24247.7,
-      "s2": 23858.7
+      "s2": 23858.7,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke High on next day"
     },
     {
       "date": "2026-04-28",
@@ -5532,6 +6187,7 @@
       "gap_type": "Gap Down",
       "body": 54.2,
       "body_pct": 24.1,
+      "clq": 0.17,
       "upper_wick": 131.9,
       "lower_wick": 38.65,
       "is_expansion_bar": false,
@@ -5556,7 +6212,11 @@
       "r1": 24132.65,
       "s1": 23907.9,
       "r2": 24269.6,
-      "s2": 23820.1
+      "s2": 23820.1,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": false,
+      "verification_detail": "Did not retrace to CPR"
     },
     {
       "date": "2026-04-29",
@@ -5577,6 +6237,7 @@
       "gap_type": "Gap Up",
       "body": 80.75,
       "body_pct": 29.4,
+      "clq": 0.43,
       "upper_wick": 157.05,
       "lower_wick": 36.95,
       "is_expansion_bar": false,
@@ -5601,7 +6262,11 @@
       "r1": 24321.59,
       "s1": 24046.84,
       "r2": 24465.52,
-      "s2": 23916.02
+      "s2": 23916.02,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 23796.85 <= 24190.77)"
     },
     {
       "date": "2026-04-30",
@@ -5622,6 +6287,7 @@
       "gap_type": "Gap Down",
       "body": 0.6,
       "body_pct": 0.2,
+      "clq": 0.69,
       "upper_wick": 89.9,
       "lower_wick": 200.1,
       "is_expansion_bar": false,
@@ -5632,8 +6298,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 24601.7,
       "pwl": 23813.65,
       "equilibrium": 23392.12,
@@ -5646,7 +6312,11 @@
       "r1": 24124.39,
       "s1": 23833.79,
       "r2": 24251.22,
-      "s2": 23670.02
+      "s2": 23670.02,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-05-04",
@@ -5667,6 +6337,7 @@
       "gap_type": "Gap Up",
       "body": 55.75,
       "body_pct": 19.5,
+      "clq": 0.4,
       "upper_wick": 170.9,
       "lower_wick": 58.8,
       "is_expansion_bar": false,
@@ -5676,9 +6347,9 @@
       "is_outside_day": false,
       "pdh_sweep": false,
       "pdl_sweep": false,
-      "bullish_bos": true,
+      "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "Bullish BOS (Expansion)",
+      "smc_structure": "Range Auction",
       "pwh": 24334.7,
       "pwl": 23796.85,
       "equilibrium": 23392.12,
@@ -5691,7 +6362,11 @@
       "r1": 24271.41,
       "s1": 23985.96,
       "r2": 24423.53,
-      "s2": 23852.63
+      "s2": 23852.63,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-05-05",
@@ -5712,6 +6387,7 @@
       "gap_type": "Gap Down",
       "body": 19.8,
       "body_pct": 9.9,
+      "clq": 0.76,
       "upper_wick": 29.1,
       "lower_wick": 150.75,
       "is_expansion_bar": false,
@@ -5736,7 +6412,11 @@
       "r1": 24115.65,
       "s1": 23916.0,
       "r2": 24198.5,
-      "s2": 23799.2
+      "s2": 23799.2,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 24356.5 >= 23998.85)"
     },
     {
       "date": "2026-05-06",
@@ -5757,6 +6437,7 @@
       "gap_type": "Gap Up",
       "body": 159.95,
       "body_pct": 44.6,
+      "clq": 0.93,
       "upper_wick": 25.55,
       "lower_wick": 173.1,
       "is_expansion_bar": false,
@@ -5781,7 +6462,11 @@
       "r1": 24459.0,
       "s1": 24100.4,
       "r2": 24587.05,
-      "s2": 23869.85
+      "s2": 23869.85,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 24482.1 >= 24356.5)"
     },
     {
       "date": "2026-05-07",
@@ -5802,6 +6487,7 @@
       "gap_type": "Gap Up",
       "body": 71.85,
       "body_pct": 36.3,
+      "clq": 0.22,
       "upper_wick": 83.6,
       "lower_wick": 42.65,
       "is_expansion_bar": false,
@@ -5826,7 +6512,11 @@
       "r1": 24444.5,
       "s1": 24246.4,
       "r2": 24562.35,
-      "s2": 24166.15
+      "s2": 24166.15,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 24126.65 <= 24364.25)"
     },
     {
       "date": "2026-05-08",
@@ -5847,6 +6537,7 @@
       "gap_type": "Gap Down",
       "body": 57.5,
       "body_pct": 45.2,
+      "clq": 0.39,
       "upper_wick": 20.15,
       "lower_wick": 49.5,
       "is_expansion_bar": false,
@@ -5871,7 +6562,11 @@
       "r1": 24244.41,
       "s1": 24117.26,
       "r2": 24312.68,
-      "s2": 24058.38
+      "s2": 24058.38,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 23799.1 <= 24126.65)"
     },
     {
       "date": "2026-05-11",
@@ -5892,6 +6587,7 @@
       "gap_type": "Gap Down",
       "body": 154.25,
       "body_pct": 77.8,
+      "clq": 0.08,
       "upper_wick": 27.35,
       "lower_wick": 16.75,
       "is_expansion_bar": true,
@@ -5916,7 +6612,11 @@
       "r1": 23942.5,
       "s1": 23744.15,
       "r2": 24069.15,
-      "s2": 23672.45
+      "s2": 23672.45,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 23348.4 <= 23799.1)"
     },
     {
       "date": "2026-05-12",
@@ -5937,6 +6637,7 @@
       "gap_type": "Gap Down",
       "body": 343.05,
       "body_pct": 83.8,
+      "clq": 0.08,
       "upper_wick": 34.95,
       "lower_wick": 31.15,
       "is_expansion_bar": true,
@@ -5961,7 +6662,11 @@
       "r1": 23641.94,
       "s1": 23232.79,
       "r2": 23904.32,
-      "s2": 23086.02
+      "s2": 23086.02,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 23262.55 <= 23348.4)"
     },
     {
       "date": "2026-05-13",
@@ -5982,6 +6687,7 @@
       "gap_type": "Flat",
       "body": 50.15,
       "body_pct": 15.7,
+      "clq": 0.47,
       "upper_wick": 170.35,
       "lower_wick": 99.9,
       "is_expansion_bar": false,
@@ -5990,10 +6696,10 @@
       "is_inside_day": false,
       "is_outside_day": false,
       "pdh_sweep": false,
-      "pdl_sweep": true,
+      "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "SSL Sweep (Bullish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 24482.1,
       "pwl": 23882.05,
       "equilibrium": 23932.12,
@@ -6006,7 +6712,11 @@
       "r1": 23576.19,
       "s1": 23255.79,
       "r2": 23739.77,
-      "s2": 23098.97
+      "s2": 23098.97,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-05-14",
@@ -6027,6 +6737,7 @@
       "gap_type": "Gap Up",
       "body": 159.35,
       "body_pct": 45.4,
+      "clq": 0.75,
       "upper_wick": 87.6,
       "lower_wick": 103.7,
       "is_expansion_bar": false,
@@ -6051,7 +6762,11 @@
       "r1": 23835.69,
       "s1": 23485.04,
       "r2": 23981.77,
-      "s2": 23280.47
+      "s2": 23280.47,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 23839.3 >= 23777.2)"
     },
     {
       "date": "2026-05-15",
@@ -6072,6 +6787,7 @@
       "gap_type": "Gap Up",
       "body": 87.9,
       "body_pct": 38.4,
+      "clq": 0.14,
       "upper_wick": 107.9,
       "lower_wick": 33.2,
       "is_expansion_bar": false,
@@ -6096,7 +6812,11 @@
       "r1": 23785.1,
       "s1": 23556.1,
       "r2": 23926.7,
-      "s2": 23468.7
+      "s2": 23468.7,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 23317.1 <= 23697.7)"
     },
     {
       "date": "2026-05-18",
@@ -6117,6 +6837,7 @@
       "gap_type": "Gap Down",
       "body": 167.75,
       "body_pct": 44.3,
+      "clq": 0.88,
       "upper_wick": 45.7,
       "lower_wick": 165.1,
       "is_expansion_bar": false,
@@ -6141,7 +6862,11 @@
       "r1": 23791.36,
       "s1": 23412.81,
       "r2": 23932.78,
-      "s2": 23175.68
+      "s2": 23175.68,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 23782.3 >= 23554.23)"
     },
     {
       "date": "2026-05-19",
@@ -6162,6 +6887,7 @@
       "gap_type": "Gap Up",
       "body": 57.3,
       "body_pct": 29.4,
+      "clq": 0.16,
       "upper_wick": 107.0,
       "lower_wick": 30.8,
       "is_expansion_bar": false,
@@ -6186,7 +6912,11 @@
       "r1": 23737.8,
       "s1": 23542.7,
       "r2": 23857.6,
-      "s2": 23467.4
+      "s2": 23467.4,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 23397.3 <= 23662.5)"
     },
     {
       "date": "2026-05-20",
@@ -6207,6 +6937,7 @@
       "gap_type": "Gap Down",
       "body": 201.75,
       "body_pct": 68.7,
+      "clq": 0.89,
       "upper_wick": 31.9,
       "lower_wick": 59.95,
       "is_expansion_bar": true,
@@ -6231,7 +6962,11 @@
       "r1": 23767.5,
       "s1": 23473.9,
       "r2": 23876.0,
-      "s2": 23288.8
+      "s2": 23288.8,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 23859.9 >= 23582.4)"
     },
     {
       "date": "2026-05-21",
@@ -6252,6 +6987,7 @@
       "gap_type": "Gap Up",
       "body": 175.35,
       "body_pct": 66.6,
+      "clq": 0.22,
       "upper_wick": 29.85,
       "lower_wick": 58.1,
       "is_expansion_bar": true,
@@ -6276,7 +7012,11 @@
       "r1": 23810.86,
       "s1": 23547.56,
       "r2": 23967.03,
-      "s2": 23440.43
+      "s2": 23440.43,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 23671.0 <= 23703.73)"
     },
     {
       "date": "2026-05-22",
@@ -6297,6 +7037,7 @@
       "gap_type": "Flat",
       "body": 48.1,
       "body_pct": 29.2,
+      "clq": 0.29,
       "upper_wick": 116.35,
       "lower_wick": 0.2,
       "is_expansion_bar": false,
@@ -6321,7 +7062,11 @@
       "r1": 23812.96,
       "s1": 23648.31,
       "r2": 23906.63,
-      "s2": 23577.33
+      "s2": 23577.33,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke High on next day"
     },
     {
       "date": "2026-05-25",
@@ -6342,6 +7087,7 @@
       "gap_type": "Gap Up",
       "body": 91.45,
       "body_pct": 69.5,
+      "clq": 0.83,
       "upper_wick": 22.75,
       "lower_wick": 17.4,
       "is_expansion_bar": true,
@@ -6366,7 +7112,11 @@
       "r1": 24083.15,
       "s1": 23951.55,
       "r2": 24134.6,
-      "s2": 23871.4
+      "s2": 23871.4,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 24089.8 >= 24054.45)"
     },
     {
       "date": "2026-05-26",
@@ -6387,6 +7137,7 @@
       "gap_type": "Gap Down",
       "body": 90.4,
       "body_pct": 44.2,
+      "clq": 0.14,
       "upper_wick": 85.7,
       "lower_wick": 28.25,
       "is_expansion_bar": false,
@@ -6411,7 +7162,11 @@
       "r1": 24040.51,
       "s1": 23836.16,
       "r2": 24167.33,
-      "s2": 23758.63
+      "s2": 23758.63,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 23858.25 <= 23962.98)"
     },
     {
       "date": "2026-05-27",
@@ -6432,6 +7187,7 @@
       "gap_type": "Gap Down",
       "body": 26.8,
       "body_pct": 21.4,
+      "clq": 0.39,
       "upper_wick": 76.05,
       "lower_wick": 22.1,
       "is_expansion_bar": false,
@@ -6440,10 +7196,10 @@
       "is_inside_day": false,
       "is_outside_day": false,
       "pdh_sweep": false,
-      "pdl_sweep": true,
+      "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "SSL Sweep (Bullish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 23859.9,
       "pwl": 23317.1,
       "equilibrium": 23872.33,
@@ -6456,7 +7212,11 @@
       "r1": 23974.15,
       "s1": 23849.2,
       "r2": 24041.15,
-      "s2": 23791.25
+      "s2": 23791.25,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2026-05-29",
@@ -6477,6 +7237,7 @@
       "gap_type": "Flat",
       "body": 354.4,
       "body_pct": 68.4,
+      "clq": 0.12,
       "upper_wick": 100.65,
       "lower_wick": 63.0,
       "is_expansion_bar": true,
@@ -6501,7 +7262,11 @@
       "r1": 23872.11,
       "s1": 23354.06,
       "r2": 24196.48,
-      "s2": 23160.38
+      "s2": 23160.38,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 23357.95 <= 23678.43)"
     },
     {
       "date": "2026-06-01",
@@ -6522,6 +7287,7 @@
       "gap_type": "Gap Up",
       "body": 271.9,
       "body_pct": 72.4,
+      "clq": 0.07,
       "upper_wick": 79.2,
       "lower_wick": 24.65,
       "is_expansion_bar": true,
@@ -6546,7 +7312,11 @@
       "r1": 23624.89,
       "s1": 23249.14,
       "r2": 23867.17,
-      "s2": 23115.67
+      "s2": 23115.67,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 23229.15 <= 23357.95)"
     },
     {
       "date": "2026-06-02",
@@ -6567,6 +7337,7 @@
       "gap_type": "Gap Down",
       "body": 254.4,
       "body_pct": 77.6,
+      "clq": 0.78,
       "upper_wick": 73.4,
       "lower_wick": 0.0,
       "is_expansion_bar": true,
@@ -6591,7 +7362,11 @@
       "r1": 23617.29,
       "s1": 23289.49,
       "r2": 23751.02,
-      "s2": 23095.42
+      "s2": 23095.42,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 23459.65 >= 23423.22)"
     },
     {
       "date": "2026-06-03",
@@ -6612,6 +7387,7 @@
       "gap_type": "Gap Down",
       "body": 10.35,
       "body_pct": 3.4,
+      "clq": 0.82,
       "upper_wick": 43.7,
       "lower_wick": 254.1,
       "is_expansion_bar": false,
@@ -6636,7 +7412,11 @@
       "r1": 23526.34,
       "s1": 23218.19,
       "r2": 23647.07,
-      "s2": 23030.77
+      "s2": 23030.77,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 23465.3 >= 23338.92)"
     },
     {
       "date": "2026-06-04",
@@ -6657,18 +7437,19 @@
       "gap_type": "Gap Down",
       "body": 134.1,
       "body_pct": 61.5,
+      "clq": 0.78,
       "upper_wick": 48.75,
       "lower_wick": 35.15,
-      "is_expansion_bar": false,
+      "is_expansion_bar": true,
       "is_pinbar": false,
-      "candle_type": "Bullish",
+      "candle_type": "Strong Bullish Expansion",
       "is_inside_day": false,
       "is_outside_day": false,
-      "pdh_sweep": true,
+      "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "BSL Sweep (Bearish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 24089.8,
       "pwl": 23484.75,
       "equilibrium": 23816.8,
@@ -6681,7 +7462,11 @@
       "r1": 23505.46,
       "s1": 23287.46,
       "r2": 23594.38,
-      "s2": 23158.38
+      "s2": 23158.38,
+      "historical_setup": "Bullish Momentum",
+      "expected_target": "PDH Test & Continuation",
+      "prediction_verified": true,
+      "verification_detail": "Tested PDH (High 23516.35 >= 23465.3)"
     },
     {
       "date": "2026-06-05",
@@ -6702,6 +7487,7 @@
       "gap_type": "Gap Up",
       "body": 112.25,
       "body_pct": 48.0,
+      "clq": 0.36,
       "upper_wick": 37.4,
       "lower_wick": 84.05,
       "is_expansion_bar": false,
@@ -6726,7 +7512,11 @@
       "r1": 23494.49,
       "s1": 23260.79,
       "r2": 23622.27,
-      "s2": 23154.87
+      "s2": 23154.87,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 23070.15 <= 23388.57)"
     },
     {
       "date": "2026-06-08",
@@ -6747,6 +7537,7 @@
       "gap_type": "Gap Down",
       "body": 42.3,
       "body_pct": 21.5,
+      "clq": 0.27,
       "upper_wick": 144.3,
       "lower_wick": 10.55,
       "is_expansion_bar": false,
@@ -6771,7 +7562,11 @@
       "r1": 23236.81,
       "s1": 23039.66,
       "r2": 23350.63,
-      "s2": 22956.33
+      "s2": 22956.33,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDL"
     },
     {
       "date": "2026-06-09",
@@ -6792,6 +7587,7 @@
       "gap_type": "Gap Up",
       "body": 16.95,
       "body_pct": 9.7,
+      "clq": 0.79,
       "upper_wick": 20.35,
       "lower_wick": 137.65,
       "is_expansion_bar": false,
@@ -6799,11 +7595,11 @@
       "candle_type": "Bearish",
       "is_inside_day": false,
       "is_outside_day": false,
-      "pdh_sweep": true,
+      "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "BSL Sweep (Bearish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 23733.7,
       "pwl": 23151.5,
       "equilibrium": 23579.98,
@@ -6816,7 +7612,11 @@
       "r1": 23312.85,
       "s1": 23137.9,
       "r2": 23383.6,
-      "s2": 23033.7
+      "s2": 23033.7,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2026-06-10",
@@ -6837,6 +7637,7 @@
       "gap_type": "Flat",
       "body": 19.0,
       "body_pct": 7.9,
+      "clq": 0.13,
       "upper_wick": 191.4,
       "lower_wick": 30.35,
       "is_expansion_bar": false,
@@ -6861,7 +7662,11 @@
       "r1": 23365.34,
       "s1": 23124.59,
       "r2": 23515.72,
-      "s2": 23034.22
+      "s2": 23034.22,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 23072.05 <= 23274.97)"
     },
     {
       "date": "2026-06-11",
@@ -6882,6 +7687,7 @@
       "gap_type": "Gap Down",
       "body": 57.2,
       "body_pct": 22.4,
+      "clq": 0.35,
       "upper_wick": 165.85,
       "lower_wick": 32.35,
       "is_expansion_bar": false,
@@ -6906,7 +7712,11 @@
       "r1": 23302.01,
       "s1": 23046.61,
       "r2": 23442.43,
-      "s2": 22931.63
+      "s2": 22931.63,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDL"
     },
     {
       "date": "2026-06-12",
@@ -6927,11 +7737,12 @@
       "gap_type": "Gap Up",
       "body": 210.35,
       "body_pct": 63.5,
+      "clq": 0.93,
       "upper_wick": 22.45,
       "lower_wick": 98.65,
-      "is_expansion_bar": false,
+      "is_expansion_bar": true,
       "is_pinbar": false,
-      "candle_type": "Bullish",
+      "candle_type": "Strong Bullish Expansion",
       "is_inside_day": false,
       "is_outside_day": false,
       "pdh_sweep": false,
@@ -6951,7 +7762,11 @@
       "r1": 23740.86,
       "s1": 23409.41,
       "r2": 23858.83,
-      "s2": 23195.93
+      "s2": 23195.93,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 24011.4 >= 23645.35)"
     },
     {
       "date": "2026-06-15",
@@ -6972,6 +7787,7 @@
       "gap_type": "Gap Up",
       "body": 130.95,
       "body_pct": 67.6,
+      "clq": 0.19,
       "upper_wick": 26.55,
       "lower_wick": 36.1,
       "is_expansion_bar": true,
@@ -6981,9 +7797,9 @@
       "is_outside_day": false,
       "pdh_sweep": false,
       "pdl_sweep": false,
-      "bullish_bos": true,
+      "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "Bullish BOS (Expansion)",
+      "smc_structure": "Range Auction",
       "pwh": 23645.35,
       "pwl": 23070.15,
       "equilibrium": 23579.98,
@@ -6996,7 +7812,11 @@
       "r1": 23970.94,
       "s1": 23777.34,
       "r2": 24087.97,
-      "s2": 23700.77
+      "s2": 23700.77,
+      "historical_setup": "Bearish Momentum",
+      "expected_target": "PDL Test & Continuation",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDL"
     },
     {
       "date": "2026-06-16",
@@ -7017,6 +7837,7 @@
       "gap_type": "Gap Up",
       "body": 65.25,
       "body_pct": 57.0,
+      "clq": 0.88,
       "upper_wick": 13.45,
       "lower_wick": 35.7,
       "is_expansion_bar": false,
@@ -7041,7 +7862,11 @@
       "r1": 24031.76,
       "s1": 23917.36,
       "r2": 24074.38,
-      "s2": 23845.58
+      "s2": 23845.58,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke High on next day"
     },
     {
       "date": "2026-06-17",
@@ -7062,6 +7887,7 @@
       "gap_type": "Gap Up",
       "body": 41.2,
       "body_pct": 29.7,
+      "clq": 0.84,
       "upper_wick": 22.5,
       "lower_wick": 74.8,
       "is_expansion_bar": false,
@@ -7086,7 +7912,11 @@
       "r1": 24139.36,
       "s1": 24000.86,
       "r2": 24193.03,
-      "s2": 23916.03
+      "s2": 23916.03,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 24189.25 >= 24108.2)"
     },
     {
       "date": "2026-06-18",
@@ -7107,11 +7937,12 @@
       "gap_type": "Flat",
       "body": 94.2,
       "body_pct": 61.9,
+      "clq": 0.86,
       "upper_wick": 21.25,
       "lower_wick": 36.85,
-      "is_expansion_bar": false,
+      "is_expansion_bar": true,
       "is_pinbar": false,
-      "candle_type": "Bullish",
+      "candle_type": "Strong Bullish Expansion",
       "is_inside_day": false,
       "is_outside_day": false,
       "pdh_sweep": false,
@@ -7131,7 +7962,11 @@
       "r1": 24225.85,
       "s1": 24073.55,
       "r2": 24283.7,
-      "s2": 23979.1
+      "s2": 23979.1,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDH"
     },
     {
       "date": "2026-06-19",
@@ -7152,6 +7987,7 @@
       "gap_type": "Gap Down",
       "body": 21.9,
       "body_pct": 15.1,
+      "clq": 0.77,
       "upper_wick": 34.1,
       "lower_wick": 89.3,
       "is_expansion_bar": false,
@@ -7162,8 +7998,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 23645.35,
       "pwl": 23070.15,
       "equilibrium": 23629.7,
@@ -7176,7 +8012,11 @@
       "r1": 24072.9,
       "s1": 23927.6,
       "r2": 24132.7,
-      "s2": 23842.1
+      "s2": 23842.1,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-06-22",
@@ -7197,6 +8037,7 @@
       "gap_type": "Gap Up",
       "body": 3.7,
       "body_pct": 3.9,
+      "clq": 0.31,
       "upper_wick": 61.45,
       "lower_wick": 29.75,
       "is_expansion_bar": false,
@@ -7206,9 +8047,9 @@
       "is_outside_day": false,
       "pdh_sweep": false,
       "pdl_sweep": false,
-      "bullish_bos": true,
+      "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "Bullish BOS (Expansion)",
+      "smc_structure": "Range Auction",
       "pwh": 24189.25,
       "pwl": 23817.8,
       "equilibrium": 23629.7,
@@ -7221,7 +8062,11 @@
       "r1": 24156.25,
       "s1": 24061.35,
       "r2": 24209.6,
-      "s2": 24019.8
+      "s2": 24019.8,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2026-06-23",
@@ -7242,6 +8087,7 @@
       "gap_type": "Gap Down",
       "body": 247.2,
       "body_pct": 70.5,
+      "clq": 0.11,
       "upper_wick": 64.2,
       "lower_wick": 39.15,
       "is_expansion_bar": true,
@@ -7266,7 +8112,11 @@
       "r1": 24044.75,
       "s1": 23694.2,
       "r2": 24265.4,
-      "s2": 23564.3
+      "s2": 23564.3,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDL"
     },
     {
       "date": "2026-06-24",
@@ -7287,6 +8137,7 @@
       "gap_type": "Gap Down",
       "body": 225.85,
       "body_pct": 75.1,
+      "clq": 0.77,
       "upper_wick": 68.4,
       "lower_wick": 6.55,
       "is_expansion_bar": true,
@@ -7311,7 +8162,11 @@
       "r1": 24144.71,
       "s1": 23843.91,
       "r2": 24267.78,
-      "s2": 23666.18
+      "s2": 23666.18,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke High on next day"
     },
     {
       "date": "2026-06-25",
@@ -7332,6 +8187,7 @@
       "gap_type": "Gap Up",
       "body": 69.85,
       "body_pct": 31.4,
+      "clq": 0.08,
       "upper_wick": 135.75,
       "lower_wick": 17.0,
       "is_expansion_bar": false,
@@ -7356,7 +8212,11 @@
       "r1": 24198.74,
       "s1": 23976.14,
       "r2": 24341.47,
-      "s2": 23896.27
+      "s2": 23896.27,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 23924.55 <= 24118.87)"
     },
     {
       "date": "2026-06-29",
@@ -7377,6 +8237,7 @@
       "gap_type": "Flat",
       "body": 115.5,
       "body_pct": 59.1,
+      "clq": 0.11,
       "upper_wick": 58.25,
       "lower_wick": 21.7,
       "is_expansion_bar": false,
@@ -7401,7 +8262,11 @@
       "r1": 24069.31,
       "s1": 23873.86,
       "r2": 24192.38,
-      "s2": 23801.48
+      "s2": 23801.48,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 23829.2 <= 23924.55)"
     },
     {
       "date": "2026-06-30",
@@ -7422,6 +8287,7 @@
       "gap_type": "Gap Up",
       "body": 166.3,
       "body_pct": 80.6,
+      "clq": 0.18,
       "upper_wick": 3.5,
       "lower_wick": 36.55,
       "is_expansion_bar": true,
@@ -7446,7 +8312,11 @@
       "r1": 23991.14,
       "s1": 23784.79,
       "r2": 24116.52,
-      "s2": 23703.82
+      "s2": 23703.82,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDL"
     },
     {
       "date": "2026-07-01",
@@ -7467,6 +8337,7 @@
       "gap_type": "Gap Up",
       "body": 108.2,
       "body_pct": 69.9,
+      "clq": 0.72,
       "upper_wick": 44.05,
       "lower_wick": 2.55,
       "is_expansion_bar": true,
@@ -7474,11 +8345,11 @@
       "candle_type": "Strong Bullish Expansion",
       "is_inside_day": false,
       "is_outside_day": false,
-      "pdh_sweep": true,
+      "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "BSL Sweep (Bearish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 24261.6,
       "pwl": 23784.95,
       "equilibrium": 23665.88,
@@ -7491,7 +8362,11 @@
       "r1": 24072.14,
       "s1": 23917.34,
       "r2": 24138.42,
-      "s2": 23828.82
+      "s2": 23828.82,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-07-02",
@@ -7512,6 +8387,7 @@
       "gap_type": "Gap Up",
       "body": 113.5,
       "body_pct": 83.6,
+      "clq": 0.86,
       "upper_wick": 18.85,
       "lower_wick": 3.4,
       "is_expansion_bar": true,
@@ -7536,7 +8412,11 @@
       "r1": 24227.24,
       "s1": 24091.49,
       "r2": 24278.77,
-      "s2": 24007.27
+      "s2": 24007.27,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 24378.15 >= 24194.55)"
     },
     {
       "date": "2026-07-03",
@@ -7557,6 +8437,7 @@
       "gap_type": "Gap Up",
       "body": 104.8,
       "body_pct": 83.3,
+      "clq": 0.15,
       "upper_wick": 2.5,
       "lower_wick": 18.5,
       "is_expansion_bar": false,
@@ -7566,9 +8447,9 @@
       "is_outside_day": false,
       "pdh_sweep": false,
       "pdl_sweep": false,
-      "bullish_bos": true,
+      "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "Bullish BOS (Expansion)",
+      "smc_structure": "Range Auction",
       "pwh": 24261.6,
       "pwl": 23784.95,
       "equilibrium": 23724.15,
@@ -7581,7 +8462,11 @@
       "r1": 24348.55,
       "s1": 24222.75,
       "r2": 24426.25,
-      "s2": 24174.65
+      "s2": 24174.65,
+      "historical_setup": "Bearish Momentum",
+      "expected_target": "PDL Test & Continuation",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDL"
     },
     {
       "date": "2026-07-06",
@@ -7602,6 +8487,7 @@
       "gap_type": "Gap Up",
       "body": 123.5,
       "body_pct": 72.0,
+      "clq": 0.84,
       "upper_wick": 28.3,
       "lower_wick": 19.75,
       "is_expansion_bar": true,
@@ -7626,7 +8512,11 @@
       "r1": 24496.96,
       "s1": 24325.41,
       "r2": 24563.58,
-      "s2": 24220.48
+      "s2": 24220.48,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 24530.9 >= 24458.65)"
     },
     {
       "date": "2026-07-07",
@@ -7647,6 +8537,7 @@
       "gap_type": "Gap Up",
       "body": 65.75,
       "body_pct": 36.1,
+      "clq": 0.27,
       "upper_wick": 66.45,
       "lower_wick": 49.75,
       "is_expansion_bar": false,
@@ -7671,7 +8562,11 @@
       "r1": 24503.41,
       "s1": 24321.46,
       "r2": 24608.13,
-      "s2": 24244.23
+      "s2": 24244.23,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 23805.2 <= 24426.18)"
     },
     {
       "date": "2026-07-08",
@@ -7692,6 +8587,7 @@
       "gap_type": "Gap Down",
       "body": 377.5,
       "body_pct": 76.3,
+      "clq": 0.16,
       "upper_wick": 40.45,
       "lower_wick": 76.85,
       "is_expansion_bar": true,
@@ -7716,7 +8612,11 @@
       "r1": 24186.3,
       "s1": 23691.5,
       "r2": 24490.55,
-      "s2": 23500.95
+      "s2": 23500.95,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDL"
     },
     {
       "date": "2026-07-09",
@@ -7737,6 +8637,7 @@
       "gap_type": "Gap Up",
       "body": 33.85,
       "body_pct": 16.2,
+      "clq": 0.18,
       "upper_wick": 171.9,
       "lower_wick": 3.25,
       "is_expansion_bar": false,
@@ -7761,7 +8662,11 @@
       "r1": 24089.76,
       "s1": 23880.76,
       "r2": 24216.73,
-      "s2": 23798.73
+      "s2": 23798.73,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke High on next day"
     },
     {
       "date": "2026-07-10",
@@ -7782,6 +8687,7 @@
       "gap_type": "Gap Up",
       "body": 82.2,
       "body_pct": 76.0,
+      "clq": 0.8,
       "upper_wick": 21.55,
       "lower_wick": 4.35,
       "is_expansion_bar": false,
@@ -7806,7 +8712,11 @@
       "r1": 24250.11,
       "s1": 24142.01,
       "r2": 24293.33,
-      "s2": 24077.13
+      "s2": 24077.13,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 24259.8 >= 24228.45)"
     },
     {
       "date": "2026-07-13",
@@ -7827,6 +8737,7 @@
       "gap_type": "Gap Down",
       "body": 171.6,
       "body_pct": 66.1,
+      "clq": 0.81,
       "upper_wick": 48.8,
       "lower_wick": 39.2,
       "is_expansion_bar": true,
@@ -7834,11 +8745,11 @@
       "candle_type": "Strong Bullish Expansion",
       "is_inside_day": false,
       "is_outside_day": true,
-      "pdh_sweep": true,
-      "pdl_sweep": false,
+      "pdh_sweep": false,
+      "pdl_sweep": true,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "BSL Sweep (Bearish Grab)",
+      "smc_structure": "SSL Sweep (Bullish Grab)",
       "pwh": 24530.9,
       "pwl": 23805.2,
       "equilibrium": 24157.92,
@@ -7851,7 +8762,11 @@
       "r1": 24313.8,
       "s1": 24054.2,
       "r2": 24416.6,
-      "s2": 23897.4
+      "s2": 23897.4,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 24157.1 >= 24157.0)"
     },
     {
       "date": "2026-07-14",
@@ -7872,6 +8787,7 @@
       "gap_type": "Gap Down",
       "body": 15.95,
       "body_pct": 12.0,
+      "clq": 0.21,
       "upper_wick": 89.1,
       "lower_wick": 28.35,
       "is_expansion_bar": false,
@@ -7896,7 +8812,11 @@
       "r1": 24131.54,
       "s1": 23998.14,
       "r2": 24211.02,
-      "s2": 23944.22
+      "s2": 23944.22,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke High on next day"
     },
     {
       "date": "2026-07-15",
@@ -7917,6 +8837,7 @@
       "gap_type": "Gap Up",
       "body": 7.35,
       "body_pct": 3.5,
+      "clq": 0.32,
       "upper_wick": 134.5,
       "lower_wick": 67.95,
       "is_expansion_bar": false,
@@ -7941,7 +8862,11 @@
       "r1": 24195.71,
       "s1": 23985.91,
       "r2": 24312.93,
-      "s2": 23893.33
+      "s2": 23893.33,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 24050.0 <= 24103.13)"
     },
     {
       "date": "2026-07-16",
@@ -7962,6 +8887,7 @@
       "gap_type": "Gap Up",
       "body": 69.35,
       "body_pct": 50.8,
+      "clq": 0.17,
       "upper_wick": 44.4,
       "lower_wick": 22.75,
       "is_expansion_bar": false,
@@ -7986,7 +8912,11 @@
       "r1": 24156.16,
       "s1": 24019.66,
       "r2": 24239.58,
-      "s2": 23966.58
+      "s2": 23966.58,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke High on next day"
     },
     {
       "date": "2026-07-17",
@@ -8007,6 +8937,7 @@
       "gap_type": "Gap Up",
       "body": 206.7,
       "body_pct": 77.1,
+      "clq": 0.88,
       "upper_wick": 33.0,
       "lower_wick": 28.55,
       "is_expansion_bar": true,
@@ -8031,7 +8962,11 @@
       "r1": 24434.71,
       "s1": 24166.46,
       "r2": 24535.13,
-      "s2": 23998.63
+      "s2": 23998.63,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDH"
     },
     {
       "date": "2026-07-20",
@@ -8052,6 +8987,7 @@
       "gap_type": "Gap Down",
       "body": 48.45,
       "body_pct": 37.2,
+      "clq": 0.79,
       "upper_wick": 27.6,
       "lower_wick": 54.2,
       "is_expansion_bar": false,
@@ -8076,7 +9012,11 @@
       "r1": 24291.11,
       "s1": 24160.86,
       "r2": 24343.73,
-      "s2": 24083.23
+      "s2": 24083.23,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke Low on next day"
     },
     {
       "date": "2026-07-21",
@@ -8097,6 +9037,7 @@
       "gap_type": "Flat",
       "body": 28.35,
       "body_pct": 22.4,
+      "clq": 0.41,
       "upper_wick": 46.15,
       "lower_wick": 52.05,
       "is_expansion_bar": false,
@@ -8105,10 +9046,10 @@
       "is_inside_day": false,
       "is_outside_day": false,
       "pdh_sweep": false,
-      "pdl_sweep": true,
+      "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "SSL Sweep (Bullish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 24367.3,
       "pwl": 24000.2,
       "equilibrium": 24157.92,
@@ -8121,7 +9062,11 @@
       "r1": 24254.71,
       "s1": 24128.16,
       "r2": 24321.73,
-      "s2": 24068.63
+      "s2": 24068.63,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-07-22",
@@ -8142,6 +9087,7 @@
       "gap_type": "Gap Down",
       "body": 154.2,
       "body_pct": 75.3,
+      "clq": 0.17,
       "upper_wick": 15.85,
       "lower_wick": 34.85,
       "is_expansion_bar": true,
@@ -8166,7 +9112,11 @@
       "r1": 24121.24,
       "s1": 23916.34,
       "r2": 24246.22,
-      "s2": 23836.42
+      "s2": 23836.42,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 23807.2 <= 23961.4)"
     },
     {
       "date": "2026-07-23",
@@ -8187,6 +9137,7 @@
       "gap_type": "Gap Down",
       "body": 35.2,
       "body_pct": 19.2,
+      "clq": 0.34,
       "upper_wick": 85.95,
       "lower_wick": 62.4,
       "is_expansion_bar": false,
@@ -8211,7 +9162,11 @@
       "r1": 23971.16,
       "s1": 23787.61,
       "r2": 24072.73,
-      "s2": 23705.63
+      "s2": 23705.63,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 23606.3 <= 23807.2)"
     },
     {
       "date": "2026-07-24",
@@ -8232,6 +9187,7 @@
       "gap_type": "Gap Down",
       "body": 101.1,
       "body_pct": 46.5,
+      "clq": 0.74,
       "upper_wick": 56.15,
       "lower_wick": 60.05,
       "is_expansion_bar": false,
@@ -8242,8 +9198,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 24367.3,
       "pwl": 24000.2,
       "equilibrium": 24068.6,
@@ -8256,7 +9212,11 @@
       "r1": 23858.6,
       "s1": 23641.3,
       "r2": 23949.75,
-      "s2": 23515.15
+      "s2": 23515.15,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-07-27",
@@ -8277,6 +9237,7 @@
       "gap_type": "Gap Up",
       "body": 67.55,
       "body_pct": 56.3,
+      "clq": 0.87,
       "upper_wick": 15.65,
       "lower_wick": 36.85,
       "is_expansion_bar": false,
@@ -8301,7 +9262,11 @@
       "r1": 24041.19,
       "s1": 23921.14,
       "r2": 24086.42,
-      "s2": 23846.32
+      "s2": 23846.32,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 24041.15 >= 24011.6)"
     },
     {
       "date": "2026-07-28",
@@ -8322,6 +9287,7 @@
       "gap_type": "Flat",
       "body": 14.1,
       "body_pct": 16.3,
+      "clq": 0.36,
       "upper_wick": 55.8,
       "lower_wick": 16.65,
       "is_expansion_bar": false,
@@ -8346,7 +9312,11 @@
       "r1": 24032.8,
       "s1": 23946.25,
       "r2": 24080.25,
-      "s2": 23907.15
+      "s2": 23907.15,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": false,
+      "verification_detail": "Did not retrace to CPR"
     },
     {
       "date": "2026-07-29",
@@ -8367,6 +9337,7 @@
       "gap_type": "Gap Up",
       "body": 73.55,
       "body_pct": 50.1,
+      "clq": 0.77,
       "upper_wick": 33.35,
       "lower_wick": 39.9,
       "is_expansion_bar": false,
@@ -8391,7 +9362,11 @@
       "r1": 24310.25,
       "s1": 24163.45,
       "r2": 24370.3,
-      "s2": 24076.7
+      "s2": 24076.7,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 24342.95 >= 24283.55)"
     },
     {
       "date": "2026-07-30",
@@ -8412,6 +9387,7 @@
       "gap_type": "Flat",
       "body": 67.6,
       "body_pct": 43.4,
+      "clq": 0.83,
       "upper_wick": 25.8,
       "lower_wick": 62.45,
       "is_expansion_bar": false,
@@ -8436,7 +9412,11 @@
       "r1": 24377.7,
       "s1": 24221.85,
       "r2": 24438.25,
-      "s2": 24126.55
+      "s2": 24126.55,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 24429.4 >= 24342.95)"
     },
     {
       "date": "2026-07-31",
@@ -8457,6 +9437,7 @@
       "gap_type": "Gap Up",
       "body": 22.15,
       "body_pct": 17.1,
+      "clq": 0.65,
       "upper_wick": 45.8,
       "lower_wick": 61.75,
       "is_expansion_bar": false,
@@ -8481,7 +9462,11 @@
       "r1": 24442.1,
       "s1": 24312.4,
       "r2": 24500.6,
-      "s2": 24241.2
+      "s2": 24241.2,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 24774.3 >= 24429.4)"
     },
     {
       "date": "2026-08-03",
@@ -8502,6 +9487,7 @@
       "gap_type": "Gap Up",
       "body": 201.6,
       "body_pct": 77.8,
+      "clq": 1.0,
       "upper_wick": 0.0,
       "lower_wick": 57.55,
       "is_expansion_bar": true,
@@ -8526,7 +9512,11 @@
       "r1": 24860.69,
       "s1": 24601.54,
       "r2": 24947.07,
-      "s2": 24428.77
+      "s2": 24428.77,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDH"
     },
     {
       "date": "2026-08-04",
@@ -8547,6 +9537,7 @@
       "gap_type": "Gap Down",
       "body": 89.0,
       "body_pct": 32.3,
+      "clq": 0.68,
       "upper_wick": 0.0,
       "lower_wick": 186.95,
       "is_expansion_bar": false,
@@ -8571,7 +9562,11 @@
       "r1": 24736.55,
       "s1": 24460.6,
       "r2": 24858.2,
-      "s2": 24306.3
+      "s2": 24306.3,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 24677.6 >= 24582.25)"
     },
     {
       "date": "2026-08-05",
@@ -8592,6 +9587,7 @@
       "gap_type": "Gap Up",
       "body": 44.55,
       "body_pct": 24.8,
+      "clq": 0.71,
       "upper_wick": 8.4,
       "lower_wick": 126.7,
       "is_expansion_bar": false,
@@ -8616,7 +9612,11 @@
       "r1": 24702.19,
       "s1": 24522.54,
       "r2": 24779.72,
-      "s2": 24420.42
+      "s2": 24420.42,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": false,
+      "verification_detail": "Remained Inside"
     },
     {
       "date": "2026-08-06",
@@ -8637,6 +9637,7 @@
       "gap_type": "Flat",
       "body": 5.0,
       "body_pct": 6.9,
+      "clq": 0.44,
       "upper_wick": 36.05,
       "lower_wick": 31.85,
       "is_expansion_bar": false,
@@ -8661,7 +9662,11 @@
       "r1": 24673.99,
       "s1": 24601.09,
       "r2": 24711.97,
-      "s2": 24566.17
+      "s2": 24566.17,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke Low on next day"
     },
     {
       "date": "2026-08-07",
@@ -8682,6 +9687,7 @@
       "gap_type": "Gap Down",
       "body": 31.75,
       "body_pct": 29.5,
+      "clq": 0.44,
       "upper_wick": 59.75,
       "lower_wick": 16.15,
       "is_expansion_bar": false,
@@ -8706,7 +9712,11 @@
       "r1": 24626.45,
       "s1": 24518.8,
       "r2": 24682.25,
-      "s2": 24466.95
+      "s2": 24466.95,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2026-08-10",
@@ -8727,6 +9737,7 @@
       "gap_type": "Flat",
       "body": 2.55,
       "body_pct": 2.3,
+      "clq": 0.66,
       "upper_wick": 37.15,
       "lower_wick": 70.15,
       "is_expansion_bar": false,
@@ -8751,7 +9762,11 @@
       "r1": 24632.8,
       "s1": 24522.95,
       "r2": 24681.8,
-      "s2": 24462.1
+      "s2": 24462.1,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 24576.85 >= 24571.95)"
     },
     {
       "date": "2026-08-11",
@@ -8772,6 +9787,7 @@
       "gap_type": "Flat",
       "body": 103.4,
       "body_pct": 70.1,
+      "clq": 0.29,
       "upper_wick": 1.75,
       "lower_wick": 42.45,
       "is_expansion_bar": true,
@@ -8796,7 +9812,11 @@
       "r1": 24555.95,
       "s1": 24408.35,
       "r2": 24640.2,
-      "s2": 24345.0
+      "s2": 24345.0,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 24265.95 <= 24429.25)"
     },
     {
       "date": "2026-08-12",
@@ -8817,6 +9837,7 @@
       "gap_type": "Flat",
       "body": 36.5,
       "body_pct": 17.6,
+      "clq": 0.82,
       "upper_wick": 0.85,
       "lower_wick": 170.0,
       "is_expansion_bar": false,
@@ -8841,7 +9862,11 @@
       "r1": 24517.51,
       "s1": 24310.16,
       "r2": 24599.08,
-      "s2": 24184.38
+      "s2": 24184.38,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 24431.6 >= 24391.73)"
     },
     {
       "date": "2026-08-13",
@@ -8862,6 +9887,7 @@
       "gap_type": "Flat",
       "body": 35.75,
       "body_pct": 29.7,
+      "clq": 0.7,
       "upper_wick": 0.0,
       "lower_wick": 84.45,
       "is_expansion_bar": false,
@@ -8886,7 +9912,11 @@
       "r1": 24447.84,
       "s1": 24327.64,
       "r2": 24499.82,
-      "s2": 24259.42
+      "s2": 24259.42,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke Low on next day"
     },
     {
       "date": "2026-08-14",
@@ -8907,6 +9937,7 @@
       "gap_type": "Gap Down",
       "body": 4.1,
       "body_pct": 3.8,
+      "clq": 0.64,
       "upper_wick": 39.2,
       "lower_wick": 65.1,
       "is_expansion_bar": false,
@@ -8931,7 +9962,11 @@
       "r1": 24415.2,
       "s1": 24306.8,
       "r2": 24464.4,
-      "s2": 24247.6
+      "s2": 24247.6,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 24360.1 >= 24356.0)"
     },
     {
       "date": "2026-08-17",
@@ -8952,6 +9987,7 @@
       "gap_type": "Flat",
       "body": 55.8,
       "body_pct": 41.9,
+      "clq": 0.46,
       "upper_wick": 16.65,
       "lower_wick": 60.7,
       "is_expansion_bar": false,
@@ -8962,8 +9998,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 24620.95,
       "pwl": 24265.95,
       "equilibrium": 24190.3,
@@ -8976,7 +10012,11 @@
       "r1": 24356.19,
       "s1": 24223.04,
       "r2": 24424.72,
-      "s2": 24158.42
+      "s2": 24158.42,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-08-18",
@@ -8997,6 +10037,7 @@
       "gap_type": "Gap Down",
       "body": 68.95,
       "body_pct": 60.1,
+      "clq": 0.0,
       "upper_wick": 45.8,
       "lower_wick": 0.0,
       "is_expansion_bar": false,
@@ -9021,7 +10062,11 @@
       "r1": 24231.4,
       "s1": 24116.65,
       "r2": 24307.9,
-      "s2": 24078.4
+      "s2": 24078.4,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 24025.65 <= 24154.9)"
     },
     {
       "date": "2026-08-19",
@@ -9042,6 +10087,7 @@
       "gap_type": "Flat",
       "body": 73.75,
       "body_pct": 50.1,
+      "clq": 0.36,
       "upper_wick": 20.8,
       "lower_wick": 52.65,
       "is_expansion_bar": false,
@@ -9066,7 +10112,11 @@
       "r1": 24158.89,
       "s1": 24011.69,
       "r2": 24239.47,
-      "s2": 23945.07
+      "s2": 23945.07,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDL"
     },
     {
       "date": "2026-08-20",
@@ -9087,6 +10137,7 @@
       "gap_type": "Gap Up",
       "body": 6.4,
       "body_pct": 7.9,
+      "clq": 0.59,
       "upper_wick": 33.3,
       "lower_wick": 40.9,
       "is_expansion_bar": false,
@@ -9111,7 +10162,11 @@
       "r1": 24269.81,
       "s1": 24189.21,
       "r2": 24307.78,
-      "s2": 24146.58
+      "s2": 24146.58,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2026-08-21",
@@ -9132,6 +10187,7 @@
       "gap_type": "Gap Up",
       "body": 32.05,
       "body_pct": 41.5,
+      "clq": 0.59,
       "upper_wick": 0.0,
       "lower_wick": 45.2,
       "is_expansion_bar": false,
@@ -9139,11 +10195,11 @@
       "candle_type": "Bearish",
       "is_inside_day": false,
       "is_outside_day": false,
-      "pdh_sweep": true,
+      "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "BSL Sweep (Bearish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 24620.95,
       "pwl": 24265.95,
       "equilibrium": 24332.93,
@@ -9156,7 +10212,11 @@
       "r1": 24288.44,
       "s1": 24211.19,
       "r2": 24324.87,
-      "s2": 24170.37
+      "s2": 24170.37,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2026-08-24",
@@ -9177,6 +10237,7 @@
       "gap_type": "Gap Up",
       "body": 66.0,
       "body_pct": 39.1,
+      "clq": 0.44,
       "upper_wick": 27.95,
       "lower_wick": 74.75,
       "is_expansion_bar": false,
@@ -9201,7 +10262,11 @@
       "r1": 24306.6,
       "s1": 24137.9,
       "r2": 24394.15,
-      "s2": 24056.75
+      "s2": 24056.75,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 24115.45 <= 24225.45)"
     },
     {
       "date": "2026-08-25",
@@ -9222,6 +10287,7 @@
       "gap_type": "Gap Down",
       "body": 158.8,
       "body_pct": 72.5,
+      "clq": 1.0,
       "upper_wick": 0.0,
       "lower_wick": 60.3,
       "is_expansion_bar": true,
@@ -9246,7 +10312,11 @@
       "r1": 24407.59,
       "s1": 24188.49,
       "r2": 24480.62,
-      "s2": 24042.42
+      "s2": 24042.42,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 24378.6 >= 24261.52)"
     },
     {
       "date": "2026-08-26",
@@ -9267,6 +10337,7 @@
       "gap_type": "Flat",
       "body": 134.2,
       "body_pct": 78.5,
+      "clq": 0.0,
       "upper_wick": 36.65,
       "lower_wick": 0.0,
       "is_expansion_bar": true,
@@ -9291,7 +10362,11 @@
       "r1": 24321.65,
       "s1": 24150.8,
       "r2": 24435.55,
-      "s2": 24093.85
+      "s2": 24093.85,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 24090.85 <= 24264.7)"
     },
     {
       "date": "2026-08-27",
@@ -9312,6 +10387,7 @@
       "gap_type": "Gap Up",
       "body": 186.75,
       "body_pct": 90.4,
+      "clq": 0.0,
       "upper_wick": 19.85,
       "lower_wick": 0.0,
       "is_expansion_bar": true,
@@ -9336,7 +10412,11 @@
       "r1": 24228.59,
       "s1": 24021.99,
       "r2": 24366.32,
-      "s2": 23953.12
+      "s2": 23953.12,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 24076.85 <= 24090.85)"
     },
     {
       "date": "2026-08-28",
@@ -9357,6 +10437,7 @@
       "gap_type": "Gap Up",
       "body": 53.05,
       "body_pct": 47.6,
+      "clq": 0.89,
       "upper_wick": 12.65,
       "lower_wick": 45.75,
       "is_expansion_bar": false,
@@ -9381,7 +10462,11 @@
       "r1": 24217.01,
       "s1": 24105.56,
       "r2": 24258.38,
-      "s2": 24035.48
+      "s2": 24035.48,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": false,
+      "verification_detail": "Did not bounce to CPR"
     },
     {
       "date": "2026-08-31",
@@ -9402,6 +10487,7 @@
       "gap_type": "Gap Down",
       "body": 37.15,
       "body_pct": 27.5,
+      "clq": 0.64,
       "upper_wick": 11.15,
       "lower_wick": 86.8,
       "is_expansion_bar": false,
@@ -9426,7 +10512,11 @@
       "r1": 24141.54,
       "s1": 24006.44,
       "r2": 24202.67,
-      "s2": 23932.47
+      "s2": 23932.47,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 24143.15 >= 24067.57)"
     },
     {
       "date": "2026-09-01",
@@ -9447,6 +10537,7 @@
       "gap_type": "Flat",
       "body": 21.75,
       "body_pct": 11.4,
+      "clq": 0.54,
       "upper_wick": 65.6,
       "lower_wick": 103.25,
       "is_expansion_bar": false,
@@ -9454,11 +10545,11 @@
       "candle_type": "Bearish",
       "is_inside_day": false,
       "is_outside_day": true,
-      "pdh_sweep": true,
-      "pdl_sweep": false,
+      "pdh_sweep": false,
+      "pdl_sweep": true,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "BSL Sweep (Bearish Grab)",
+      "smc_structure": "SSL Sweep (Bullish Grab)",
       "pwh": 24378.6,
       "pwl": 24076.85,
       "equilibrium": 24315.08,
@@ -9471,7 +10562,11 @@
       "r1": 24148.45,
       "s1": 23957.85,
       "r2": 24241.1,
-      "s2": 23859.9
+      "s2": 23859.9,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": false,
+      "verification_detail": "Did not bounce to CPR"
     },
     {
       "date": "2026-09-02",
@@ -9492,6 +10587,7 @@
       "gap_type": "Gap Down",
       "body": 56.45,
       "body_pct": 44.2,
+      "clq": 1.0,
       "upper_wick": 0.0,
       "lower_wick": 71.2,
       "is_expansion_bar": false,
@@ -9502,8 +10598,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 24378.6,
       "pwl": 24076.85,
       "equilibrium": 24231.93,
@@ -9516,7 +10612,11 @@
       "r1": 23957.0,
       "s1": 23829.35,
       "r2": 23999.55,
-      "s2": 23744.25
+      "s2": 23744.25,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-09-03",
@@ -9537,6 +10637,7 @@
       "gap_type": "Gap Up",
       "body": 124.5,
       "body_pct": 81.9,
+      "clq": 0.0,
       "upper_wick": 27.45,
       "lower_wick": 0.0,
       "is_expansion_bar": true,
@@ -9561,7 +10662,11 @@
       "r1": 23974.75,
       "s1": 23822.8,
       "r2": 24076.05,
-      "s2": 23772.15
+      "s2": 23772.15,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 23895.85 <= 23924.1)"
     },
     {
       "date": "2026-09-04",
@@ -9582,6 +10687,7 @@
       "gap_type": "Gap Up",
       "body": 13.2,
       "body_pct": 12.0,
+      "clq": 0.02,
       "upper_wick": 94.85,
       "lower_wick": 1.85,
       "is_expansion_bar": false,
@@ -9606,7 +10712,11 @@
       "r1": 23970.35,
       "s1": 23860.45,
       "r2": 24043.0,
-      "s2": 23823.2
+      "s2": 23823.2,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke Low on next day"
     },
     {
       "date": "2026-09-07",
@@ -9627,6 +10737,7 @@
       "gap_type": "Flat",
       "body": 104.0,
       "body_pct": 68.4,
+      "clq": 0.27,
       "upper_wick": 6.85,
       "lower_wick": 41.25,
       "is_expansion_bar": true,
@@ -9651,7 +10762,11 @@
       "r1": 23866.8,
       "s1": 23714.7,
       "r2": 23954.45,
-      "s2": 23650.25
+      "s2": 23650.25,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 23623.1 <= 23737.9)"
     },
     {
       "date": "2026-09-08",
@@ -9672,6 +10787,7 @@
       "gap_type": "Gap Down",
       "body": 108.0,
       "body_pct": 79.5,
+      "clq": 0.09,
       "upper_wick": 15.85,
       "lower_wick": 12.0,
       "is_expansion_bar": true,
@@ -9696,7 +10812,11 @@
       "r1": 23721.66,
       "s1": 23585.81,
       "r2": 23808.23,
-      "s2": 23536.53
+      "s2": 23536.53,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 23431.5 <= 23623.1)"
     },
     {
       "date": "2026-09-09",
@@ -9717,11 +10837,12 @@
       "gap_type": "Gap Down",
       "body": 90.55,
       "body_pct": 64.7,
+      "clq": 0.0,
       "upper_wick": 49.5,
       "lower_wick": 0.0,
-      "is_expansion_bar": false,
+      "is_expansion_bar": true,
       "is_pinbar": false,
-      "candle_type": "Bearish",
+      "candle_type": "Strong Bearish Expansion",
       "is_inside_day": false,
       "is_outside_day": false,
       "pdh_sweep": false,
@@ -9741,7 +10862,11 @@
       "r1": 23524.86,
       "s1": 23384.81,
       "r2": 23618.23,
-      "s2": 23338.13
+      "s2": 23338.13,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 23380.1 <= 23431.5)"
     },
     {
       "date": "2026-09-10",
@@ -9762,6 +10887,7 @@
       "gap_type": "Flat",
       "body": 31.2,
       "body_pct": 27.2,
+      "clq": 0.85,
       "upper_wick": 17.15,
       "lower_wick": 66.5,
       "is_expansion_bar": false,
@@ -9786,7 +10912,11 @@
       "r1": 23521.8,
       "s1": 23406.95,
       "r2": 23565.8,
-      "s2": 23336.1
+      "s2": 23336.1,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": false,
+      "verification_detail": "Did not bounce to CPR"
     },
     {
       "date": "2026-09-11",
@@ -9807,6 +10937,7 @@
       "gap_type": "Gap Down",
       "body": 127.8,
       "body_pct": 59.0,
+      "clq": 0.77,
       "upper_wick": 50.0,
       "lower_wick": 38.9,
       "is_expansion_bar": false,
@@ -9831,7 +10962,11 @@
       "r1": 23487.0,
       "s1": 23270.3,
       "r2": 23575.9,
-      "s2": 23142.5
+      "s2": 23142.5,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 23592.85 >= 23359.2)"
     },
     {
       "date": "2026-09-15",
@@ -9852,6 +10987,7 @@
       "gap_type": "Gap Up",
       "body": 457.55,
       "body_pct": 96.5,
+      "clq": 0.0,
       "upper_wick": 16.7,
       "lower_wick": 0.0,
       "is_expansion_bar": true,
@@ -9876,7 +11012,11 @@
       "r1": 23434.76,
       "s1": 22960.51,
       "r2": 23750.93,
-      "s2": 22802.43
+      "s2": 22802.43,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 23116.1 <= 23276.68)"
     },
     {
       "date": "2026-09-16",
@@ -9897,6 +11037,7 @@
       "gap_type": "Gap Up",
       "body": 16.0,
       "body_pct": 9.5,
+      "clq": 0.6,
       "upper_wick": 67.15,
       "lower_wick": 85.5,
       "is_expansion_bar": false,
@@ -9921,7 +11062,11 @@
       "r1": 23296.2,
       "s1": 23127.55,
       "r2": 23374.8,
-      "s2": 23037.5
+      "s2": 23037.5,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 23363.55 >= 23206.15)"
     },
     {
       "date": "2026-09-17",
@@ -9942,6 +11087,7 @@
       "gap_type": "Flat",
       "body": 75.35,
       "body_pct": 44.3,
+      "clq": 0.45,
       "upper_wick": 92.95,
       "lower_wick": 1.6,
       "is_expansion_bar": false,
@@ -9966,7 +11112,11 @@
       "r1": 23358.21,
       "s1": 23188.31,
       "r2": 23445.83,
-      "s2": 23106.03
+      "s2": 23106.03,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": false,
+      "verification_detail": "Did not retrace to CPR"
     },
     {
       "date": "2026-09-18",
@@ -9987,6 +11137,7 @@
       "gap_type": "Gap Up",
       "body": 11.7,
       "body_pct": 11.4,
+      "clq": 0.58,
       "upper_wick": 42.75,
       "lower_wick": 48.1,
       "is_expansion_bar": false,
@@ -9994,11 +11145,11 @@
       "candle_type": "Doji (Indecision)",
       "is_inside_day": false,
       "is_outside_day": false,
-      "pdh_sweep": true,
+      "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "BSL Sweep (Bearish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 23890.0,
       "pwl": 23231.4,
       "equilibrium": 23747.35,
@@ -10011,7 +11162,11 @@
       "r1": 23394.84,
       "s1": 23292.29,
       "r2": 23443.27,
-      "s2": 23238.17
+      "s2": 23238.17,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2026-09-21",
@@ -10032,6 +11187,7 @@
       "gap_type": "Flat",
       "body": 84.1,
       "body_pct": 55.3,
+      "clq": 0.65,
       "upper_wick": 52.5,
       "lower_wick": 15.4,
       "is_expansion_bar": false,
@@ -10056,7 +11212,11 @@
       "r1": 23482.46,
       "s1": 23330.46,
       "r2": 23550.63,
-      "s2": 23246.63
+      "s2": 23246.63,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 23489.0 >= 23466.8)"
     },
     {
       "date": "2026-09-22",
@@ -10077,11 +11237,12 @@
       "gap_type": "Gap Up",
       "body": 125.05,
       "body_pct": 61.5,
+      "clq": 0.21,
       "upper_wick": 34.95,
       "lower_wick": 43.25,
-      "is_expansion_bar": false,
+      "is_expansion_bar": true,
       "is_pinbar": false,
-      "candle_type": "Bearish",
+      "candle_type": "Strong Bearish Expansion",
       "is_inside_day": false,
       "is_outside_day": true,
       "pdh_sweep": true,
@@ -10101,7 +11262,11 @@
       "r1": 23450.09,
       "s1": 23246.84,
       "r2": 23571.17,
-      "s2": 23164.67
+      "s2": 23164.67,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 23349.55 <= 23367.92)"
     },
     {
       "date": "2026-09-23",
@@ -10122,6 +11287,7 @@
       "gap_type": "Flat",
       "body": 94.65,
       "body_pct": 80.7,
+      "clq": 0.83,
       "upper_wick": 20.1,
       "lower_wick": 2.6,
       "is_expansion_bar": false,
@@ -10146,7 +11312,11 @@
       "r1": 23492.61,
       "s1": 23375.26,
       "r2": 23538.43,
-      "s2": 23303.73
+      "s2": 23303.73,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke Low on next day"
     },
     {
       "date": "2026-09-24",
@@ -10167,6 +11337,7 @@
       "gap_type": "Gap Down",
       "body": 158.7,
       "body_pct": 67.3,
+      "clq": 0.07,
       "upper_wick": 60.15,
       "lower_wick": 16.95,
       "is_expansion_bar": true,
@@ -10191,7 +11362,11 @@
       "r1": 23214.65,
       "s1": 22978.85,
       "r2": 23366.2,
-      "s2": 22894.6
+      "s2": 22894.6,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 23020.95 <= 23046.15)"
     },
     {
       "date": "2026-09-25",
@@ -10212,6 +11387,7 @@
       "gap_type": "Gap Down",
       "body": 105.5,
       "body_pct": 74.4,
+      "clq": 0.84,
       "upper_wick": 22.2,
       "lower_wick": 14.05,
       "is_expansion_bar": true,
@@ -10236,7 +11412,11 @@
       "r1": 23195.15,
       "s1": 23053.4,
       "r2": 23249.8,
-      "s2": 22966.3
+      "s2": 22966.3,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": false,
+      "verification_detail": "Did not bounce to CPR"
     },
     {
       "date": "2026-09-28",
@@ -10257,6 +11437,7 @@
       "gap_type": "Gap Down",
       "body": 284.65,
       "body_pct": 89.5,
+      "clq": 0.06,
       "upper_wick": 15.35,
       "lower_wick": 18.05,
       "is_expansion_bar": true,
@@ -10281,7 +11462,11 @@
       "r1": 22986.26,
       "s1": 22668.21,
       "r2": 23192.28,
-      "s2": 22556.18
+      "s2": 22556.18,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 22569.65 <= 22762.2)"
     },
     {
       "date": "2026-09-29",
@@ -10302,6 +11487,7 @@
       "gap_type": "Gap Down",
       "body": 16.25,
       "body_pct": 8.9,
+      "clq": 0.8,
       "upper_wick": 20.8,
       "lower_wick": 146.55,
       "is_expansion_bar": false,
@@ -10312,8 +11498,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 23489.0,
       "pwl": 23020.95,
       "equilibrium": 23356.4,
@@ -10326,7 +11512,11 @@
       "r1": 22789.75,
       "s1": 22606.15,
       "r2": 22863.3,
-      "s2": 22496.1
+      "s2": 22496.1,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2026-09-30",
@@ -10347,6 +11537,7 @@
       "gap_type": "Gap Down",
       "body": 44.55,
       "body_pct": 20.8,
+      "clq": 0.12,
       "upper_wick": 144.35,
       "lower_wick": 25.25,
       "is_expansion_bar": false,
@@ -10371,7 +11562,11 @@
       "r1": 22754.8,
       "s1": 22540.65,
       "r2": 22889.15,
-      "s2": 22460.85
+      "s2": 22460.85,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 22217.3 <= 22675.0)"
     },
     {
       "date": "2026-10-01",
@@ -10392,6 +11587,7 @@
       "gap_type": "Gap Down",
       "body": 121.75,
       "body_pct": 31.0,
+      "clq": 0.52,
       "upper_wick": 66.9,
       "lower_wick": 204.65,
       "is_expansion_bar": false,
@@ -10402,8 +11598,8 @@
       "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
-      "bearish_bos": true,
-      "smc_structure": "Bearish BOS (Expansion)",
+      "bearish_bos": false,
+      "smc_structure": "Range Auction",
       "pwh": 23489.0,
       "pwl": 23020.95,
       "equilibrium": 23121.35,
@@ -10416,7 +11612,11 @@
       "r1": 22615.94,
       "s1": 22222.64,
       "r2": 22809.92,
-      "s2": 22023.32
+      "s2": 22023.32,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2026-10-05",
@@ -10437,6 +11637,7 @@
       "gap_type": "Gap Up",
       "body": 23.35,
       "body_pct": 10.4,
+      "clq": 0.71,
       "upper_wick": 66.05,
       "lower_wick": 135.3,
       "is_expansion_bar": false,
@@ -10444,11 +11645,11 @@
       "candle_type": "Bullish",
       "is_inside_day": false,
       "is_outside_day": false,
-      "pdh_sweep": true,
+      "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "BSL Sweep (Bearish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 23080.25,
       "pwl": 22217.3,
       "equilibrium": 23111.53,
@@ -10461,7 +11662,11 @@
       "r1": 22652.66,
       "s1": 22427.96,
       "r2": 22749.58,
-      "s2": 22300.18
+      "s2": 22300.18,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-10-06",
@@ -10482,6 +11687,7 @@
       "gap_type": "Gap Up",
       "body": 172.85,
       "body_pct": 80.6,
+      "clq": 1.0,
       "upper_wick": 0.0,
       "lower_wick": 41.65,
       "is_expansion_bar": true,
@@ -10506,7 +11712,11 @@
       "r1": 22847.6,
       "s1": 22633.1,
       "r2": 22919.1,
-      "s2": 22490.1
+      "s2": 22490.1,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDH"
     },
     {
       "date": "2026-10-07",
@@ -10527,6 +11737,7 @@
       "gap_type": "Gap Down",
       "body": 87.4,
       "body_pct": 51.0,
+      "clq": 0.33,
       "upper_wick": 27.2,
       "lower_wick": 56.75,
       "is_expansion_bar": false,
@@ -10535,10 +11746,10 @@
       "is_inside_day": false,
       "is_outside_day": false,
       "pdh_sweep": false,
-      "pdl_sweep": true,
+      "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "SSL Sweep (Bullish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 23080.25,
       "pwl": 22217.3,
       "equilibrium": 22988.12,
@@ -10551,7 +11762,11 @@
       "r1": 22698.36,
       "s1": 22527.01,
       "r2": 22793.68,
-      "s2": 22450.98
+      "s2": 22450.98,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": false,
+      "verification_detail": "Auctioned away from CPR"
     },
     {
       "date": "2026-10-08",
@@ -10572,6 +11787,7 @@
       "gap_type": "Flat",
       "body": 367.25,
       "body_pct": 87.6,
+      "clq": 0.12,
       "upper_wick": 0.0,
       "lower_wick": 51.9,
       "is_expansion_bar": true,
@@ -10596,7 +11812,11 @@
       "r1": 22493.94,
       "s1": 22074.79,
       "r2": 22756.07,
-      "s2": 21917.77
+      "s2": 21917.77,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": false,
+      "verification_detail": "Failed to test PDL"
     },
     {
       "date": "2026-10-09",
@@ -10617,6 +11837,7 @@
       "gap_type": "Gap Up",
       "body": 205.5,
       "body_pct": 71.9,
+      "clq": 0.79,
       "upper_wick": 60.3,
       "lower_wick": 20.2,
       "is_expansion_bar": true,
@@ -10641,7 +11862,11 @@
       "r1": 22635.89,
       "s1": 22349.89,
       "r2": 22751.32,
-      "s2": 22179.32
+      "s2": 22179.32,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke High on next day"
     },
     {
       "date": "2026-10-12",
@@ -10662,6 +11887,7 @@
       "gap_type": "Gap Up",
       "body": 229.85,
       "body_pct": 66.3,
+      "clq": 0.17,
       "upper_wick": 57.9,
       "lower_wick": 58.9,
       "is_expansion_bar": true,
@@ -10686,7 +11912,11 @@
       "r1": 22574.81,
       "s1": 22228.16,
       "r2": 22786.28,
-      "s2": 22092.98
+      "s2": 22092.98,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 22288.45 <= 22439.63)"
     },
     {
       "date": "2026-10-13",
@@ -10707,6 +11937,7 @@
       "gap_type": "Flat",
       "body": 357.8,
       "body_pct": 82.5,
+      "clq": 1.0,
       "upper_wick": 0.0,
       "lower_wick": 75.7,
       "is_expansion_bar": true,
@@ -10731,7 +11962,11 @@
       "r1": 22866.45,
       "s1": 22432.95,
       "r2": 23010.95,
-      "s2": 22143.95
+      "s2": 22143.95,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 22757.95 >= 22577.45)"
     },
     {
       "date": "2026-10-14",
@@ -10752,6 +11987,7 @@
       "gap_type": "Flat",
       "body": 93.05,
       "body_pct": 46.8,
+      "clq": 0.32,
       "upper_wick": 42.2,
       "lower_wick": 63.75,
       "is_expansion_bar": false,
@@ -10776,7 +12012,11 @@
       "r1": 22734.11,
       "s1": 22535.11,
       "r2": 22845.53,
-      "s2": 22447.53
+      "s2": 22447.53,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 22637.4 <= 22646.53)"
     },
     {
       "date": "2026-10-15",
@@ -10797,6 +12037,7 @@
       "gap_type": "Gap Up",
       "body": 326.05,
       "body_pct": 77.8,
+      "clq": 0.86,
       "upper_wick": 59.05,
       "lower_wick": 33.9,
       "is_expansion_bar": true,
@@ -10821,7 +12062,11 @@
       "r1": 23156.7,
       "s1": 22737.7,
       "r2": 23316.05,
-      "s2": 22478.05
+      "s2": 22478.05,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 23149.85 >= 23056.4)"
     },
     {
       "date": "2026-10-16",
@@ -10842,6 +12087,7 @@
       "gap_type": "Gap Up",
       "body": 81.05,
       "body_pct": 34.3,
+      "clq": 0.98,
       "upper_wick": 3.7,
       "lower_wick": 151.3,
       "is_expansion_bar": false,
@@ -10866,7 +12112,11 @@
       "r1": 23226.06,
       "s1": 22990.01,
       "r2": 23305.98,
-      "s2": 22833.88
+      "s2": 22833.88,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 23175.25 >= 23149.85)"
     },
     {
       "date": "2026-10-19",
@@ -10887,6 +12137,7 @@
       "gap_type": "Flat",
       "body": 261.9,
       "body_pct": 79.3,
+      "clq": 0.13,
       "upper_wick": 24.4,
       "lower_wick": 43.95,
       "is_expansion_bar": true,
@@ -10911,7 +12162,11 @@
       "r1": 23094.46,
       "s1": 22764.21,
       "r2": 23299.98,
-      "s2": 22639.48
+      "s2": 22639.48,
+      "historical_setup": "BSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDL",
+      "prediction_verified": true,
+      "verification_detail": "Retraced into CPR (Low 22649.9 <= 22969.73)"
     },
     {
       "date": "2026-10-21",
@@ -10932,6 +12187,7 @@
       "gap_type": "Gap Up",
       "body": 204.65,
       "body_pct": 43.5,
+      "clq": 0.34,
       "upper_wick": 104.9,
       "lower_wick": 161.45,
       "is_expansion_bar": false,
@@ -10956,7 +12212,11 @@
       "r1": 23071.54,
       "s1": 22600.54,
       "r2": 23331.72,
-      "s2": 22389.72
+      "s2": 22389.72,
+      "historical_setup": "Bearish BOS",
+      "expected_target": "PDL Sweep & S1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDL (Low 22554.85 <= 22649.9)"
     },
     {
       "date": "2026-10-22",
@@ -10977,6 +12237,7 @@
       "gap_type": "Gap Down",
       "body": 0.1,
       "body_pct": 0.0,
+      "clq": 0.58,
       "upper_wick": 97.25,
       "lower_wick": 132.8,
       "is_expansion_bar": false,
@@ -11001,7 +12262,11 @@
       "r1": 22796.81,
       "s1": 22566.66,
       "r2": 22905.98,
-      "s2": 22445.68
+      "s2": 22445.68,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 22787.25 >= 22675.83)"
     },
     {
       "date": "2026-10-23",
@@ -11022,6 +12287,7 @@
       "gap_type": "Gap Up",
       "body": 142.2,
       "body_pct": 34.2,
+      "clq": 0.55,
       "upper_wick": 45.05,
       "lower_wick": 228.0,
       "is_expansion_bar": false,
@@ -11029,11 +12295,11 @@
       "candle_type": "Bearish",
       "is_inside_day": false,
       "is_outside_day": true,
-      "pdh_sweep": true,
-      "pdl_sweep": false,
+      "pdh_sweep": false,
+      "pdl_sweep": true,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "BSL Sweep (Bearish Grab)",
+      "smc_structure": "SSL Sweep (Bullish Grab)",
       "pwh": 23149.85,
       "pwl": 22288.45,
       "equilibrium": 22730.92,
@@ -11046,7 +12312,11 @@
       "r1": 22800.84,
       "s1": 22385.59,
       "r2": 23001.67,
-      "s2": 22171.17
+      "s2": 22171.17,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 22753.2 >= 22586.42)"
     },
     {
       "date": "2026-10-26",
@@ -11067,11 +12337,12 @@
       "gap_type": "Gap Down",
       "body": 228.8,
       "body_pct": 62.5,
+      "clq": 1.0,
       "upper_wick": 0.0,
       "lower_wick": 137.05,
-      "is_expansion_bar": false,
+      "is_expansion_bar": true,
       "is_pinbar": false,
-      "candle_type": "Bullish",
+      "candle_type": "Strong Bullish Expansion",
       "is_inside_day": true,
       "is_outside_day": false,
       "pdh_sweep": false,
@@ -11091,7 +12362,11 @@
       "r1": 22875.15,
       "s1": 22509.3,
       "r2": 22997.1,
-      "s2": 22265.4
+      "s2": 22265.4,
+      "historical_setup": "Inside Compression",
+      "expected_target": "Range Breakout (PDH or PDL)",
+      "prediction_verified": true,
+      "verification_detail": "Broke High on next day"
     },
     {
       "date": "2026-10-27",
@@ -11112,6 +12387,7 @@
       "gap_type": "Gap Down",
       "body": 40.95,
       "body_pct": 21.2,
+      "clq": 0.59,
       "upper_wick": 80.0,
       "lower_wick": 71.95,
       "is_expansion_bar": false,
@@ -11119,11 +12395,11 @@
       "candle_type": "Bullish",
       "is_inside_day": false,
       "is_outside_day": false,
-      "pdh_sweep": true,
+      "pdh_sweep": false,
       "pdl_sweep": false,
       "bullish_bos": false,
       "bearish_bos": false,
-      "smc_structure": "BSL Sweep (Bearish Grab)",
+      "smc_structure": "Range Auction",
       "pwh": 23175.25,
       "pwl": 22372.0,
       "equilibrium": 22677.58,
@@ -11136,7 +12412,11 @@
       "r1": 22840.71,
       "s1": 22647.81,
       "r2": 22931.68,
-      "s2": 22545.88
+      "s2": 22545.88,
+      "historical_setup": "Mean Reversion / Range",
+      "expected_target": "CPR S1-R1 Range Test",
+      "prediction_verified": true,
+      "verification_detail": "Tested CPR pivot band"
     },
     {
       "date": "2026-10-28",
@@ -11157,6 +12437,7 @@
       "gap_type": "Gap Down",
       "body": 20.85,
       "body_pct": 7.4,
+      "clq": 0.72,
       "upper_wick": 79.2,
       "lower_wick": 180.3,
       "is_expansion_bar": false,
@@ -11181,7 +12462,11 @@
       "r1": 22818.7,
       "s1": 22538.35,
       "r2": 22938.55,
-      "s2": 22377.85
+      "s2": 22377.85,
+      "historical_setup": "SSL Sweep Reversal",
+      "expected_target": "Retrace to CPR / Test PDH",
+      "prediction_verified": true,
+      "verification_detail": "Bounced into CPR (High 22961.95 >= 22658.2)"
     },
     {
       "date": "2026-10-29",
@@ -11190,7 +12475,7 @@
       "high": 22961.95,
       "low": 22656.75,
       "close": 22936.75,
-      "volume": 0,
+      "volume": 344000,
       "range": 305.2,
       "range_pct": 1.35,
       "prev_close": 22698.85,
@@ -11202,6 +12487,7 @@
       "gap_type": "Flat",
       "body": 246.1,
       "body_pct": 80.6,
+      "clq": 0.92,
       "upper_wick": 25.2,
       "lower_wick": 33.9,
       "is_expansion_bar": true,
@@ -11226,7 +12512,57 @@
       "r1": 23046.89,
       "s1": 22741.69,
       "r2": 23157.02,
-      "s2": 22546.62
+      "s2": 22546.62,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 23082.85 >= 22961.95)"
+    },
+    {
+      "date": "2026-10-30",
+      "day": "Friday",
+      "open": 22964.5,
+      "high": 23082.85,
+      "low": 22905.1,
+      "close": 23065.1,
+      "volume": 0,
+      "range": 177.75,
+      "range_pct": 0.77,
+      "prev_close": 22936.75,
+      "prev_high": 22961.95,
+      "prev_low": 22656.75,
+      "change": 128.35,
+      "change_pct": 0.56,
+      "gap": 27.75,
+      "gap_type": "Gap Up",
+      "body": 100.6,
+      "body_pct": 56.6,
+      "clq": 0.9,
+      "upper_wick": 17.75,
+      "lower_wick": 59.4,
+      "is_expansion_bar": false,
+      "is_pinbar": false,
+      "candle_type": "Bullish",
+      "is_inside_day": false,
+      "is_outside_day": false,
+      "pdh_sweep": false,
+      "pdl_sweep": false,
+      "bullish_bos": true,
+      "bearish_bos": false,
+      "smc_structure": "Bullish BOS (Expansion)",
+      "pwh": 23175.25,
+      "pwl": 22372.0,
+      "equilibrium": 22677.58,
+      "zone": "Premium",
+      "pivot": 23017.68,
+      "tc": 23041.39,
+      "bc": 22993.97,
+      "cpr_width": 47.42,
+      "cpr_type": "Average",
+      "r1": 23130.26,
+      "s1": 22952.51,
+      "r2": 23195.43,
+      "s2": 22839.93
     }
   ]
 }
