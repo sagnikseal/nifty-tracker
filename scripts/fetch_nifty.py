@@ -11,6 +11,7 @@ import sys
 import json
 import os
 import datetime
+import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -672,8 +673,80 @@ def fetch_overnight_macro_and_news(existing_macro=None):
     crude_score = (-crude_pct) * 2.0  # Falling crude is bullish for India
     dxy_score = (-dxy_pct) * 1.5      # Weakening DXY stops FII outflows
     yield_score = (-tnx_pct) * 0.5
+
+    # Multi-Stream News & Geopolitical Shock Harvester
+    news_streams = [
+        ("Market & Macro", "https://news.google.com/rss/search?q=Nifty+OR+Sensex+OR+RBI+OR+%22Federal+Reserve%22+OR+inflation&hl=en-IN&gl=IN&ceid=IN:en"),
+        ("Geopolitical & War", "https://news.google.com/rss/search?q=war+OR+attack+OR+missile+OR+conflict+OR+sanctions+OR+%22Middle+East%22+OR+%22Hormuz%22&hl=en-IN&gl=IN&ceid=IN:en"),
+        ("Crisis & Policy", "https://news.google.com/rss/search?q=emergency+OR+crisis+OR+tariff+OR+embargo+OR+election+OR+default&hl=en-IN&gl=IN&ceid=IN:en")
+    ]
     
-    raw_macro_score = us_score + asia_score + crude_score + dxy_score + yield_score
+    news_items = []
+    seen_titles = set()
+    for cat_name, stream_url in news_streams:
+        try:
+            req = urllib.request.Request(stream_url, headers=headers)
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                root = ET.fromstring(resp.read())
+                items = root.findall(".//item")[:3]
+                for it in items:
+                    title = it.find("title").text if it.find("title") is not None else ""
+                    pub = it.find("pubDate").text if it.find("pubDate") is not None else ""
+                    link = it.find("link").text if it.find("link") is not None else "#"
+                    source = it.find("source").text if it.find("source") is not None else "Financial Wire"
+                    clean_title = title.rsplit(" - ", 1)[0] if " - " in title else title
+                    if clean_title not in seen_titles:
+                        seen_titles.add(clean_title)
+                        news_items.append({
+                            "category": cat_name,
+                            "title": clean_title,
+                            "source": source,
+                            "pub_date": pub,
+                            "link": link
+                        })
+        except Exception:
+            continue
+
+    if not news_items and existing_macro and existing_macro.get("news_headlines"):
+        news_items = existing_macro["news_headlines"]
+
+    # High-impact shock keyword detector (War, Attacks, Sanctions, Crisis)
+    shock_patterns = [
+        (r'\b(war|attack|missile|strike|invasion|tanker attack|military strike|bombing|drone attack)\b', 'War / Military Conflict', 2.0),
+        (r'\b(sanctions|oil embargo|tariff war|trade ban|strait of hormuz)\b', 'Geopolitical Trade / Supply Disruption', 1.5),
+        (r'\b(emergency rate|market crash|bank run|sovereign default|liquidity crisis)\b', 'Macroeconomic Shock', 2.0),
+        (r'\b(pipeline blast|nuclear|curfew|martial law|state of emergency)\b', 'Disaster / Emergency Disruption', 1.5)
+    ]
+    
+    flagged_shocks = []
+    total_shock_weight = 0.0
+    for n in news_items:
+        t_low = n["title"].lower()
+        for pat, shock_type, weight in shock_patterns:
+            if re.search(pat, t_low):
+                flagged_shocks.append({
+                    "headline": n["title"],
+                    "category": n.get("category", "Geopolitical"),
+                    "shock_type": shock_type,
+                    "source": n.get("source", "Wire")
+                })
+                total_shock_weight += weight
+                break
+                
+    if total_shock_weight >= 3.0:
+        geo_risk_level = "Elevated Conflict / Shock Alert"
+        geo_status = "Critical Geopolitical / Conflict Shocks Detected"
+        risk_penalty = -2.5
+    elif total_shock_weight >= 1.5:
+        geo_risk_level = "Moderate Tension"
+        geo_status = "Active Conflict / Tension Cues"
+        risk_penalty = -1.0
+    else:
+        geo_risk_level = "Stable / Low Risk"
+        geo_status = "No Critical Black-Swan Events Flagged"
+        risk_penalty = 0.0
+
+    raw_macro_score = us_score + asia_score + crude_score + dxy_score + yield_score + risk_penalty
     macro_score = round(max(-10.0, min(10.0, raw_macro_score)), 2)
     
     if macro_score >= 2.5:
@@ -709,31 +782,23 @@ def fetch_overnight_macro_and_news(existing_macro=None):
     if abs(tnx_pct) >= 1.0:
         decision_factors.append(f"US 10-Yr Treasury Yield shifted {tnx_pct:+.2f}% to {market_data.get('US 10Y Yield', {}).get('price')}%, influencing global cost of capital.")
 
-    # News Headlines via Google News RSS
-    news_items = []
-    news_url = "https://news.google.com/rss/search?q=Nifty+OR+%22stock+market%22+OR+%22Federal+Reserve%22&hl=en-IN&gl=IN&ceid=IN:en"
-    try:
-        req = urllib.request.Request(news_url, headers=headers)
-        with urllib.request.urlopen(req, timeout=6) as resp:
-            root = ET.fromstring(resp.read())
-            items = root.findall(".//item")[:5]
-            for it in items:
-                title = it.find("title").text if it.find("title") is not None else ""
-                pub = it.find("pubDate").text if it.find("pubDate") is not None else ""
-                link = it.find("link").text if it.find("link") is not None else "#"
-                source = it.find("source").text if it.find("source") is not None else "Financial Wire"
-                clean_title = title.rsplit(" - ", 1)[0] if " - " in title else title
-                news_items.append({
-                    "title": clean_title,
-                    "source": source,
-                    "pub_date": pub,
-                    "link": link
-                })
-    except Exception as e:
-        if existing_macro and existing_macro.get("news_headlines"):
-            news_items = existing_macro["news_headlines"]
-        else:
-            news_items = []
+    # Geopolitical Decision Factor
+    if flagged_shocks:
+        top_shock = flagged_shocks[0]
+        decision_factors.append(
+            f"⚔️ Geopolitical Shock Watch ({top_shock['shock_type']}): '{top_shock['headline']}' ({top_shock['source']}). "
+            f"Conflict escalation increases supply risk on crude and prompts risk-off flows."
+        )
+    else:
+        decision_factors.append("🛡️ Geopolitical Status: No war declarations, military strikes, or black-swan crises detected overnight.")
+
+    geopolitical_risk = {
+        "risk_level": geo_risk_level,
+        "status_description": geo_status,
+        "shock_count": len(flagged_shocks),
+        "risk_penalty": risk_penalty,
+        "flagged_events": flagged_shocks[:4]
+    }
 
     utc_now = datetime.datetime.now(datetime.timezone.utc)
     ist_now = utc_now + datetime.timedelta(hours=5, minutes=30)
@@ -747,6 +812,7 @@ def fetch_overnight_macro_and_news(existing_macro=None):
         "gap_expectation": gap_expectation,
         "decision_factors": decision_factors,
         "market_data": market_data,
+        "geopolitical_risk": geopolitical_risk,
         "news_headlines": news_items
     }
 
@@ -832,6 +898,16 @@ def synthesize_macro_with_prediction(prediction, overnight_macro):
         "gap_expectation": gap_exp,
         "adjustment_note": adjustment_note
     }
+
+    geo_risk = overnight_macro.get("geopolitical_risk", {})
+    if geo_risk.get("risk_level") in ["Elevated Conflict / Shock Alert", "Moderate Tension"]:
+        flagged = geo_risk.get("flagged_events", [])
+        headline_summary = flagged[0]["headline"] if flagged else "Active conflict reported"
+        prediction["event_rule"] = (
+            f"🚨 GEOPOLITICAL / CRISIS ALERT: {geo_risk.get('status_description')} ('{headline_summary}'). "
+            f"Elevated gap volatility risk. The 9:15 AM Opening Execution Gate is MANDATORY."
+        )
+
     return prediction
 
 

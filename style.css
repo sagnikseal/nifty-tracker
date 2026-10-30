@@ -2193,6 +2193,28 @@ body.theme-light .overnight-macro-bar {
   border-color: rgba(148, 163, 184, 0.3);
 }
 
+.badge-geo {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--green);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-geo.alert {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.badge-geo.danger {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--red);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
 .macro-gap-badge {
   font-size: 0.72rem;
   font-weight: 600;
@@ -2366,11 +2388,95 @@ body.theme-light .macro-pop-header {
   border: 1px solid rgba(59, 130, 246, 0.2);
   border-radius: 8px;
   padding: 0.85rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
 }
 
 body.theme-light .macro-impact-box {
   background: #f1f5f9;
+}
+
+/* Geopolitical & Black-Swan Shock Box */
+.geo-shock-box {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 8px;
+  padding: 0.75rem 0.85rem;
+  margin-bottom: 1rem;
+}
+
+body.theme-light .geo-shock-box {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.geo-shock-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+  gap: 0.5rem;
+}
+
+.geo-shock-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fbbf24;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+body.theme-light .geo-shock-title {
+  color: #b45309;
+}
+
+.geo-shock-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+body.theme-light .geo-shock-pill {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.geo-shock-detail {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.news-cat-pill {
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  margin-right: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  display: inline-block;
+}
+
+.cat-geo {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.cat-market {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.cat-crisis {
+  background: rgba(168, 85, 247, 0.2);
+  color: #d8b4fe;
+  border: 1px solid rgba(168, 85, 247, 0.35);
 }
 
 .impact-box-header {

@@ -224,6 +224,7 @@ const el = {
   // Overnight Global Macro Radar Elements
   overnightMacroCard: document.getElementById('overnight-macro-card'),
   macroBiasBadge: document.getElementById('macro-bias-badge'),
+  macroGeoBadge: document.getElementById('macro-geo-badge'),
   macroGapBadge: document.getElementById('macro-gap-badge'),
   macroSynthesisText: document.getElementById('macro-synthesis-text'),
   btnMacroBreakdown: document.getElementById('btn-macro-breakdown'),
@@ -235,6 +236,9 @@ const el = {
   macroPopGap: document.getElementById('macro-pop-gap'),
   macroPopRationale: document.getElementById('macro-pop-rationale'),
   macroPopFactors: document.getElementById('macro-pop-factors'),
+  geoShockBox: document.getElementById('geo-shock-box'),
+  geoShockPill: document.getElementById('geo-shock-pill'),
+  geoShockDetail: document.getElementById('geo-shock-detail'),
   macroTickersGrid: document.getElementById('macro-tickers-grid'),
   macroNewsList: document.getElementById('macro-news-list'),
 
@@ -898,6 +902,15 @@ function renderOvernightMacro(macro, pred) {
     el.macroBiasBadge.className = 'macro-badge ' + (isTailwind ? '' : (isHeadwind ? 'badge-headwind' : 'badge-neutral'));
   }
 
+  // Geopolitical Shock Pill on Bar
+  const geo = macro.geopolitical_risk;
+  if (geo && el.macroGeoBadge) {
+    const isElevated = (geo.risk_level || '').includes('Elevated') || (geo.risk_level || '').includes('Crisis');
+    const isModerate = (geo.risk_level || '').includes('Moderate');
+    el.macroGeoBadge.textContent = isElevated ? '⚔️ Geopolitics: Elevated' : (isModerate ? '⚠️ Geopolitics: Moderate' : '🛡️ Geopolitics: Stable');
+    el.macroGeoBadge.className = 'macro-badge badge-geo ' + (isElevated ? 'danger' : (isModerate ? 'alert' : ''));
+  }
+
   // Gap Expectation
   if (el.macroGapBadge) {
     el.macroGapBadge.textContent = macro.gap_expectation || 'Flat / Range Open';
@@ -946,6 +959,26 @@ function renderOvernightMacro(macro, pred) {
     el.macroPopFactors.innerHTML = macro.decision_factors.map(f => `<li>${f}</li>`).join('');
   }
 
+  // Geopolitical & Black-Swan Conflict Risk Box
+  if (geo && el.geoShockBox) {
+    if (el.geoShockPill) {
+      el.geoShockPill.textContent = geo.risk_level || 'Stable';
+      const isElevated = (geo.risk_level || '').includes('Elevated') || (geo.risk_level || '').includes('Crisis');
+      el.geoShockPill.style.color = isElevated ? 'var(--red)' : '#fbbf24';
+    }
+    if (el.geoShockDetail) {
+      if (geo.flagged_events && geo.flagged_events.length > 0) {
+        const top = geo.flagged_events[0];
+        el.geoShockDetail.innerHTML = `
+          <strong>${geo.status_description}:</strong> Active trigger: <em>"${top.headline}"</em> (${top.source}). 
+          Military conflict and geopolitical friction elevate crude oil supply vulnerability and trigger flight-to-safety capital flows.
+        `;
+      } else {
+        el.geoShockDetail.textContent = 'Continuous real-time wire monitoring: No emergency war declarations, military strikes, sanctions, or black-swan crises detected overnight.';
+      }
+    }
+  }
+
   // Tickers Grid (8 Factors)
   if (el.macroTickersGrid && macro.market_data) {
     const contextLabels = {
@@ -980,20 +1013,28 @@ function renderOvernightMacro(macro, pred) {
     }).join('');
   }
 
-  // News List
+  // News List with Categorization (Market, War/Conflict, Crisis/Policy)
   if (el.macroNewsList && Array.isArray(macro.news_headlines)) {
     if (macro.news_headlines.length === 0) {
       el.macroNewsList.innerHTML = `<div style="font-size:0.75rem; color:var(--text-dim);">No overnight breaking headlines flagged.</div>`;
     } else {
-      el.macroNewsList.innerHTML = macro.news_headlines.map(n => `
-        <a class="macro-news-item" href="${n.link || '#'}" target="_blank" rel="noopener noreferrer">
-          <span class="news-source-tag">${n.source || 'News'}</span>
-          <div class="news-title-wrap">
-            <div class="news-title">${n.title}</div>
-            <div class="news-time">${n.pub_date || ''}</div>
-          </div>
-        </a>
-      `).join('');
+      el.macroNewsList.innerHTML = macro.news_headlines.map(n => {
+        let catClass = 'cat-market';
+        const cat = n.category || 'Market';
+        if (cat.includes('War') || cat.includes('Geopolitical')) catClass = 'cat-geo';
+        else if (cat.includes('Crisis') || cat.includes('Policy')) catClass = 'cat-crisis';
+
+        return `
+          <a class="macro-news-item" href="${n.link || '#'}" target="_blank" rel="noopener noreferrer">
+            <span class="news-cat-pill ${catClass}">${cat}</span>
+            <span class="news-source-tag">${n.source || 'News'}</span>
+            <div class="news-title-wrap">
+              <div class="news-title">${n.title}</div>
+              <div class="news-time">${n.pub_date || ''}</div>
+            </div>
+          </a>
+        `;
+      }).join('');
     }
   }
 }
