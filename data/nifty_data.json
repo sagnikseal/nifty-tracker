@@ -3,36 +3,36 @@
   "ticker": "^NSEI",
   "exchange": "NSE",
   "currency": "INR",
-  "last_updated": "2026-10-30 12:56:10 IST",
-  "last_updated_iso": "2026-10-30T12:56:10.644473+00:00",
+  "last_updated": "2026-10-30 12:59:28 IST",
+  "last_updated_iso": "2026-10-30T12:59:28.775044+00:00",
   "meta": {
     "fifty_two_week_high": 26373.2,
     "fifty_two_week_low": 22179.9,
-    "adr_20": 307.01,
-    "adr_5": 270.06,
+    "adr_20": 307.36,
+    "adr_5": 271.46,
     "total_trading_days": 248
   },
   "latest": {
     "date": "2026-10-30",
     "day": "Friday",
     "open": 22964.5,
-    "high": 23111.1,
+    "high": 23118.1,
     "low": 22905.1,
-    "close": 23110.05,
+    "close": 23108.15,
     "volume": 0,
-    "range": 206.0,
-    "range_pct": 0.9,
+    "range": 213.0,
+    "range_pct": 0.93,
     "prev_close": 22936.75,
     "prev_high": 22961.95,
     "prev_low": 22656.75,
-    "change": 173.3,
-    "change_pct": 0.76,
+    "change": 171.4,
+    "change_pct": 0.75,
     "gap": 27.75,
     "gap_type": "Gap Up",
-    "body": 145.55,
-    "body_pct": 70.7,
-    "clq": 0.99,
-    "upper_wick": 1.05,
+    "body": 143.65,
+    "body_pct": 67.4,
+    "clq": 0.95,
+    "upper_wick": 9.95,
     "lower_wick": 59.4,
     "is_expansion_bar": true,
     "is_pinbar": false,
@@ -48,15 +48,15 @@
     "pwl": 22372.0,
     "equilibrium": 22677.58,
     "zone": "Premium",
-    "pivot": 23042.08,
-    "tc": 23076.06,
-    "bc": 23008.1,
-    "cpr_width": 67.96,
+    "pivot": 23043.78,
+    "tc": 23075.96,
+    "bc": 23011.6,
+    "cpr_width": 64.36,
     "cpr_type": "Average",
-    "r1": 23179.06,
-    "s1": 22973.06,
-    "r2": 23248.08,
-    "s2": 22836.08
+    "r1": 23182.46,
+    "s1": 22969.46,
+    "r2": 23256.78,
+    "s2": 22830.78
   },
   "prev_day": {
     "date": "2026-10-29",
@@ -106,7 +106,7 @@
     "historical_setup": "Bullish BOS",
     "expected_target": "PDH Sweep & R1 Expansion",
     "prediction_verified": true,
-    "verification_detail": "Swept PDH (High 23111.1 >= 22961.95)"
+    "verification_detail": "Swept PDH (High 23118.1 >= 22961.95)"
   },
   "validation_scorecard": {
     "total_sessions_evaluated": 246,
@@ -163,14 +163,14 @@
   },
   "overnight_macro": {
     "status": "Active",
-    "last_checked_ist": "2026-10-30 12:56:10 IST",
-    "macro_score": 10.0,
+    "last_checked_ist": "2026-10-30 12:59:28 IST",
+    "macro_score": 9.9,
     "bias": "Strong Global Tailwind",
     "gap_expectation": "Gap-Up Favored (+40 to +80 pts)",
     "decision_factors": [
       "US Tech (Nasdaq +0.68%) provides directional momentum for Indian IT & growth heavyweights.",
       "Asian morning market cues (Nikkei 225 +1.77%) establish early opening risk sentiment.",
-      "Brent Crude dropped -3.15% to $112.16/bbl, easing imported inflation and reducing India's trade deficit (Tailwind for Paints, Autos, FMCG).",
+      "Brent Crude dropped -2.95% to $112.39/bbl, easing imported inflation and reducing India's trade deficit (Tailwind for Paints, Autos, FMCG).",
       "US Dollar Index softening (DXY -0.15%) reduces pressure on the Rupee and discourages foreign institutional (FII) capital outflow."
     ],
     "market_data": {
@@ -209,23 +209,23 @@
       "Hang Seng": {
         "symbol": "^HSI",
         "category": "Asian Markets",
-        "price": 23280.22,
+        "price": 23292.58,
         "prev_close": 23093.37,
-        "change_pct": 0.81,
+        "change_pct": 0.86,
         "status": "Bullish"
       },
       "Brent Crude": {
         "symbol": "BZ=F",
         "category": "Commodities & FX",
-        "price": 112.16,
+        "price": 112.39,
         "prev_close": 115.81,
-        "change_pct": -3.15,
+        "change_pct": -2.95,
         "status": "Bearish"
       },
       "US Dollar Index": {
         "symbol": "DX-Y.NYB",
         "category": "Commodities & FX",
-        "price": 101.81,
+        "price": 101.8,
         "prev_close": 101.96,
         "change_pct": -0.15,
         "status": "Neutral"
@@ -247,12 +247,6 @@
         "link": "https://news.google.com/rss/articles/CBMi_AFBVV95cUxOZFZvM3NMeWFaZWdDOXJWX3Y3dnA3RjJmMUlZNjZUU3I4RlRwemFzWjNLc2VGSXIxOThvYXJmekVZMkJDNjkxbkV0SVNRWjI2ZGdsOFctY2Z3TExhbFFKUXlfUHZXUG5RNmVtVktMLUtLVjN1WmdmM2RvQUs5b0gwVlBhbkEwdlFkN1duNURLcGJ2Ni1fSVpCdXpORXlFR1JudmYyZHM4U3RsRFpuMUxtakh2MjFMLUJKMkRoSmZmU3lSRmxhWHpNLUlDS2E2c2VGbU5fV0d1dW5jc2tpb1VQWjQzYV9sRmh4Ykk5Vk5rLWR4UkZZZFdJNW1yNzDSAYICQVVfeXFMTXhyQlhLeEtxLW9oR0lQcHoxNTBaaTdqaDgyMWVYVXhJZXlteDZGUEcwUjlZd05rUXdSRC1yMmFZWkl6ZEZZRmFiZ0dBSFBMcTVzU3ZORG82VzZ6VGVseW0yZGZxR1M4V1VLTjI0aDJfU29EZ0NqT1VsaktXNTVoeXdPNlNxYlNpSWZpOXpTQzB4c1lrb2Y3T1F1MVp2T08xaW4zNTVobVpQTmlfdlRITThka2hhc1U5WTF5cXgtXzBZdXlYbGVPT0t5OTd1MXZnTUtMWUxVRUFwbWlPWmxTeFRKV0VvNkh6U3pEUVdBZ04wSzJaN0dEWUFsWnMteWpuZzB3?oc=5"
       },
       {
-        "title": "Stock Market Today: Stock Market News And Analysis",
-        "source": "Investor's Business Daily",
-        "pub_date": "Thu, 29 Oct 2026 16:53:00 GMT",
-        "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE8zdGl1MmxTM2JJa2pLNlFSWVhuZUd1ekRIeVpDcGVqckVJcloxaWlnRHJ3b0hqb291NXk4dlo0SmRQNlhDaGpubDh6ZWNTUHZiYVhjOVJINUxSYXE0NHRiNVE2OW51R2h4N1daaXRIdzVBR1UxT0g4?oc=5"
-      },
-      {
         "title": "Why markets rallied: Sensex jumps over 900 points, Nifty gains 1 per cent; 5 key reasons",
         "source": "The Times of India",
         "pub_date": "Thu, 29 Oct 2026 13:03:00 GMT",
@@ -269,6 +263,12 @@
         "source": "Light Reading",
         "pub_date": "Fri, 30 Oct 2026 06:02:05 GMT",
         "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNdEY3RENvMEJlVXpZMHEwQVd1N1poYVBhY0JGWEJkUXRQR2FndW9rbTNkRzE1SXBobm5HU25PX2x0aGFLZWZPRW13TWdyMENDSV9fZ2R0ZjhYRm9zUi1ubUdoV3hmUTlSQUJxY0VkV1dnemZEbWZSMzhJcURmVVdRYUVXbDdQT1RqVmtsNDk0d1JGOFFET3M0WDF6c1g?oc=5"
+      },
+      {
+        "title": "Sensex, Nifty trade flat as IT gains counter crude oil concerns",
+        "source": "India Today",
+        "pub_date": "Fri, 30 Oct 2026 05:07:58 GMT",
+        "link": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxOMUFDOGdnZDc3VlZTRnBlVi1TNmpxRmRKTUtJaVVaYXFIOWJYRklfam54WG1OWkU2MEphUEhmbjlEVHBWUEp4TVhNSFZQN256ZGxjcjdaRUxsd1ZsNjYyc192SnlCNnVBdjJXU3gwdEVBX3AxMllFTXlLbFJOUGlkWnNRRjE2RXJRUUhUMVFraGpnZEFRQlFLUTVnY3lDREJkWXdsZ2l4MVhxNXZxSlUzMllBQy1IRm9ja1lYTUdzRXBqdHhvTkFOVlRJTVR1VFRFMjFEUzVR0gHbAUFVX3lxTFAwZDI2NmhfbDE1RmRhTlk3a0NVMGpWakRNLXpfMVdYQmJGcDRjYWpOTkVNTS0xaWc3MVRCRXVrV0g4YlNIY080RmtqN1QwUEdwRzlXOGdESzFXOUZxalN2RmJRZGh5MGdOUUFEQlQ1XzZOSFUtb2dEemREUFJXTUZYSTJ0eWwtRUpMWTBBa2ZBanpkV19PYkpUNFJFVDk0OWN4cnJTeUw1MjdVTjBDNF9Mamdzc3BrTHM3dXFWZWs3Ujh4ZWREQTZQVlRWYU1raXJpMmpOVDFpUC1vbw?oc=5"
       }
     ]
   },
@@ -278,27 +278,27 @@
     "confidence": "High (67.4% Win Rate)",
     "historical_win_rate": "67.4% Verified (46 Sessions)",
     "win_rate_pct": 67.4,
-    "clq": 0.9949029126213628,
+    "clq": 0.9532863849765395,
     "opening_gate": {
-      "condition": "Open >= Central Pivot (23042.08) -> Confirmed 92.5% Hit Rate",
+      "condition": "Open >= Central Pivot (23043.78) -> Confirmed 92.5% Hit Rate",
       "gate_win_rate": "84.1% Confirmed Hit Rate",
       "invalidation_action": "If opening print violates gate, stand down (win rate drops to 37.5%)"
     },
-    "risk_reward_ratio": "1 : 0.7",
-    "primary_liquidity_target": "PDH Sweep (23111.1) & R1 (23179.06)",
-    "secondary_target": "R2: 23248.08",
-    "invalidation_level": "Break below Bottom Central Pivot (23008.1)",
-    "cpr_structure": "Average CPR (67.96 pts). Expect balanced auction around Pivot (23042.08).",
-    "expected_range_adr": "307.01 pts",
-    "rationale": "Break of Structure (BOS): Daily close broke and held cleanly above previous high (22961.95) with strong auction settlement (CLQ: 0.99). Trend inertia remains dominant (67.4% hit rate).",
-    "playbook": "Expect shallow opening dips into Central Pivot (23042.08) to act as demand. Ride continuation momentum towards PDH (23111.1) and target R1 (23179.06).",
+    "risk_reward_ratio": "1 : 0.8",
+    "primary_liquidity_target": "PDH Sweep (23118.1) & R1 (23182.46)",
+    "secondary_target": "R2: 23256.78",
+    "invalidation_level": "Break below Bottom Central Pivot (23011.6)",
+    "cpr_structure": "Average CPR (64.36 pts). Expect balanced auction around Pivot (23043.78).",
+    "expected_range_adr": "307.36 pts",
+    "rationale": "Break of Structure (BOS): Daily close broke and held cleanly above previous high (22961.95) with strong auction settlement (CLQ: 0.95). Trend inertia remains dominant (67.4% hit rate).",
+    "playbook": "Expect shallow opening dips into Central Pivot (23043.78) to act as demand. Ride continuation momentum towards PDH (23118.1) and target R1 (23182.46).",
     "event_rule": "Notice: Any unscheduled macro event, overnight global shock, or opening gap > 60 pts supersedes technical continuation.",
     "overnight_synthesis": {
       "alignment": "Aligned",
       "macro_bias": "Strong Global Tailwind",
-      "macro_score": 10.0,
+      "macro_score": 9.9,
       "gap_expectation": "Gap-Up Favored (+40 to +80 pts)",
-      "adjustment_note": "Global Tailwind (+10.0) reinforces technical bullish structure. Expected Gap-Up Favored (+40 to +80 pts) increases odds of early PDH liquidity sweep. Opening Gate confirmation probability elevated."
+      "adjustment_note": "Global Tailwind (+9.9) reinforces technical bullish structure. Expected Gap-Up Favored (+40 to +80 pts) increases odds of early PDH liquidity sweep. Opening Gate confirmation probability elevated."
     }
   },
   "history": [
@@ -12646,29 +12646,29 @@
       "historical_setup": "Bullish BOS",
       "expected_target": "PDH Sweep & R1 Expansion",
       "prediction_verified": true,
-      "verification_detail": "Swept PDH (High 23111.1 >= 22961.95)"
+      "verification_detail": "Swept PDH (High 23118.1 >= 22961.95)"
     },
     {
       "date": "2026-10-30",
       "day": "Friday",
       "open": 22964.5,
-      "high": 23111.1,
+      "high": 23118.1,
       "low": 22905.1,
-      "close": 23110.05,
+      "close": 23108.15,
       "volume": 0,
-      "range": 206.0,
-      "range_pct": 0.9,
+      "range": 213.0,
+      "range_pct": 0.93,
       "prev_close": 22936.75,
       "prev_high": 22961.95,
       "prev_low": 22656.75,
-      "change": 173.3,
-      "change_pct": 0.76,
+      "change": 171.4,
+      "change_pct": 0.75,
       "gap": 27.75,
       "gap_type": "Gap Up",
-      "body": 145.55,
-      "body_pct": 70.7,
-      "clq": 0.99,
-      "upper_wick": 1.05,
+      "body": 143.65,
+      "body_pct": 67.4,
+      "clq": 0.95,
+      "upper_wick": 9.95,
       "lower_wick": 59.4,
       "is_expansion_bar": true,
       "is_pinbar": false,
@@ -12684,15 +12684,15 @@
       "pwl": 22372.0,
       "equilibrium": 22677.58,
       "zone": "Premium",
-      "pivot": 23042.08,
-      "tc": 23076.06,
-      "bc": 23008.1,
-      "cpr_width": 67.96,
+      "pivot": 23043.78,
+      "tc": 23075.96,
+      "bc": 23011.6,
+      "cpr_width": 64.36,
       "cpr_type": "Average",
-      "r1": 23179.06,
-      "s1": 22973.06,
-      "r2": 23248.08,
-      "s2": 22836.08
+      "r1": 23182.46,
+      "s1": 22969.46,
+      "r2": 23256.78,
+      "s2": 22830.78
     }
   ]
 }
