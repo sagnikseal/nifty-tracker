@@ -23,9 +23,9 @@ from typing import Any, Dict, List, Tuple
 
 import numpy as np
 
-# Import the core engine from the output directory
-OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output"
-sys.path.insert(0, str(OUTPUT_DIR))
+# Import the core engine from scripts directory
+SCRIPTS_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPTS_DIR))
 
 from realtime_engine import (  # type: ignore
     CandleBar,

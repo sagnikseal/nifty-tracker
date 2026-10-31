@@ -108,7 +108,7 @@
 
   function injectRealtimeDOM() {
     injectRealtimeStyles();
-    const metricsGrid = document.querySelector('.metrics-grid');
+    const metricsGrid = document.querySelector('.metrics-grid') || document.querySelector('.hero-grid');
     if (!metricsGrid || document.getElementById('rt-prediction-panel')) return;
 
     // 1. Geopolitical Crisis Regime Alert Banner
