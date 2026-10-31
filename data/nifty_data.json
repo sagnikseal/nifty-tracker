@@ -3,8 +3,8 @@
   "ticker": "^NSEI",
   "exchange": "NSE",
   "currency": "INR",
-  "last_updated": "2026-10-31 17:00:37 IST",
-  "last_updated_iso": "2026-10-31T17:00:37.266965+00:00",
+  "last_updated": "2026-10-31 17:12:47 IST",
+  "last_updated_iso": "2026-10-31T17:12:47.078680+00:00",
   "meta": {
     "fifty_two_week_high": 26373.2,
     "fifty_two_week_low": 22179.9,
@@ -163,7 +163,7 @@
   },
   "overnight_macro": {
     "status": "Active",
-    "last_checked_ist": "2026-10-31 17:00:37 IST",
+    "last_checked_ist": "2026-10-31 17:12:47 IST",
     "macro_score": 3.0,
     "bias": "Strong Global Tailwind",
     "gap_expectation": "Gap-Up Favored (+40 to +80 pts)",
@@ -287,7 +287,7 @@
         "category": "Geopolitical & War",
         "title": "Oil Prices Rise as Middle East, Ukraine-Russia Conflict Fuel Supply Worries",
         "source": "WSJ",
-        "pub_date": "Fri, 30 Oct 2026 20:19:00 GMT",
+        "pub_date": "Fri, 30 Oct 2026 20:26:06 GMT",
         "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPUnhpZVZHQUliUnJIQUJWb3JmbVl6VV9GZ3NJN0M3X0EzZU9pa2N4SEcybGNlakZkcmxyeVNqV0E5LWRxTU1VZUM4Uk9TdGZTS0RJLU1CZ1JVVFBlM0pTcWFPd2U0b1RFTkVyV2oxSzNwZzYzMjBwVmRtbUFvWUowS1RPSEQ3eE1Qa2ZQQVJ5SExsbzVXQTQtNlZYRC1Bbnh2YmpnZ2VGaHZLQlJDRWJRZEZOU2VCZ1hPcENQcTUtYw?oc=5"
       },
       {
@@ -306,17 +306,17 @@
       },
       {
         "category": "Crisis & Policy",
+        "title": "Challenge to powers of the Chief Election Commissioner",
+        "source": "Supreme Court Observer",
+        "pub_date": "Wed, 28 Oct 2026 07:00:00 GMT",
+        "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxNV3ZldmFfcFRNMWRDYVZiSTUxT1FfNU5Ya3F2aVJMeVpTdk85SndqbE5sM05rcGNCeGFSQVpUVkNjZ1NkVVVyR3JPY2RYM1NMSk8tS0o5QS01RnJnQmFzTVVDN2NtaEJudzJISVFTU1Y4ZWxBQkFWUFdfRV9lenJiZ1Juek4weWRMcXpDN3UyZGc?oc=5"
+      },
+      {
+        "category": "Crisis & Policy",
         "title": "US midterm elections 2026: Election Day date, polling hours, results and when to expect winners",
         "source": "The Indian Express",
         "pub_date": "Sat, 31 Oct 2026 10:38:13 GMT",
         "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxONXFBRzRDWGFPdDRmZkpWZ0lyQnlaMlZzMTBRN0J1TDlucXhVdUI0Y2JFX3k2aEJXSUdSZGY3WDBDT3pJYTZrZkhIRUcwQnBIelNLT0h2N0JBY0NFakNsSWFXWWk3UTRPNnVSVV9iZkJXVDRyMDJGUjMteXR0SlE4UUdOYWZrV0UwQXM5clhkRURNMW1GeE5UMWhTOFE5bjdvVXcyOTBvcGNzUnRaNjZITzFNYklMY1YxX2pn0gHCAUFVX3lxTE9XWEJQWkFqajVKUWRZU3BJMDlQb1FxTzdHLXFGanBoOFJlLXY2ZnBuUFNwNTZkQVNpcGhoNlo3b29XZkN1WEp2OVhOay1INEJDVGNBV2RkRC1yMjg4dVRkc3paS05nVG1NaU1KYk8zZXFLdkRPUFZXVmJWZDBnSUhqMWtNa2k5XzVxRC1IMmtpUFlTYjBFcVBydFE4UlZrakRDYzQ2ay04ZS10OTFoWGJsR01DZWNBbFd3bUJOSFMtRm5B?oc=5"
-      },
-      {
-        "category": "Crisis & Policy",
-        "title": "Israel\u2019s deadlocked election could force a new vote in 2027",
-        "source": "Brookings",
-        "pub_date": "Fri, 30 Oct 2026 20:11:54 GMT",
-        "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNYTFUdTlUQWg5OF8wSGwzVVVmR0s0SkRBZlpIcDJ2RExfX1JQR2otMGVRWFlBUVBkclpwcHdVaFJVT04zZVBzZE9FVDVma2RMUE9BeHFWNnY4U0hNNmtobTJ3VGVVaW03dUVudXNmaHA4eTV6Znl0NmxkYWgyWjZ4TEc4XzZBaUR5MU81eVFCX0NiU1RNYl9yZ2lB?oc=5"
       }
     ]
   },
