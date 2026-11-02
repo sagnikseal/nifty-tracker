@@ -1,6 +1,6 @@
 {
   "model_name": "NIFTY-50-v3-RegimeGated-MoE-Bayesian-Ensemble",
-  "trained_at_utc": "2026-11-02T20:28:57.638283+00:00",
+  "trained_at_utc": "2026-11-02T20:47:33.940665+00:00",
   "training_samples": 2154,
   "validation_samples": 718,
   "corpus_breakdown": {
@@ -322,7 +322,7 @@
       "feature": "geopolitical_war_shock",
       "feature_index": 14,
       "threshold": 0.0,
-      "left_LogOddsDelta": -0.0,
+      "left_LogOddsDelta": 0.0,
       "right_LogOddsDelta": 0.0,
       "importance_gain": 0.0
     },
