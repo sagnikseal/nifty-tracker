@@ -3,16 +3,62 @@
   "ticker": "^NSEI",
   "exchange": "NSE",
   "currency": "INR",
-  "last_updated": "2026-10-31 17:12:47 IST",
-  "last_updated_iso": "2026-10-31T17:12:47.078680+00:00",
+  "last_updated": "2026-11-02 16:08:02 IST",
+  "last_updated_iso": "2026-11-02T16:08:02.017144+00:00",
   "meta": {
     "fifty_two_week_high": 26373.2,
     "fifty_two_week_low": 22179.9,
-    "adr_20": 307.36,
-    "adr_5": 271.46,
-    "total_trading_days": 248
+    "adr_20": 299.38,
+    "adr_5": 245.04,
+    "total_trading_days": 249
   },
   "latest": {
+    "date": "2026-11-02",
+    "day": "Monday",
+    "open": 23222.3,
+    "high": 23440.8,
+    "low": 23207.05,
+    "close": 23440.8,
+    "volume": 0,
+    "range": 233.75,
+    "range_pct": 1.01,
+    "prev_close": 23053.1,
+    "prev_high": 23118.1,
+    "prev_low": 22905.1,
+    "change": 387.7,
+    "change_pct": 1.68,
+    "gap": 169.2,
+    "gap_type": "Gap Up",
+    "body": 218.5,
+    "body_pct": 93.5,
+    "clq": 1.0,
+    "upper_wick": 0.0,
+    "lower_wick": 15.25,
+    "is_expansion_bar": true,
+    "is_pinbar": false,
+    "candle_type": "Strong Bullish Expansion",
+    "is_inside_day": false,
+    "is_outside_day": false,
+    "pdh_sweep": false,
+    "pdl_sweep": false,
+    "bullish_bos": true,
+    "bearish_bos": false,
+    "smc_structure": "Bullish BOS (Expansion)",
+    "pwh": 23118.1,
+    "pwl": 22387.35,
+    "equilibrium": 22810.35,
+    "zone": "Premium",
+    "pivot": 23362.88,
+    "tc": 23401.84,
+    "bc": 23323.92,
+    "cpr_width": 77.92,
+    "cpr_type": "Average",
+    "r1": 23518.71,
+    "s1": 23284.96,
+    "r2": 23596.63,
+    "s2": 23129.13
+  },
+  "prev_day": {
     "date": "2026-10-30",
     "day": "Friday",
     "open": 22964.5,
@@ -56,68 +102,22 @@
     "r1": 23145.76,
     "s1": 22932.76,
     "r2": 23238.43,
-    "s2": 22812.43
-  },
-  "prev_day": {
-    "date": "2026-10-29",
-    "day": "Thursday",
-    "open": 22690.65,
-    "high": 22961.95,
-    "low": 22656.75,
-    "close": 22936.75,
-    "volume": 344000,
-    "range": 305.2,
-    "range_pct": 1.35,
-    "prev_close": 22698.85,
-    "prev_high": 22778.05,
-    "prev_low": 22497.7,
-    "change": 237.9,
-    "change_pct": 1.05,
-    "gap": -8.2,
-    "gap_type": "Flat",
-    "body": 246.1,
-    "body_pct": 80.6,
-    "clq": 0.92,
-    "upper_wick": 25.2,
-    "lower_wick": 33.9,
-    "is_expansion_bar": true,
-    "is_pinbar": false,
-    "candle_type": "Strong Bullish Expansion",
-    "is_inside_day": false,
-    "is_outside_day": false,
-    "pdh_sweep": false,
-    "pdl_sweep": false,
-    "bullish_bos": true,
-    "bearish_bos": false,
-    "smc_structure": "Bullish BOS (Expansion)",
-    "pwh": 23175.25,
-    "pwl": 22372.0,
-    "equilibrium": 22677.58,
-    "zone": "Premium",
-    "pivot": 22851.82,
-    "tc": 22894.29,
-    "bc": 22809.35,
-    "cpr_width": 84.94,
-    "cpr_type": "Average",
-    "r1": 23046.89,
-    "s1": 22741.69,
-    "r2": 23157.02,
-    "s2": 22546.62,
+    "s2": 22812.43,
     "historical_setup": "Bullish BOS",
     "expected_target": "PDH Sweep & R1 Expansion",
     "prediction_verified": true,
-    "verification_detail": "Swept PDH (High 23118.1 >= 22961.95)"
+    "verification_detail": "Swept PDH (High 23440.8 >= 23118.1)"
   },
   "validation_scorecard": {
-    "total_sessions_evaluated": 246,
-    "total_verified_hits": 188,
-    "overall_accuracy_pct": 76.4,
-    "in_sample_accuracy_pct": 76.9,
+    "total_sessions_evaluated": 247,
+    "total_verified_hits": 189,
+    "overall_accuracy_pct": 76.5,
+    "in_sample_accuracy_pct": 77.0,
     "out_of_sample_accuracy_pct": 75.3,
-    "in_sample_sessions": 173,
+    "in_sample_sessions": 174,
     "out_of_sample_sessions": 73,
-    "gate_confirmed_accuracy_pct": 84.1,
-    "gate_confirmed_sessions": 208,
+    "gate_confirmed_accuracy_pct": 84.2,
+    "gate_confirmed_sessions": 209,
     "setups": {
       "Bearish BOS": {
         "count": 55,
@@ -135,9 +135,9 @@
         "win_rate_pct": 52.6
       },
       "Bullish BOS": {
-        "count": 46,
-        "verified": 31,
-        "win_rate_pct": 67.4
+        "count": 47,
+        "verified": 32,
+        "win_rate_pct": 68.1
       },
       "BSL Sweep Reversal": {
         "count": 38,
@@ -163,16 +163,16 @@
   },
   "overnight_macro": {
     "status": "Active",
-    "last_checked_ist": "2026-10-31 17:12:47 IST",
-    "macro_score": 3.0,
+    "last_checked_ist": "2026-11-02 16:08:02 IST",
+    "macro_score": 6.93,
     "bias": "Strong Global Tailwind",
     "gap_expectation": "Gap-Up Favored (+40 to +80 pts)",
     "decision_factors": [
       "US Tech (Nasdaq -2.00%) provides directional momentum for Indian IT & growth heavyweights.",
-      "Asian morning market cues (Nikkei 225 +1.77%) establish early opening risk sentiment.",
-      "Brent Crude dropped -2.06% to $113.43/bbl, easing imported inflation and reducing India's trade deficit (Tailwind for Paints, Autos, FMCG).",
+      "Brent Crude dropped -5.73% to $108.71/bbl, easing imported inflation and reducing India's trade deficit (Tailwind for Paints, Autos, FMCG).",
+      "US Dollar Index softening (DXY -0.52%) reduces pressure on the Rupee and discourages foreign institutional (FII) capital outflow.",
       "US 10-Yr Treasury Yield shifted -1.14% to 4.93%, influencing global cost of capital.",
-      "\u2694\ufe0f Geopolitical Shock Watch (Geopolitical Trade / Supply Disruption): 'Iran's IRGC Navy says four tankers catch fire in Strait of Hormuz' (Reuters). Conflict escalation increases supply risk on crude and prompts risk-off flows."
+      "\u2694\ufe0f Geopolitical Shock Watch (War / Military Conflict): 'Trump holds call with Netanyahu over state of Iran war: report' (The Hindu). Conflict escalation increases supply risk on crude and prompts risk-off flows."
     ],
     "market_data": {
       "S&P 500": {
@@ -202,34 +202,34 @@
       "Nikkei 225": {
         "symbol": "^N225",
         "category": "Asian Markets",
-        "price": 63290.11,
-        "prev_close": 62189.65,
-        "change_pct": 1.77,
-        "status": "Bullish"
+        "price": 63081.86,
+        "prev_close": 63268.37,
+        "change_pct": -0.29,
+        "status": "Bearish"
       },
       "Hang Seng": {
         "symbol": "^HSI",
         "category": "Asian Markets",
-        "price": 23294.42,
-        "prev_close": 23093.37,
-        "change_pct": 0.87,
+        "price": 23393.32,
+        "prev_close": 23211.81,
+        "change_pct": 0.78,
         "status": "Bullish"
       },
       "Brent Crude": {
         "symbol": "BZ=F",
         "category": "Commodities & FX",
-        "price": 113.43,
-        "prev_close": 115.81,
-        "change_pct": -2.06,
+        "price": 108.71,
+        "prev_close": 115.32,
+        "change_pct": -5.73,
         "status": "Bearish"
       },
       "US Dollar Index": {
         "symbol": "DX-Y.NYB",
         "category": "Commodities & FX",
-        "price": 101.96,
-        "prev_close": 101.96,
-        "change_pct": 0.0,
-        "status": "Neutral"
+        "price": 101.65,
+        "prev_close": 102.19,
+        "change_pct": -0.52,
+        "status": "Bearish"
       },
       "US 10Y Yield": {
         "symbol": "^TNX",
@@ -241,68 +241,81 @@
       }
     },
     "geopolitical_risk": {
-      "risk_level": "Moderate Tension",
-      "status_description": "Active Conflict / Tension Cues",
-      "shock_count": 1,
-      "risk_penalty": -1.0,
+      "risk_level": "Elevated Conflict / Shock Alert",
+      "status_description": "Critical Geopolitical / Conflict Shocks Detected",
+      "shock_count": 2,
+      "risk_penalty": -2.5,
       "flagged_events": [
         {
-          "headline": "Iran's IRGC Navy says four tankers catch fire in Strait of Hormuz",
+          "headline": "Trump holds call with Netanyahu over state of Iran war: report",
           "category": "Geopolitical & War",
-          "shock_type": "Geopolitical Trade / Supply Disruption",
-          "source": "Reuters"
+          "shock_type": "War / Military Conflict",
+          "source": "The Hindu"
+        },
+        {
+          "headline": "Kherson braces for return of war as localised Russia-Ukraine truce ends",
+          "category": "Geopolitical & War",
+          "shock_type": "War / Military Conflict",
+          "source": "Al Jazeera"
         }
       ]
     },
     "news_headlines": [
       {
         "category": "Market & Macro",
-        "title": "Bank of Japan Declares Inflation Win, Clearing Way for Rate Hikes",
-        "source": "WSJ",
-        "pub_date": "Sat, 31 Oct 2026 11:03:58 GMT",
-        "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPWnJWU0FUQ3RzZzNCVjVCREZiMTJvOGI5UjU1VmlwR2lmYThxSGt2LS10eTEzd054TXpCVjhnRFlVcDBWYjAxOHRSSFZKdlVqMGJ0WDJGck43cTFGRXRiYW1TYTlrZUVEdEJVWVdCZjI4ZUV0czFUOC15dG9FYlpwRk5FOHFNR25RbWhrRVVPVlVkcWJUTGtrNVlzMnFaa1JjOGtrQjRLWG5JTnBrMi1R?oc=5"
-      },
-      {
-        "category": "Market & Macro",
-        "title": "India's RBI tightens cyber checks on lenders after spate of hacks",
+        "title": "Reliance earnings, lower oil prices power India's Sensex to near two-month high",
         "source": "Reuters",
-        "pub_date": "Fri, 30 Oct 2026 21:59:04 GMT",
-        "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxOUV9lcE01R2l5NFJ3Nmg3YWVuSUxtcUNET1ZsTHdEMGNTcGh6X1pqT0NjUkk3NFBXOHliWlhuaXZISV9KdXMxbFVyVGo0OXhUMkdFczRyVjRVMWhfWVRtN1JWRlNpVkdzNUJUNDQzTFM2TlJjbkxVUmljbnFSNDFQeWNXUE1ZTkJuQ2hxRnRIMENTUGprdW9NRWFYMkstLVNIbVpBc0NaZk1mVmlCV0pTUQ?oc=5"
+        "pub_date": "Mon, 02 Nov 2026 02:42:00 GMT",
+        "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPRV9nWF8tcV9tRkNYTENXRnRyTDhkcnRoZEJmMFJ1Wm1USDJwbDNxcEFuU0xNbE9JSnRJb2xScTBmWWVpZWJ5SmlhXzdBajNuSDhnOWdULWQ4UUZ2T3RRdjhpNWxZb08tcEQxR01tdks4dkhLTUN1WjJiZVFSa1JCbHBRdGVsZVZqNzFoQ2ZDdF9zbE9MeUlvRHhzZGRRM05SeGxlaFB1MFZjWVB3TVZjbTBfUlprRTZ2eTA3bFBFQVpLdw?oc=5"
       },
       {
         "category": "Market & Macro",
-        "title": "Bank credit and interest rate trends for September show significant movements: RBI",
-        "source": "News On AIR",
-        "pub_date": "Fri, 30 Oct 2026 16:13:24 GMT",
-        "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPSTZad2hnQUJxYXFGaTY1QWszNkh4MENadkprWkFDRFBYdmw3aDVzeWVHMS1QSFBRTDhUSGdmTjN4OW01MjI1TmY1X2Z5NWpFcmY1dkQ4VlcyaHpQa3A3RzVBbUUzemVYNkZvYWRZR2I2dmU0R0pzVFZfTWF3RlZhcFNsWnF6V214dDJoOXZMd3h4SG5iMC1iV1FVZTlUaHRSZ1NLNTV3SmNCUmc?oc=5"
+        "title": "Playbook to overcome inflation",
+        "source": "The Hindu",
+        "pub_date": "Mon, 02 Nov 2026 01:01:00 GMT",
+        "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNSVdDWjkyNC1SWFptR0dETmRnZWNSclB1R01VZGZVRmtiMFVxSDJzaEVPRk9xZk41OWhRNXlRX0MzdjZHTFlpYkdHdkVZSElqMFY2aFpYazBfdjVmYUFlQVBHNGNFSWpjN2M2cDhvdUlLbnh2YnZVc0JpUG05RDVMaVE2ZjhrclVtbi1nRWVLbU9ySW5iNXdv0gGeAUFVX3lxTE45RnpCLUdoZlNkaXBneDBKM1pXZnVqRnBCQ29zZVc4S0JhMVFhOEw5ZDdOUTB3NkxJZU80Rkxha3Fscm90bVo2YVRnOUpFWUJySWdnTU8zemJUdW1aYWxVcWltS0ZyTWlrUEtERzg4cXFaNEptdWtLNDgzZEtYMlh3RjNZOTk0Y0JRcEZoV1YwbUZjcTRnWWh1RHZVRXhR?oc=5"
+      },
+      {
+        "category": "Market & Macro",
+        "title": "Sensex jumps 1,000 points: 3 reasons why stock market is rising today",
+        "source": "India Today",
+        "pub_date": "Mon, 02 Nov 2026 04:14:18 GMT",
+        "link": "https://news.google.com/rss/articles/CBMi6AFBVV95cUxQSHh6UXZZZzZub2xaNVdIVlgzZHo1U1ItVEt6V0d6Q2hmY2w2eVpKYk9XMDBfNFNDRXh0U1RzajZOVkl6UkExWGFmdEQwa1ZhWWhWNzd2UzRoRDhUYWdidUdSVzd1RVc3ampOV2tYNVBIMVRycUlsV2JsRnd3Q2R0S2dDenpIYXk4bXFIVU5abms2MFNpbFNJandLc0FBR1hEMVhvYWdIVXg0VklJeEE3UkdaNnBqWU9icFR0b2RtSkk1S0o2MlBqZ1E5UTdUVkR4N1d4T1g1Mm9mS2dEZkNxODZOcy1fdmtU0gHuAUFVX3lxTE54UXg3MVQ1amhOYXlRcmpvWUZPSlUwX2JheXBCcTA1bjhIQTctWjRQaEp1NnN2YlpsaFBBamo5VVZoM0pEZTFXWm9oR2ZUMVlzZW1FOHdRQXhhR3VqT1VTRmxHNGRnNGV2SDZ0eGtHdkpza1R6cFRuQUJEU2JzZ0pHVkxfcVBCVjI5VnZ2elRkNnRGM2ttXy14TmtqLTdURUNOYWw0bVdCa0d6WmhJbVBDanJfclJBT1ZjLTBESVAtNTEwZ2xXdlA0MGVLWVVQbVZaQ1RPaVBQNWIwYmRMN1k2cXlOd3FoV0ZwaDd4M2c?oc=5"
       },
       {
         "category": "Geopolitical & War",
-        "title": "Iran to shift uranium stockpile abroad, reopen Hormuz within 7 days under draft deal: Report",
-        "source": "The Times of India",
-        "pub_date": "Sat, 31 Oct 2026 02:43:00 GMT",
-        "link": "https://news.google.com/rss/articles/CBMi_wFBVV95cUxQbi1hYm5XVmZyUkxVckItel81VUQ0YUVPaG0xRU1KWXpOM013NWtfYkNZY0V3bm9talZfRHd3QjduU2R0X0w2clRQM2VhaFJOUV9nWWJ2YnVlSDQ1TXZMS240elNRdGJDNjN4Z1BVSjBxQ2dCQXhHdVAyQVNNdXF6dnZaWkJBS1ZfUVNWV0RzUFVSRVpJQkxwbm1LeG5CUkVmR0dUR09HVEIxdnk5N0wyc0Vtb1NNSVRnZlRveUxDRDN4ZmtzVzZYZnFWSklIRlhqaFBkbG9zNVZobTBsa3Q5aGpKWko1bHhBOERRSEs3VTJKWjJWNlpSWjJjSGx6WHPSAYQCQVVfeXFMUDdzZjdEVnpqb3lnQVN1RGtReFZ4S3Y4VkNmbWRBcGZpRFh3LWZBdnIxMVo0VnRQRXlaN2k0Vlc4YzZKaWFneG1vVVQxa2NSZjlfaFZTUEUtR0xEZ3RZdVZiTlBoSUFCTGwxS1hxdnhZbGlybHJrTl8weFlfektqUGFMY0xlWHVPUVJMRURocFZUTF9uQTVfQmJzalNtRWRZZF9WbWVXR1NoQWNWZXVMbGFUWDFqaDFoN2dJMVdVMGU5SEljYWtwMGVnYzhUVVFkOG52OU5JemxGT2d0WFd0bFFyWDNrekJ4X0JyaEFxb0VmcF9VeGRpWkMteEtmUHo3dDZGYWg?oc=5"
+        "title": "Trump holds call with Netanyahu over state of Iran war: report",
+        "source": "The Hindu",
+        "pub_date": "Sun, 01 Nov 2026 20:34:51 GMT",
+        "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNQlF5a1R0ODBDVUI5QmhvSElocGlNSFc1ZTBveElYeENFakp1U0lnWi1saFRpd1o1U21KTU9WdDQyY0dOeG5LcnA3VWcwUnpoRGowbkhWNVZ3N2Y0WktmVXlHajk2VlBBQ2lyZXEtb24tZEFZS1lEalYtOUNQQmEzdGZ3ODZCOE5QZHh0UWdqU0VPVG4yd1hwMG55WUZIM3NDUk1kaUN1SkpQdXFReUZFNjNnc0xnUDk1U0FLOHdmOTkzSGvSAcoBQVVfeXFMTkFGTl9ISTZTampsd3VGMjZ6cUxjbVlTdVprWEUwWWZGSVV0MEE5a3VIMVNlbG8waWVmQTR4TDY2VUg2MjRiVUdOcWRvTS1rdmRmV2tfYWItZ0FBV2E1ODJ1SExDM01kemhkX3ZhUUtCNXpGVHFsNkdGd1JTVkNRMVBJWHRQdVE0c0NheU1NQ0dXd2lxRkR5QmNiZ2FyQk5UNndoNUwwQllVaFFuVnJyLTNpWEQxSWJxWUc3b3RPeG5EMnMzVE5vR0JMZw?oc=5"
+      },
+      {
+        "category": "Geopolitical & War",
+        "title": "Kherson braces for return of war as localised Russia-Ukraine truce ends",
+        "source": "Al Jazeera",
+        "pub_date": "Mon, 02 Nov 2026 05:52:56 GMT",
+        "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPSmhPRWdMd0h3RkJOUWJLdUdMZk4xN1VvR1RVS1pRaG50MzJUYWFvYnYzS3h2WlBwZGFpYjNid3dMcHVhZWNpbFVSa0VTWTdITEs5T2Y0dWpRckJBOUtGWXFDelRITE5NcUQ4RFZUTksxQ2dqX29lXzJJem0tT1pPV2lxcUloS0Q4RENLZWEyaE5YSEtpR3RyQ0k0eXpPSTNLZXBzNUFWRnRKZWpWcWZielhZakvSAboBQVVfeXFMTVNGdVRNRW8tWlZVOVJrVktvU3BQTjh5aVB3Y005Q3g0RGhSTlFZN2NfWTNINUJqT1B0WVVFWHRVQkJ0THJZaHdfNHNNclBUTVNhdHFJRlZhTVQ0Wk5vOTRncWxJUTBZWkdxb0FISDh4eXRMTTA3bEwtQ1pndzdZVlNFcTZYcmJZR2tLZ2lVaVZ3bURvejgxcFRSZXhYYkktU3Zic0l0ZldkWWV0ZlRoV3JpQzdwbWhOVVZ3?oc=5"
       },
       {
         "category": "Geopolitical & War",
         "title": "Oil Prices Rise as Middle East, Ukraine-Russia Conflict Fuel Supply Worries",
         "source": "WSJ",
-        "pub_date": "Fri, 30 Oct 2026 20:26:06 GMT",
+        "pub_date": "Mon, 02 Nov 2026 09:59:41 GMT",
         "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPUnhpZVZHQUliUnJIQUJWb3JmbVl6VV9GZ3NJN0M3X0EzZU9pa2N4SEcybGNlakZkcmxyeVNqV0E5LWRxTU1VZUM4Uk9TdGZTS0RJLU1CZ1JVVFBlM0pTcWFPd2U0b1RFTkVyV2oxSzNwZzYzMjBwVmRtbUFvWUowS1RPSEQ3eE1Qa2ZQQVJ5SExsbzVXQTQtNlZYRC1Bbnh2YmpnZ2VGaHZLQlJDRWJRZEZOU2VCZ1hPcENQcTUtYw?oc=5"
       },
       {
-        "category": "Geopolitical & War",
-        "title": "Iran's IRGC Navy says four tankers catch fire in Strait of Hormuz",
-        "source": "Reuters",
-        "pub_date": "Fri, 30 Oct 2026 20:40:06 GMT",
-        "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPMzdWakFCLTEzM2pYaGh6ZHpxZE9KMjh2QjkzcE1ieWVwa0dmRFZZWUlOamZJUlpwN0M1ajJuZ3dNRFJ4ZzJwSmFJaGl4cGFWTEZPYmI0UllLZ1lCRzIzWVpNSlhkQnpCejl4RFltVXJvV3QtcXhqY1JiUF91TjZmSU5XYXFHM05CcE1fbzV6dVNmOFFUNEExZm1qVTFQWnhBYnVyZkUxYmlRTnEtTHlla3l0RGxncHgwbDRyVVVuMjU?oc=5"
+        "category": "Crisis & Policy",
+        "title": "How the president\u2019s party has fared in every US midterm election since 1946",
+        "source": "Al Jazeera",
+        "pub_date": "Mon, 02 Nov 2026 08:09:41 GMT",
+        "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOWU5LRkRLT1diYjluQWhYZTljU2xlNGtlLWlxUjRrRmx5TjZkUjNTMFBSejgtUDJ3VzZFWnptMEhzRTMwNS1CZHlyRFJnVHdMRXVweFNSU19FY2I2T3ZUcEVXb2I5QUNfMlFfVDFsR0lZN2diY1J3U3lteUlCelZzUnlDUHFzbFdMaThwT0RETTY5OEJLNjF6LW5nWFNUb2JyZUxtbjRSSWJ0Y1R0QmRnMms4UGJnd9IBuwFBVV95cUxOWUxoc1hFSnBZWGl4OGNqMW4wN1pBNlpOUHRlSFF5N3d4RFpwdXhYN0RMSGs0clI1ZXN3SFVWTjJTdlNwZHlXRnlTUWg3UnVPbDhQWlhfdkNQQTdQTGFTMmttOTA1cFdiaThMZ2l1ZWdDQkxmTWctWnpDektiQ21yWlNEMTNHdTlvY3ExdG1BdVVGMHhaQi1YbnN0UFpTSUxtSEM3ZEQxcTVOczRlc1puN0xoQ1lzTWpWdllr?oc=5"
       },
       {
         "category": "Crisis & Policy",
-        "title": "Israel election final results leave both ruling & opposition blocs short of majority",
-        "source": "News On AIR",
-        "pub_date": "Sat, 31 Oct 2026 07:05:09 GMT",
-        "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxNa1ZYN1pvT3dVNXdQcFVuUTV4Mzg1WWE4Tl9UdVcwS1poQWZlZF9OeFRmemt3WEhZSFFTM1lYdVV5eXgtLWVWeHlBbnR2Y3dURHFyU0RYenp2SGtuWXpoWFRMR1BSVmJsUGlzUzl5amN0alpyT1U0WHQyOEY4NHpJeWNmbnhnNVE1M3hJY3J2NmI3Si0tYktnYnFDX0k3UEo0OW0wVlUtc214cVR4?oc=5"
+        "title": "Live Results and Map: 2026 US Midterm Elections | Key Races to Watch",
+        "source": "Bloomberg",
+        "pub_date": "Mon, 02 Nov 2026 09:08:18 GMT",
+        "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE0tTWNNRkFpSGJONmdZckNUQ2NaSXBjc21LSklDTUNiM2tFQm9wS3pwNnNGdFJhM1NzYllHWnBJdzgtcUtuWFV1dmlHZ1NYNjUtbDNNWUZ6MXV4R3p4enlpTW5IQVVrU2pxam1YVQ?oc=5"
       },
       {
         "category": "Crisis & Policy",
@@ -310,43 +323,36 @@
         "source": "Supreme Court Observer",
         "pub_date": "Wed, 28 Oct 2026 07:00:00 GMT",
         "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxNV3ZldmFfcFRNMWRDYVZiSTUxT1FfNU5Ya3F2aVJMeVpTdk85SndqbE5sM05rcGNCeGFSQVpUVkNjZ1NkVVVyR3JPY2RYM1NMSk8tS0o5QS01RnJnQmFzTVVDN2NtaEJudzJISVFTU1Y4ZWxBQkFWUFdfRV9lenJiZ1Juek4weWRMcXpDN3UyZGc?oc=5"
-      },
-      {
-        "category": "Crisis & Policy",
-        "title": "US midterm elections 2026: Election Day date, polling hours, results and when to expect winners",
-        "source": "The Indian Express",
-        "pub_date": "Sat, 31 Oct 2026 10:38:13 GMT",
-        "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxONXFBRzRDWGFPdDRmZkpWZ0lyQnlaMlZzMTBRN0J1TDlucXhVdUI0Y2JFX3k2aEJXSUdSZGY3WDBDT3pJYTZrZkhIRUcwQnBIelNLT0h2N0JBY0NFakNsSWFXWWk3UTRPNnVSVV9iZkJXVDRyMDJGUjMteXR0SlE4UUdOYWZrV0UwQXM5clhkRURNMW1GeE5UMWhTOFE5bjdvVXcyOTBvcGNzUnRaNjZITzFNYklMY1YxX2pn0gHCAUFVX3lxTE9XWEJQWkFqajVKUWRZU3BJMDlQb1FxTzdHLXFGanBoOFJlLXY2ZnBuUFNwNTZkQVNpcGhoNlo3b29XZkN1WEp2OVhOay1INEJDVGNBV2RkRC1yMjg4dVRkc3paS05nVG1NaU1KYk8zZXFLdkRPUFZXVmJWZDBnSUhqMWtNa2k5XzVxRC1IMmtpUFlTYjBFcVBydFE4UlZrakRDYzQ2ay04ZS10OTFoWGJsR01DZWNBbFd3bUJOSFMtRm5B?oc=5"
       }
     ]
   },
   "next_day_prediction": {
     "setup_name": "Bullish BOS",
     "bias": "Bullish Trend Continuation",
-    "confidence": "High (67.4% Win Rate)",
-    "historical_win_rate": "67.4% Verified (46 Sessions)",
-    "win_rate_pct": 67.4,
-    "clq": 0.6948356807511737,
+    "confidence": "High (68.1% Win Rate)",
+    "historical_win_rate": "68.1% Verified (47 Sessions)",
+    "win_rate_pct": 68.1,
+    "clq": 1.0,
     "opening_gate": {
-      "condition": "Open >= Central Pivot (23025.43) -> Confirmed 92.5% Hit Rate",
-      "gate_win_rate": "84.1% Confirmed Hit Rate",
+      "condition": "Open >= Central Pivot (23362.88) -> Confirmed 92.5% Hit Rate",
+      "gate_win_rate": "84.2% Confirmed Hit Rate",
       "invalidation_action": "If opening print violates gate, stand down (win rate drops to 37.5%)"
     },
-    "risk_reward_ratio": "1 : 2.2",
-    "primary_liquidity_target": "PDH Sweep (23118.1) & R1 (23145.76)",
-    "secondary_target": "R2: 23238.43",
-    "invalidation_level": "Break below Bottom Central Pivot (23011.6)",
-    "cpr_structure": "Narrow CPR (27.66 pts) indicates high probability of a strong Trending Expansion Day (>1.2x ADR).",
-    "expected_range_adr": "307.36 pts",
-    "rationale": "Break of Structure (BOS): Daily close broke and held cleanly above previous high (22961.95) with strong auction settlement (CLQ: 0.69). Trend inertia remains dominant (67.4% hit rate).",
-    "playbook": "Expect shallow opening dips into Central Pivot (23025.43) to act as demand. Ride continuation momentum towards PDH (23118.1) and target R1 (23145.76).",
-    "event_rule": "\ud83d\udea8 GEOPOLITICAL / CRISIS ALERT: Active Conflict / Tension Cues ('Iran's IRGC Navy says four tankers catch fire in Strait of Hormuz'). Elevated gap volatility risk. The 9:15 AM Opening Execution Gate is MANDATORY.",
+    "risk_reward_ratio": "1 : 0.7",
+    "primary_liquidity_target": "PDH Sweep (23440.8) & R1 (23518.71)",
+    "secondary_target": "R2: 23596.63",
+    "invalidation_level": "Break below Bottom Central Pivot (23323.92)",
+    "cpr_structure": "Average CPR (77.92 pts). Expect balanced auction around Pivot (23362.88).",
+    "expected_range_adr": "299.38 pts",
+    "rationale": "Break of Structure (BOS): Daily close broke and held cleanly above previous high (23118.1) with strong auction settlement (CLQ: 1.00). Trend inertia remains dominant (68.1% hit rate).",
+    "playbook": "Expect shallow opening dips into Central Pivot (23362.88) to act as demand. Ride continuation momentum towards PDH (23440.8) and target R1 (23518.71).",
+    "event_rule": "\ud83d\udea8 GEOPOLITICAL / CRISIS ALERT: Critical Geopolitical / Conflict Shocks Detected ('Trump holds call with Netanyahu over state of Iran war: report'). Elevated gap volatility risk. The 9:15 AM Opening Execution Gate is MANDATORY.",
     "overnight_synthesis": {
       "alignment": "Aligned",
       "macro_bias": "Strong Global Tailwind",
-      "macro_score": 3.0,
+      "macro_score": 6.93,
       "gap_expectation": "Gap-Up Favored (+40 to +80 pts)",
-      "adjustment_note": "Global Tailwind (+3.0) reinforces technical bullish structure. Expected Gap-Up Favored (+40 to +80 pts) increases odds of early PDH liquidity sweep. Opening Gate confirmation probability elevated."
+      "adjustment_note": "Global Tailwind (+6.93) reinforces technical bullish structure. Expected Gap-Up Favored (+40 to +80 pts) increases odds of early PDH liquidity sweep. Opening Gate confirmation probability elevated."
     }
   },
   "history": [
@@ -480,7 +486,7 @@
       "smc_structure": "Bearish BOS (Expansion)",
       "pwh": null,
       "pwl": null,
-      "equilibrium": 25904.52,
+      "equilibrium": 25904.53,
       "zone": "Discount",
       "pivot": 25795.68,
       "tc": 25758.89,
@@ -12740,7 +12746,57 @@
       "r1": 23145.76,
       "s1": 22932.76,
       "r2": 23238.43,
-      "s2": 22812.43
+      "s2": 22812.43,
+      "historical_setup": "Bullish BOS",
+      "expected_target": "PDH Sweep & R1 Expansion",
+      "prediction_verified": true,
+      "verification_detail": "Swept PDH (High 23440.8 >= 23118.1)"
+    },
+    {
+      "date": "2026-11-02",
+      "day": "Monday",
+      "open": 23222.3,
+      "high": 23440.8,
+      "low": 23207.05,
+      "close": 23440.8,
+      "volume": 0,
+      "range": 233.75,
+      "range_pct": 1.01,
+      "prev_close": 23053.1,
+      "prev_high": 23118.1,
+      "prev_low": 22905.1,
+      "change": 387.7,
+      "change_pct": 1.68,
+      "gap": 169.2,
+      "gap_type": "Gap Up",
+      "body": 218.5,
+      "body_pct": 93.5,
+      "clq": 1.0,
+      "upper_wick": 0.0,
+      "lower_wick": 15.25,
+      "is_expansion_bar": true,
+      "is_pinbar": false,
+      "candle_type": "Strong Bullish Expansion",
+      "is_inside_day": false,
+      "is_outside_day": false,
+      "pdh_sweep": false,
+      "pdl_sweep": false,
+      "bullish_bos": true,
+      "bearish_bos": false,
+      "smc_structure": "Bullish BOS (Expansion)",
+      "pwh": 23118.1,
+      "pwl": 22387.35,
+      "equilibrium": 22810.35,
+      "zone": "Premium",
+      "pivot": 23362.88,
+      "tc": 23401.84,
+      "bc": 23323.92,
+      "cpr_width": 77.92,
+      "cpr_type": "Average",
+      "r1": 23518.71,
+      "s1": 23284.96,
+      "r2": 23596.63,
+      "s2": 23129.13
     }
   ]
 }
