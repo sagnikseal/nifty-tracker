@@ -1,26 +1,12 @@
-# Python
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
-env/
-venv/
-ENV/
+.env
 .venv/
-
-# Operating System Files
+venv/
+env/
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# IDEs
-.vscode/
+*.log
+data/live_recorded_snapshots.jsonl
 .idea/
-*.swp
-*.swo
-
+.vscode/

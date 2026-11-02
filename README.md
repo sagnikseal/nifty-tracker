@@ -1,132 +1,93 @@
-# 📈 NIFTY 50 Daily High-Low Tracker & Trading Journal
+# NIFTY 50 Institutional Tracker & 4-Pillar AI Prediction Terminal (Overhaul v2.0)
 
-An automated **GitHub Pages** web application that tracks **NIFTY 50 Daily High, Low, Range, CPR, and Candlestick metrics** after the National Stock Exchange (NSE) closes each day, and provides a built-in interface to **mark trading observations, key levels, trade setups, and journal notes**.
-
-Powered by automated **GitHub Actions** running on a weekday schedule (Monday to Friday after 3:30 PM IST).
+An institutional-grade intraday prediction engine, options microstructure analyzer, cross-asset macro radar, geopolitical shock scanner, and Smart Money Concepts (SMC) End-of-Day tracker for **NSE NIFTY 50 (`^NSEI`)**.
 
 ---
 
-## 🚀 Live Features
+## What Was Fixed & Overhauled in v2.0
 
-- **Daily High & Low Spotlight**: Prominently highlights today's High, Low, Range (in points and %), settled Close, and compares with previous day levels.
-- **20-Day Average Daily Range (ADR)**: Compare today's volatility and expansion against the 20-day historical average.
-- **52-Week Range Gauge**: Visual slider indicating where today's price sits within the 52-week band.
-- **Next Session CPR & Pivots**: Automatically computes Central Pivot Range (TC, BC, Pivot), CPR width (Narrow / Average / Wide), and classic support/resistance levels ($R_1$, $R_2$, $S_1$, $S_2$).
-- **Interactive Candlestick Chart**: Embedded TradingView Lightweight Charts canvas with time-scale zooming (1M, 3M, 6M, 1Y, All) and hover crosshairs.
-- **Trading Info Marking & Journaling**:
-  - Mark daily bias: 🟢 Bullish, 🔴 Bearish, 🟡 Range / Chop, ⚡ High Volatility.
-  - Tag price action patterns: *Trend Day, Inside Bar, Outside Bar, Gap & Go, CPR Bounce, Fake Breakout, Expiry Move*.
-  - Log traded levels (PDH, PDL, CPR, round numbers) and trade execution outcomes (Profit, Loss, Breakeven, Observer).
-  - Add freeform psychology notes and custom `#tags`.
-  - Stored persistently in browser `localStorage`.
-  - Export & Import journal backups anytime (`.json`).
-  - Marked days appear with custom badges on the candlestick chart and in the table!
-- **Data Table**: Filterable by "All Days", "My Marks Only", or "Inside Bars", with search and CSV download.
-- **Theme Toggle**: Switch between Dark and Light trading themes.
+### 1. Eliminated the `CONNECTING...` Freeze Permanently
+- **Non-Blocking Async Background Worker (`scripts/realtime_engine.py`)**: External broker, macro, and RSS requests now run in a background worker thread (`asyncio.to_thread`) every 1.0s rather than blocking FastAPI's `/ws/stream` and `/api/signal` handlers. Responses now return in **<5ms**.
+- **Proper URL-Encoding & Intraday Endpoints for Upstox (`UpstoxProvider`)**: Properly encodes `NSE_INDEX|Nifty 50` (`NSE_INDEX%7CNifty%2050`), targets the Upstox v2 intraday endpoint (`/v2/historical-candle/intraday/.../1minute`), and automatically calculates the next Thursday weekly expiry date for `/v2/option/chain`.
+- **Complete `AngelOneProvider` & `GrowwProvider` Implementation**: Implements AngelOne SmartAPI live quotes (`99926000` NIFTY 50 & `99926017` India VIX) and historical intraday candles.
+- **Auto-Sync Credentials & Explicit State Machine (`realtime_client.js`)**: Automatically pushes saved `localStorage` broker credentials to `POST /api/admin/configure` on page load, enforces a 2.2s connection watchdog, and seamlessly activates the built-in **In-Browser 4-Pillar Quant Engine** when viewing on static GitHub Pages without a local Python server.
+- **Strict Live-Only Safety Lock (`block_synthetic_trades`)**: Optional toggle that locks the engine to `NO_TRADE_CASH (SYNTHETIC_FEED_LOCKED)` whenever your broker token expires or falls back to modeled option chains.
+
+### 2. The 4-Pillar Calibrated AI Ensemble (`scripts/train_ml_model.py` & `models/nifty_ensemble_weights.json`)
+Predictions combine **16 engineered features** across four pillars using an L2-regularized Logistic + Gradient Residual Stump ensemble calibrated via **Pool-Adjacent-Violators (PAVA) Isotonic Regression**:
+
+| Pillar | Weight | Key Signals & Market Drivers |
+| :--- | :--- | :--- |
+| **1. Technical, SMC & Volume VWAP** | **28%** | Multi-timeframe (1m/5m/15m) Supertrend alignment, Futures/Proxy Volume-Weighted VWAP Z-Score, Central Pivot Range (TC/Pivot/BC width), PDH/PDL Liquidity Sweeps, 3-Candle Fair Value Gaps (FVG), Break of Structure (BOS), and Opening Range Breakout (ORB). |
+| **2. Options Microstructure & Top-6 Heavyweights** | **34%** | True analytical Black-Scholes Gamma & Dealer Net GEX (in ₹ Cr), Zero-Gamma Flip strike, Call/Put OI Walls, 15-minute rolling ring buffer for 5m PCR Velocity, Trapped Call/Put Writer Short-Covering Panic detector, and **Top 6 NIFTY Heavyweights Basket** (`HDFCBANK`, `RELIANCE`, `ICICIBANK`, `INFY`, `LT`, `TCS` — ~42% of NIFTY weight) with automatic divergence veto. |
+| **3. Global Macro & Economic Cross-Asset Shocks** | **18%** | Live cross-asset tracking of **Brent Crude Oil** (`$/bbl`), **USD/INR** spot, **US Dollar Index (DXY)**, **US 10Y Treasury Yield**, **S&P 500 E-Mini Futures**, **GIFT Nifty** spread, and **India VIX** level + velocity regime switch. |
+| **4. Geopolitical Conflict & Live News NLP Wire** | **20%** | Multi-feed live RSS parser (*Economic Times*, *Moneycontrol*, *LiveMint*) + custom wire injection scored by a dual **Geopolitical War/Conflict Escalation Lexicon** (war, missile, airstrike, blockade, sanctions, Red Sea/Hormuz/border tensions) and **Central Bank / Macro Policy NLP** (RBI MPC, Fed FOMC, CPI, GDP, FII flows). |
 
 ---
 
-## 🛠️ Project Structure
+## Repository Structure
 
-```
-Trading/
-├── .github/
-│   └── workflows/
-│       └── update_nifty.yml       # GitHub Actions: Mon-Fri scheduled run & deployment
+```text
+nifty-tracker/
+├── .github/workflows/
+│   └── update_nifty.yml            # Daily EOD sync, ML calibration & GitHub Pages deploy
 ├── data/
-│   └── nifty_data.json            # Historical & latest OHLC + pivots data (pre-populated)
+│   ├── nifty_data.json             # 248-session NIFTY 50 EOD OHLC, SMC & CPR dataset
+│   └── trading_marks.json          # Persistent trade journal annotations
+├── models/
+│   └── nifty_ensemble_weights.json # Calibrated 4-Pillar ML weights & isotonic knots
 ├── scripts/
-│   └── fetch_nifty.py             # Python script fetching ^NSEI & calculating metrics
-├── index.html                     # Responsive web interface
-├── style.css                      # Trading terminal styling (dark/light theme)
-├── app.js                         # Application logic, chart, table & journal state
-├── README.md                      # Documentation & deployment guide
-└── .gitignore                     # Git ignore rules
+│   ├── fetch_nifty.py              # Daily EOD NIFTY 50 fetcher & SMC/CPR calculator
+│   ├── train_ml_model.py           # Triple-Barrier ML trainer & PAVA isotonic calibrator
+│   ├── realtime_engine.py          # FastAPI + WebSocket 4-Pillar realtime server
+│   └── backtest_stress_test.py     # Multi-regime walk-forward & war/macro stress tester
+├── index.html                      # Institutional 4-Pillar AI & EOD SMC Terminal UI
+├── style.css                       # Responsive dark/light theme styling
+├── app.js                          # EOD SMC/CPR cards, interactive OHLC canvas & journal
+├── realtime_client.js              # WebSocket/HTTP client & In-Browser 4-Pillar engine
+├── requirements.txt                # Python dependencies
+└── .env.example                    # Template for Upstox / AngelOne / Groww tokens
 ```
 
 ---
 
-## ⚙️ GitHub Actions Automation
+## Quick Start: Replace Your Local Clone & Push to GitHub
 
-The workflow file [`.github/workflows/update_nifty.yml`](.github/workflows/update_nifty.yml) runs automatically:
+1. **Extract the Overhaul Zip into Your Local Clone**:
+   ```bash
+   cd /path/to/your/nifty-tracker
+   unzip -o ~/Downloads/nifty-tracker-overhaul.zip -d .
+   ```
 
-- **Schedule**:
-  - `30 10 * * 1-5`: Runs at **10:30 UTC** (**4:00 PM IST**), 30 minutes after NSE market closes at 3:30 PM IST.
-  - `15 11 * * 1-5`: Runs at **11:15 UTC** (**4:45 PM IST**) to ensure final post-market settlement prices are recorded.
-- **Manual Trigger**: Can be run anytime on demand via the **Run workflow** button in GitHub Actions.
-- **Auto-Commit**: Automatically commits updated `data/nifty_data.json` to the repo with `[skip ci]`.
-- **Pages Deploy**: Deploys the freshly updated site directly to GitHub Pages.
+2. **Install Python Dependencies**:
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate   # On Windows: .venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
----
+3. **Verify the Calibrated ML Model & Walk-Forward Stress Tests**:
+   ```bash
+   python scripts/fetch_nifty.py
+   python scripts/train_ml_model.py
+   python scripts/backtest_stress_test.py
+   ```
 
-## 🚢 How to Deploy to Your GitHub Pages (Step-by-Step)
+4. **Launch the Live 4-Pillar Realtime Backend Engine**:
+   ```bash
+   cp .env.example .env
+   # Edit .env to add your UPSTOX_ACCESS_TOKEN or ANGELONE_ACCESS_TOKEN
+   python scripts/realtime_engine.py
+   ```
+   The engine starts on `http://localhost:8000` (WebSocket stream at `ws://localhost:8000/ws/stream`, health check at `http://localhost:8000/api/health`).
 
-### Step 1: Initialize & Commit Locally (Already configured)
+5. **Open the Trading Terminal**:
+   - Serve the directory locally (`python -m http.server 3000` and visit `http://localhost:3000`) or open `index.html` directly.
+   - Click **⚙ Broker API & Feeds** in the top navigation bar to paste your daily broker token, test backend latency, or toggle the **Strict Live-Only Lock**.
 
-If you haven't committed yet:
-```bash
-git add .
-git commit -m "Initial commit: NIFTY Daily Tracker & Trading Journal"
-```
-
-### Step 2: Create a New GitHub Repository
-
-1. Open this direct link: **[Create `nifty-tracker` on GitHub](https://github.com/new?name=nifty-tracker)**.
-2. Ensure the repository name is **`nifty-tracker`**.
-3. Choose **Public** (or Private if you have GitHub Pro for Pages).
-4. Leave "Add a README file", ".gitignore", and "license" unchecked (we already have them created and committed).
-5. Click **Create repository**.
-
-### Step 3: Push to GitHub
-
-In your local terminal inside this folder, run:
-```bash
-git push -u origin main
-```
-*(The remote `origin` is already pre-configured to `https://github.com/sagnikseal/nifty-tracker.git`)*
-
-### Step 4: Configure GitHub Pages Settings
-
-1. On GitHub, go to your repository **Settings** tab.
-2. In the left sidebar, click **Pages** (under "Code and automation").
-3. Under **Build and deployment**:
-   - Change **Source** to **GitHub Actions**.
-
-### Step 5: Grant Workflow Write Permissions
-
-Because the workflow commits the newly fetched daily data back into `data/nifty_data.json`, enable write permissions:
-1. In your repository **Settings**, go to **Actions** -> **General** (in left sidebar).
-2. Scroll down to **Workflow permissions**.
-3. Select **Read and write permissions**.
-4. Check **Allow GitHub Actions to create and approve pull requests** (optional, recommended).
-5. Click **Save**.
-
-### Step 6: Test Your First Workflow Run
-
-1. Go to the **Actions** tab in your repository.
-2. In the left sidebar, click **Update NIFTY Data & Deploy to Pages**.
-3. Click the **Run workflow** dropdown on the right and click the green **Run workflow** button.
-4. Once completed (approx. 40 seconds), your site will be live at:
-   **`https://sagnikseal.github.io/nifty-tracker/`**
-
----
-
-## 💻 Local Development
-
-You can run and test the app locally anytime without any external dependencies:
-
-```bash
-# Run the Python data fetcher locally (fetches latest NIFTY data)
-python3 scripts/fetch_nifty.py
-
-# Start a simple local server to preview the web app
-python3 -m http.server 8000
-```
-Then visit `http://localhost:8000` in your web browser.
-
----
-
-## 📝 License
-
-MIT License. Built for index traders and market participants.
-
+6. **Commit & Push to Your GitHub Repository**:
+   ```bash
+   git add .
+   git commit -m "feat: complete v2.0 overhaul with 4-Pillar AI engine, macro/geopolitical NLP, and broker streaming fix"
+   git push origin main
+   ```

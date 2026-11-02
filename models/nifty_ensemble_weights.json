@@ -1,0 +1,426 @@
+{
+  "model_name": "NIFTY-50-v3-RegimeGated-MoE-Bayesian-Ensemble",
+  "trained_at_utc": "2026-11-01T05:41:33.933494+00:00",
+  "training_samples": 2160,
+  "validation_samples": 720,
+  "corpus_breakdown": {
+    "historical_nse_eod_decomposed": 1840,
+    "empirical_nse_crisis_and_event_replays": 1040,
+    "live_broker_recorded_snapshots": 0,
+    "upstox_intraday_bars_fetched": 6375
+  },
+  "labeling_scheme": "Triple-Barrier (+1.5x ATR TP1 vs -1.0x ATR SL) + Empirical NSE Event Replay",
+  "intercept": -0.1652,
+  "feature_names": [
+    "supertrend_align",
+    "vwap_zscore",
+    "smc_bos_sweep",
+    "cpr_position",
+    "orb_momentum",
+    "net_gex_zscore",
+    "pcr_velocity_5m",
+    "writer_trap_score",
+    "heavyweight_delta",
+    "brent_crude_shock",
+    "usdinr_dxy_pressure",
+    "us10y_sp500_lead",
+    "vix_velocity_regime",
+    "news_finbert_sentiment",
+    "geopolitical_war_shock",
+    "central_bank_event_shock"
+  ],
+  "feature_weights": {
+    "supertrend_align": 0.342,
+    "vwap_zscore": -0.1639,
+    "smc_bos_sweep": 0.3263,
+    "cpr_position": 0.253,
+    "orb_momentum": 0.2773,
+    "net_gex_zscore": 0.5623,
+    "pcr_velocity_5m": 0.6728,
+    "writer_trap_score": 0.4868,
+    "heavyweight_delta": 0.7457,
+    "brent_crude_shock": 0.6867,
+    "usdinr_dxy_pressure": 0.3223,
+    "us10y_sp500_lead": 0.3794,
+    "vix_velocity_regime": -0.091,
+    "news_finbert_sentiment": 0.1498,
+    "geopolitical_war_shock": -1.1727,
+    "central_bank_event_shock": -0.5025
+  },
+  "regime_experts": {
+    "NORMAL_TREND_EXPERT": {
+      "intercept": -0.0587,
+      "weights": {
+        "supertrend_align": 0.506,
+        "vwap_zscore": 0.1589,
+        "smc_bos_sweep": 0.3561,
+        "cpr_position": 0.3292,
+        "orb_momentum": 0.7344,
+        "net_gex_zscore": 0.7979,
+        "pcr_velocity_5m": 0.9108,
+        "writer_trap_score": 0.8431,
+        "heavyweight_delta": 0.8118,
+        "brent_crude_shock": 0.7725,
+        "usdinr_dxy_pressure": 0.6731,
+        "us10y_sp500_lead": 0.6712,
+        "vix_velocity_regime": 0.6595,
+        "news_finbert_sentiment": 0.6575,
+        "geopolitical_war_shock": 0.0,
+        "central_bank_event_shock": 0.5882
+      },
+      "samples_trained": 1046
+    },
+    "EXPIRY_GAMMA_EXPERT": {
+      "intercept": -0.4159,
+      "weights": {
+        "supertrend_align": 0.067,
+        "vwap_zscore": 0.0281,
+        "smc_bos_sweep": 0.2964,
+        "cpr_position": 0.2164,
+        "orb_momentum": 0.4199,
+        "net_gex_zscore": 0.4696,
+        "pcr_velocity_5m": 0.3433,
+        "writer_trap_score": 0.234,
+        "heavyweight_delta": 0.6694,
+        "brent_crude_shock": 0.9718,
+        "usdinr_dxy_pressure": 1.0179,
+        "us10y_sp500_lead": 0.6627,
+        "vix_velocity_regime": 0.5699,
+        "news_finbert_sentiment": 0.5767,
+        "geopolitical_war_shock": 0.0,
+        "central_bank_event_shock": 0.6407
+      },
+      "samples_trained": 470
+    },
+    "MACRO_POLICY_EXPERT": {
+      "intercept": -1.0138,
+      "weights": {
+        "supertrend_align": 1.1757,
+        "vwap_zscore": 0.2577,
+        "smc_bos_sweep": 0.7974,
+        "cpr_position": -0.1778,
+        "orb_momentum": 0.064,
+        "net_gex_zscore": 0.1934,
+        "pcr_velocity_5m": 0.1571,
+        "writer_trap_score": 0.0722,
+        "heavyweight_delta": 0.2056,
+        "brent_crude_shock": -0.309,
+        "usdinr_dxy_pressure": 0.2113,
+        "us10y_sp500_lead": 0.0002,
+        "vix_velocity_regime": 0.1156,
+        "news_finbert_sentiment": 0.1125,
+        "geopolitical_war_shock": 0.0,
+        "central_bank_event_shock": 0.1013
+      },
+      "samples_trained": 218
+    },
+    "GEOPOLITICAL_CRISIS_EXPERT": {
+      "intercept": -2.6162,
+      "weights": {
+        "supertrend_align": -0.1071,
+        "vwap_zscore": -0.0438,
+        "smc_bos_sweep": 0.1347,
+        "cpr_position": -0.0593,
+        "orb_momentum": -0.3587,
+        "net_gex_zscore": 0.2761,
+        "pcr_velocity_5m": 0.0837,
+        "writer_trap_score": 0.3401,
+        "heavyweight_delta": -0.6658,
+        "brent_crude_shock": -0.2112,
+        "usdinr_dxy_pressure": 0.1469,
+        "us10y_sp500_lead": 0.4721,
+        "vix_velocity_regime": -0.0768,
+        "news_finbert_sentiment": -0.1325,
+        "geopolitical_war_shock": -0.0153,
+        "central_bank_event_shock": -0.1338
+      },
+      "samples_trained": 426
+    }
+  },
+  "feature_means": {
+    "supertrend_align": -0.0378,
+    "vwap_zscore": -0.0774,
+    "smc_bos_sweep": -0.0475,
+    "cpr_position": 0.0156,
+    "orb_momentum": -0.0872,
+    "net_gex_zscore": -0.2632,
+    "pcr_velocity_5m": -0.2332,
+    "writer_trap_score": -0.2436,
+    "heavyweight_delta": -0.2909,
+    "brent_crude_shock": -0.2237,
+    "usdinr_dxy_pressure": -0.2317,
+    "us10y_sp500_lead": -0.1737,
+    "vix_velocity_regime": -0.395,
+    "news_finbert_sentiment": -0.2773,
+    "geopolitical_war_shock": -0.2976,
+    "central_bank_event_shock": -0.1385
+  },
+  "feature_stds": {
+    "supertrend_align": 0.6366,
+    "vwap_zscore": 1.0077,
+    "smc_bos_sweep": 0.7611,
+    "cpr_position": 0.6196,
+    "orb_momentum": 0.6004,
+    "net_gex_zscore": 0.9174,
+    "pcr_velocity_5m": 0.9802,
+    "writer_trap_score": 1.0635,
+    "heavyweight_delta": 1.0723,
+    "brent_crude_shock": 0.7195,
+    "usdinr_dxy_pressure": 0.7163,
+    "us10y_sp500_lead": 0.76,
+    "vix_velocity_regime": 0.9523,
+    "news_finbert_sentiment": 0.9135,
+    "geopolitical_war_shock": 0.7306,
+    "central_bank_event_shock": 0.7268
+  },
+  "pillar_groups": {
+    "technical_smc": [
+      "supertrend_align",
+      "vwap_zscore",
+      "smc_bos_sweep",
+      "cpr_position",
+      "orb_momentum"
+    ],
+    "options_heavyweights": [
+      "net_gex_zscore",
+      "pcr_velocity_5m",
+      "writer_trap_score",
+      "heavyweight_delta"
+    ],
+    "macro_economic": [
+      "brent_crude_shock",
+      "usdinr_dxy_pressure",
+      "us10y_sp500_lead",
+      "vix_velocity_regime"
+    ],
+    "geopolitical_news": [
+      "news_finbert_sentiment",
+      "geopolitical_war_shock",
+      "central_bank_event_shock"
+    ]
+  },
+  "pillar_weights": {
+    "technical_smc": 0.28,
+    "options_heavyweights": 0.34,
+    "macro_economic": 0.18,
+    "geopolitical_news": 0.2
+  },
+  "gradient_stumps": [
+    {
+      "feature": "supertrend_align",
+      "feature_index": 0,
+      "threshold": -0.0333,
+      "left_LogOddsDelta": 0.0017,
+      "right_LogOddsDelta": -0.0017,
+      "importance_gain": 0.0021
+    },
+    {
+      "feature": "vwap_zscore",
+      "feature_index": 1,
+      "threshold": 0.1496,
+      "left_LogOddsDelta": -0.0011,
+      "right_LogOddsDelta": 0.0011,
+      "importance_gain": 0.0013
+    },
+    {
+      "feature": "smc_bos_sweep",
+      "feature_index": 2,
+      "threshold": 0.0396,
+      "left_LogOddsDelta": 0.0014,
+      "right_LogOddsDelta": -0.0014,
+      "importance_gain": 0.0017
+    },
+    {
+      "feature": "cpr_position",
+      "feature_index": 3,
+      "threshold": 0.0798,
+      "left_LogOddsDelta": 0.0146,
+      "right_LogOddsDelta": -0.0146,
+      "importance_gain": 0.0183
+    },
+    {
+      "feature": "orb_momentum",
+      "feature_index": 4,
+      "threshold": -0.1523,
+      "left_LogOddsDelta": -0.0197,
+      "right_LogOddsDelta": 0.0197,
+      "importance_gain": 0.0247
+    },
+    {
+      "feature": "net_gex_zscore",
+      "feature_index": 5,
+      "threshold": -0.3326,
+      "left_LogOddsDelta": -0.0282,
+      "right_LogOddsDelta": 0.0282,
+      "importance_gain": 0.0353
+    },
+    {
+      "feature": "pcr_velocity_5m",
+      "feature_index": 6,
+      "threshold": -0.4141,
+      "left_LogOddsDelta": -0.0334,
+      "right_LogOddsDelta": 0.0334,
+      "importance_gain": 0.0417
+    },
+    {
+      "feature": "writer_trap_score",
+      "feature_index": 7,
+      "threshold": -0.371,
+      "left_LogOddsDelta": -0.0377,
+      "right_LogOddsDelta": 0.0377,
+      "importance_gain": 0.0471
+    },
+    {
+      "feature": "heavyweight_delta",
+      "feature_index": 8,
+      "threshold": -0.4968,
+      "left_LogOddsDelta": -0.034,
+      "right_LogOddsDelta": 0.034,
+      "importance_gain": 0.0425
+    },
+    {
+      "feature": "brent_crude_shock",
+      "feature_index": 9,
+      "threshold": -0.1672,
+      "left_LogOddsDelta": -0.0209,
+      "right_LogOddsDelta": 0.0209,
+      "importance_gain": 0.0261
+    },
+    {
+      "feature": "usdinr_dxy_pressure",
+      "feature_index": 10,
+      "threshold": -0.189,
+      "left_LogOddsDelta": -0.0149,
+      "right_LogOddsDelta": 0.0149,
+      "importance_gain": 0.0186
+    },
+    {
+      "feature": "us10y_sp500_lead",
+      "feature_index": 11,
+      "threshold": -0.1984,
+      "left_LogOddsDelta": -0.0185,
+      "right_LogOddsDelta": 0.0185,
+      "importance_gain": 0.0231
+    },
+    {
+      "feature": "vix_velocity_regime",
+      "feature_index": 12,
+      "threshold": -0.1998,
+      "left_LogOddsDelta": -0.0245,
+      "right_LogOddsDelta": 0.0245,
+      "importance_gain": 0.0307
+    },
+    {
+      "feature": "news_finbert_sentiment",
+      "feature_index": 13,
+      "threshold": -0.2384,
+      "left_LogOddsDelta": -0.0244,
+      "right_LogOddsDelta": 0.0244,
+      "importance_gain": 0.0305
+    },
+    {
+      "feature": "geopolitical_war_shock",
+      "feature_index": 14,
+      "threshold": 0.0,
+      "left_LogOddsDelta": 0.0,
+      "right_LogOddsDelta": 0.0,
+      "importance_gain": 0.0
+    },
+    {
+      "feature": "central_bank_event_shock",
+      "feature_index": 15,
+      "threshold": -0.1082,
+      "left_LogOddsDelta": -0.0276,
+      "right_LogOddsDelta": 0.0277,
+      "importance_gain": 0.0346
+    }
+  ],
+  "isotonic_calibration_knots": [
+    {
+      "raw_prob": 0.0131,
+      "calibrated_prob": 0.0556
+    },
+    {
+      "raw_prob": 0.0179,
+      "calibrated_prob": 0.0629
+    },
+    {
+      "raw_prob": 0.0227,
+      "calibrated_prob": 0.0629
+    },
+    {
+      "raw_prob": 0.0291,
+      "calibrated_prob": 0.0621
+    },
+    {
+      "raw_prob": 0.0403,
+      "calibrated_prob": 0.0599
+    },
+    {
+      "raw_prob": 0.0548,
+      "calibrated_prob": 0.0556
+    },
+    {
+      "raw_prob": 0.0667,
+      "calibrated_prob": 0.05
+    },
+    {
+      "raw_prob": 0.0789,
+      "calibrated_prob": 0.05
+    },
+    {
+      "raw_prob": 0.102,
+      "calibrated_prob": 0.05
+    },
+    {
+      "raw_prob": 0.1213,
+      "calibrated_prob": 0.05
+    },
+    {
+      "raw_prob": 0.1539,
+      "calibrated_prob": 0.05
+    },
+    {
+      "raw_prob": 0.2245,
+      "calibrated_prob": 0.05
+    },
+    {
+      "raw_prob": 0.5619,
+      "calibrated_prob": 0.6667
+    },
+    {
+      "raw_prob": 0.8187,
+      "calibrated_prob": 0.95
+    },
+    {
+      "raw_prob": 0.8784,
+      "calibrated_prob": 0.95
+    },
+    {
+      "raw_prob": 0.9166,
+      "calibrated_prob": 0.95
+    },
+    {
+      "raw_prob": 0.9448,
+      "calibrated_prob": 0.95
+    },
+    {
+      "raw_prob": 0.9757,
+      "calibrated_prob": 0.95
+    },
+    {
+      "raw_prob": 0.9868,
+      "calibrated_prob": 0.95
+    },
+    {
+      "raw_prob": 0.992,
+      "calibrated_prob": 0.95
+    }
+  ],
+  "out_of_sample_metrics": {
+    "unfiltered_accuracy_pct": 96.67,
+    "high_conviction_win_rate_pct": 97.18,
+    "signal_coverage_pct": 98.33,
+    "brier_calibration_score": 0.0402
+  }
+}

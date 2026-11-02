@@ -1,13 +1,10 @@
-name: Update NIFTY Data & Deploy to Pages
+name: Update NIFTY 50 Data, Media Intelligence & Calibrate v3.0 MoE Model
 
 on:
   schedule:
-    # 03:00 UTC = 08:30 AM IST (Overnight Global Macro & Pre-Market Catalyst Sync)
-    - cron: '00 3 * * 1-5'
-    # 10:30 UTC = 16:00 IST (4:00 PM IST, 30 min after NSE close)
-    - cron: '30 10 * * 1-5'
-    # 11:15 UTC = 16:45 IST (4:45 PM IST, post-closing settlement sync)
-    - cron: '15 11 * * 1-5'
+    - cron: '00 3 * * 1-5'   # 08:30 IST Pre-market sync
+    - cron: '30 10 * * 1-5'  # 16:00 IST Post-close sync
+    - cron: '15 11 * * 1-5'  # 16:45 IST Settlement sync
   workflow_dispatch:
   push:
     branches:
@@ -22,46 +19,53 @@ permissions:
   id-token: write
 
 concurrency:
-  group: 'pages'
+  group: "pages-and-data"
   cancel-in-progress: false
 
 jobs:
   update-and-deploy:
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
-      - name: Fetch Latest NIFTY 50 Data
+      - name: Install Python Dependencies
         run: |
-          python scripts/fetch_nifty.py
+          python -m pip install --upgrade pip
+          pip install numpy pandas scipy yfinance requests
 
-      - name: Commit and Push Updated Data
+      - name: Fetch Latest NIFTY 50 EOD & SMC Data
+        run: python scripts/fetch_nifty.py
+
+      - name: Build Empirical Multi-Asset & Crisis Training Corpus
+        run: python scripts/build_real_training_data.py
+
+      - name: Train & Calibrate v3.0 Regime-Gated MoE Ensemble
+        run: python scripts/train_ml_model.py
+
+      - name: Commit & Push Updated Data & Model Weights
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          if [ -n "$(git status --porcelain data/nifty_data.json)" ]; then
-            git add data/nifty_data.json
-            git commit -m "Auto-update NIFTY daily data [skip ci]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/nifty_data.json data/real_training_samples.json models/nifty_ensemble_weights.json
+          if ! git diff --staged --quiet; then
+            git commit -m "auto: update NIFTY 50 EOD data, real corpus & v3.0 MoE weights [skip ci]"
             git push
-          else
-            echo "No changes in NIFTY data to commit."
           fi
 
-      - name: Setup Pages
+      - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload Pages Artifact
+      - name: Upload Static Site Artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
@@ -69,4 +73,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-

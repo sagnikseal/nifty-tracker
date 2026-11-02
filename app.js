@@ -1,1897 +1,344 @@
 /**
- * NIFTY 50 Daily High-Low Tracker & Trading Journal with SMC Engine
- * Features:
- * - Smart Money Concepts (SMC) Liquidity & Sweep Engine (PDH, PDL, PWH, PWL, BOS, Sweeps)
- * - Next-Day Algorithmic Directional Bias & Fuel Targets
- * - Beginner Hover-Activated Definitions for All Technical Terms
- * - SMC Terminology Glossary & Searchable Cheat Sheet
- * - Local Storage + Two-Way GitHub Repository Cloud Sync
- * - Interactive TradingView Lightweight Charts & Filtering
+ * NIFTY 50 Historical EOD SMC & CPR Dashboard Controller (`app.js`)
+ * =================================================================
+ * Loads `data/nifty_data.json`, populates the hero EOD cards, renders the interactive
+ * HTML5 Candlestick + Central Pivot Range (CPR) + PDH/PDL Sweep canvas chart,
+ * manages the filterable historical table, and persists trade journal annotations.
  */
 
-// Application State
-const state = {
-  data: null,
-  history: [],          // Chronological list
-  displayHistory: [],   // Reverse chronological for table
-  filteredHistory: [],
-  marks: {},            // Saved in localStorage & GitHub repo
-  activeFilter: 'all',  // 'all', 'marked', 'smc', 'inside'
-  searchQuery: '',
-  currentPage: 1,
-  pageSize: 20,
-  chart: null,
-  candleSeries: null,
-  activeTheme: localStorage.getItem('nifty_theme') || 'dark',
-  github: {
-    repo: localStorage.getItem('nifty_gh_repo') || 'sagnikseal/nifty-tracker',
-    token: localStorage.getItem('nifty_gh_token') || '',
-    autoSync: localStorage.getItem('nifty_gh_autosync') !== 'false',
-    isSyncing: false,
-    fileSha: null,
-  }
-};
+(function () {
+  'use strict';
 
-// SMC & Trading Terminology Dictionary (For Tooltips and Glossary Modal)
-const GLOSSARY_DATA = {
-  SMC: {
-    term: 'SMC',
-    full: 'Smart Money Concepts',
-    cat: 'Theory',
-    def: 'A trading methodology focused on tracking the footprints of institutional market participants (FIIs, DIIs, banks, and hedge funds) rather than retail indicators.',
-    edge: 'Institutions move markets with massive orders that require counterparty liquidity. SMC shows where those orders enter and exit.'
-  },
-  PDH: {
-    term: 'PDH',
-    full: 'Previous Day High (External Buy-Side Liquidity)',
-    cat: 'Liquidity',
-    def: 'The highest price reached during yesterday\'s trading session. Acts as a major cluster for retail stop-losses and breakout buy orders.',
-    edge: 'Algorithms treat PDH as "Fuel". Price often surges above PDH to trigger buy stops, and either expands higher (BOS) or reverses downward (Liquidity Sweep).'
-  },
-  PDL: {
-    term: 'PDL',
-    full: 'Previous Day Low (External Sell-Side Liquidity)',
-    cat: 'Liquidity',
-    def: 'The lowest price reached during yesterday\'s session. Clusters retail panic sell stops and breakdown orders.',
-    edge: 'Algorithms hunt below PDL to absorb sell orders at discount prices before driving a bullish reversal (Turtle Soup).'
-  },
-  PWH: {
-    term: 'PWH',
-    full: 'Previous Week High',
-    cat: 'Liquidity',
-    def: 'The highest price traded in the preceding calendar week.',
-    edge: 'Higher timeframe liquidity pool. When swept, can cause multi-day trend shifts on NIFTY.'
-  },
-  PWL: {
-    term: 'PWL',
-    full: 'Previous Week Low',
-    cat: 'Liquidity',
-    def: 'The lowest price traded in the preceding calendar week.',
-    edge: 'Higher timeframe institutional discount level. Major demand target for swing traders.'
-  },
-  ERL: {
-    term: 'ERL',
-    full: 'External Range Liquidity',
-    cat: 'Liquidity',
-    def: 'Liquidity pools sitting outside the recent trading range: PDH, PDL, Weekly Highs/Lows, and major swing extremes.',
-    edge: 'The market continuously alternates: it runs from Internal Liquidity (gaps/CPR) outward to sweep External Liquidity (PDH/PDL).'
-  },
-  IRL: {
-    term: 'IRL',
-    full: 'Internal Range Liquidity',
-    cat: 'Liquidity',
-    def: 'Liquidity pools inside the recent range: Fair Value Gaps (FVG), Central Pivot Range (CPR), opening gaps, and 50% Equilibrium.',
-    edge: 'After sweeping an external high or low, price frequently retraces back inside to rebalance internal liquidity.'
-  },
-  BSL: {
-    term: 'BSL',
-    full: 'Buy-Side Liquidity',
-    cat: 'Liquidity',
-    def: 'A concentration of buy orders (short-seller stop losses and breakout buyers) above key highs.',
-    edge: 'Smart money sells into Buy-Side Liquidity to exit long trades without negative slippage.'
-  },
-  SSL: {
-    term: 'SSL',
-    full: 'Sell-Side Liquidity',
-    cat: 'Liquidity',
-    def: 'A concentration of sell orders (buyer stop losses and breakdown sellers) below key lows.',
-    edge: 'Smart money buys into Sell-Side Liquidity at discounted prices to accumulate massive long positions.'
-  },
-  BOS: {
-    term: 'BOS',
-    full: 'Break of Structure',
-    cat: 'Structure',
-    def: 'When a daily candle closes beyond a key swing high or low, confirming trend continuation.',
-    edge: 'Indicates strong institutional commitment to carry the market in the direction of the break.'
-  },
-  Sweep: {
-    term: 'Sweep',
-    full: 'Liquidity Sweep / Turtle Soup',
-    cat: 'Pattern',
-    def: 'Price spikes past PDH or PDL to trigger stop-losses, but immediately fails to sustain and closes back inside the range.',
-    edge: 'Classic institutional trap. Generates rapid, high-probability counter-trend reversals.'
-  },
-  CPR: {
-    term: 'CPR',
-    full: 'Central Pivot Range',
-    cat: 'Pivots',
-    def: 'A 3-level price band (Top Central TC, Pivot, Bottom Central BC) calculated from yesterday\'s High, Low, and Close.',
-    edge: 'Narrow CPR (<40 pts on NIFTY) predicts a strong trending day. Wide CPR (>90 pts) predicts sideways, rangebound chop.'
-  },
-  ADR: {
-    term: 'ADR',
-    full: 'Average Daily Range (20-Day)',
-    cat: 'Volatility',
-    def: 'The average distance between the daily high and daily low over the last 20 trading sessions.',
-    edge: 'Used to calculate realistic daily profit targets. When daily range exceeds ADR, exhaustion is likely.'
-  },
-  Discount: {
-    term: 'Discount',
-    full: 'Discount Zone (<50% Equilibrium)',
-    cat: 'Valuation',
-    def: 'When price trades below the 50% midpoint of the 20-day high-low range.',
-    edge: 'Institutions prefer buying in Discount zones where prices are mathematically cheap.'
-  },
-  Premium: {
-    term: 'Premium',
-    full: 'Premium Zone (>50% Equilibrium)',
-    cat: 'Valuation',
-    def: 'When price trades above the 50% midpoint of the 20-day high-low range.',
-    edge: 'Institutions avoid chasing longs in Premium; they prefer distributing or hedging.'
-  },
-  Fuel: {
-    term: 'Fuel',
-    full: 'Liquidity Fuel',
-    cat: 'Theory',
-    def: 'Retail stop-loss orders that algorithms seek to trigger to absorb liquidity.',
-    edge: 'As noted in market theory: trends need fuel to continue. Without liquidity, price stalls.'
-  },
-  Event: {
-    term: 'Event',
-    full: 'Macro / Catalyst Event',
-    cat: 'Fundamentals',
-    def: 'High-impact news (RBI policy, US Fed, CPI, elections, corporate earnings, breaking news on Twitter/X).',
-    edge: 'Injects sudden volume that can invalidate standard technical setups and cause aggressive two-sided liquidity sweeps.'
-  },
-  Pivots: {
-    term: 'Pivots',
-    full: 'Classic Pivot Points (S1, S2, R1, R2, P)',
-    cat: 'Pivots',
-    def: 'Support and resistance benchmark levels derived mathematically from the prior day\'s auction.',
-    edge: 'Widely observed by institutional execution algos for intraday target setting.'
-  }
-};
+  const appState = {
+    dataset: null,
+    entries: [],
+    latestEntry: null,
+    chartRange: 60,
+    journalMarks: JSON.parse(localStorage.getItem('nifty_trading_marks') || '{}'),
+  };
 
-// DOM Elements
-const el = {
-  valDayHigh: document.getElementById('val-day-high'),
-  valDayLow: document.getElementById('val-day-low'),
-  valDayRange: document.getElementById('val-day-range'),
-  valDayClose: document.getElementById('val-day-close'),
-  diffPrevHigh: document.getElementById('diff-prev-high'),
-  diffPrevLow: document.getElementById('diff-prev-low'),
-  valAdr20: document.getElementById('val-adr-20'),
-  valNetChange: document.getElementById('val-net-change'),
-  pillRangeType: document.getElementById('pill-range-type'),
-  pillCloseChange: document.getElementById('pill-close-change'),
-  val52wLow: document.getElementById('val-52w-low'),
-  val52wHigh: document.getElementById('val-52w-high'),
-  track52wProgress: document.getElementById('track-52w-progress'),
-  pin52w: document.getElementById('pin-52w'),
-  badgeCprType: document.getElementById('badge-cpr-type'),
-  pS1: document.getElementById('p-s1'),
-  pBc: document.getElementById('p-bc'),
-  pPivot: document.getElementById('p-pivot'),
-  pTc: document.getElementById('p-tc'),
-  pR1: document.getElementById('p-r1'),
+  window.niftyApp = appState;
 
-  // SMC Prediction Radar Elements
-  smcBiasBadge: document.getElementById('smc-bias-badge'),
-  predConfidence: document.getElementById('pred-confidence'),
-  predSetupName: document.getElementById('pred-setup-name'),
-  predBiasText: document.getElementById('pred-bias-text'),
-  predRationale: document.getElementById('pred-rationale'),
-  predPlaybook: document.getElementById('pred-playbook'),
-  predEventRule: document.getElementById('pred-event-rule'),
-  predPrimaryTarget: document.getElementById('pred-primary-target'),
-  predSecondaryTarget: document.getElementById('pred-secondary-target'),
-  predInvalidation: document.getElementById('pred-invalidation'),
-  predAdrExp: document.getElementById('pred-adr-exp'),
-  predCprExp: document.getElementById('pred-cpr-exp'),
-  smcPdh: document.getElementById('smc-pdh'),
-  smcPdl: document.getElementById('smc-pdl'),
-  smcPwh: document.getElementById('smc-pwh'),
-  smcPwl: document.getElementById('smc-pwl'),
-  smcZone: document.getElementById('smc-zone'),
-  smcStructureEvent: document.getElementById('smc-structure-event'),
-
-  // Validation Scorecard Elements
-  valOverallAcc: document.getElementById('val-overall-acc'),
-  valSampleInfo: document.getElementById('val-sample-info'),
-  valOosAcc: document.getElementById('val-oos-acc'),
-  valGateAcc: document.getElementById('val-gate-acc'),
-  valBslAcc: document.getElementById('val-bsl-acc'),
-  valSslAcc: document.getElementById('val-ssl-acc'),
-  valInsideAcc: document.getElementById('val-inside-acc'),
-  valBearBosAcc: document.getElementById('val-bear-bos-acc'),
-  valBullBosAcc: document.getElementById('val-bull-bos-acc'),
-  gateWinRate: document.getElementById('gate-win-rate'),
-  gateConditionText: document.getElementById('gate-condition-text'),
-  gateActionText: document.getElementById('gate-action-text'),
-  predRrRatio: document.getElementById('pred-rr-ratio'),
-  ttCloseBtn: document.getElementById('tt-close-btn'),
-
-  // Overnight Global Macro Radar Elements
-  overnightMacroCard: document.getElementById('overnight-macro-card'),
-  macroBiasBadge: document.getElementById('macro-bias-badge'),
-  macroGeoBadge: document.getElementById('macro-geo-badge'),
-  macroGapBadge: document.getElementById('macro-gap-badge'),
-  macroSynthesisText: document.getElementById('macro-synthesis-text'),
-  btnMacroBreakdown: document.getElementById('btn-macro-breakdown'),
-  macroScorePill: document.getElementById('macro-score-pill'),
-  macroPopover: document.getElementById('macro-popover'),
-  macroPopClose: document.getElementById('macro-pop-close'),
-  macroPopSync: document.getElementById('macro-pop-sync'),
-  macroPopBiasTag: document.getElementById('macro-pop-bias-tag'),
-  macroPopGap: document.getElementById('macro-pop-gap'),
-  macroPopRationale: document.getElementById('macro-pop-rationale'),
-  macroPopFactors: document.getElementById('macro-pop-factors'),
-  geoShockBox: document.getElementById('geo-shock-box'),
-  geoShockPill: document.getElementById('geo-shock-pill'),
-  geoShockDetail: document.getElementById('geo-shock-detail'),
-  macroTickersGrid: document.getElementById('macro-tickers-grid'),
-  macroNewsList: document.getElementById('macro-news-list'),
-
-  // Table & Controls
-  marketStatusBadge: document.getElementById('market-status-badge'),
-  marketStatusText: document.getElementById('market-status-text'),
-  lastSyncText: document.getElementById('last-sync-text'),
-  tableBody: document.getElementById('table-body'),
-  tableCountBadge: document.getElementById('table-count-badge'),
-  markedCount: document.getElementById('marked-count'),
-  paginationInfo: document.getElementById('pagination-info'),
-  btnPrevPage: document.getElementById('btn-prev-page'),
-  btnNextPage: document.getElementById('btn-next-page'),
-  pageNum: document.getElementById('page-number'),
-  chartLegend: document.getElementById('chart-legend'),
-  tvChart: document.getElementById('tv-chart'),
-  btnQuickMark: document.getElementById('btn-quick-mark'),
-  btnExportJournal: document.getElementById('btn-export-journal'),
-  btnImportJournal: document.getElementById('btn-import-journal'),
-  importFileInput: document.getElementById('import-file-input'),
-  btnThemeToggle: document.getElementById('btn-theme-toggle'),
-  btnDownloadCsv: document.getElementById('btn-download-csv'),
-  filterSearch: document.getElementById('filter-search'),
-  filterAll: document.getElementById('filter-all'),
-  filterMarked: document.getElementById('filter-marked'),
-  filterSmc: document.getElementById('filter-smc'),
-  filterInside: document.getElementById('filter-inside'),
-
-  // Mark Modal
-  markModal: document.getElementById('mark-modal'),
-  markForm: document.getElementById('mark-form'),
-  btnCloseModal: document.getElementById('btn-close-modal'),
-  btnCancelModal: document.getElementById('btn-cancel-modal'),
-  btnDeleteMark: document.getElementById('btn-delete-mark'),
-  markDate: document.getElementById('mark-date'),
-  modalDateSubtitle: document.getElementById('modal-date-subtitle'),
-  snapHigh: document.getElementById('snap-high'),
-  snapLow: document.getElementById('snap-low'),
-  snapRange: document.getElementById('snap-range'),
-  snapClose: document.getElementById('snap-close'),
-  markPattern: document.getElementById('mark-pattern'),
-  markTradeTaken: document.getElementById('mark-trade-taken'),
-  markOutcome: document.getElementById('mark-outcome'),
-  markLevels: document.getElementById('mark-levels'),
-  markPredBias: document.getElementById('mark-pred-bias'),
-  markPredTarget: document.getElementById('mark-pred-target'),
-  markEventCheck: document.getElementById('mark-event-check'),
-  markNotes: document.getElementById('mark-notes'),
-  markTags: document.getElementById('mark-tags'),
-  toast: document.getElementById('toast'),
-
-  // GitHub Sync Elements
-  btnGithubSync: document.getElementById('btn-github-sync'),
-  syncBtnLabel: document.getElementById('sync-btn-label'),
-  syncModal: document.getElementById('sync-modal'),
-  btnCloseSyncModal: document.getElementById('btn-close-sync-modal'),
-  ghRepoInput: document.getElementById('gh-repo-input'),
-  ghTokenInput: document.getElementById('gh-token-input'),
-  ghAutoSyncToggle: document.getElementById('gh-auto-sync-toggle'),
-  btnSaveGhToken: document.getElementById('btn-save-gh-token'),
-  btnPushToGithub: document.getElementById('btn-push-to-github'),
-  btnPullFromGithub: document.getElementById('btn-pull-from-github'),
-  btnDisconnectGithub: document.getElementById('btn-disconnect-github'),
-  syncStatusMsg: document.getElementById('sync-status-msg'),
-
-  // Glossary & Tooltips
-  btnOpenGlossary: document.getElementById('btn-open-glossary'),
-  glossaryModal: document.getElementById('glossary-modal'),
-  btnCloseGlossaryModal: document.getElementById('btn-close-glossary-modal'),
-  glossarySearch: document.getElementById('glossary-search'),
-  glossaryGrid: document.getElementById('glossary-grid'),
-  termTooltip: document.getElementById('term-tooltip'),
-  ttTerm: document.getElementById('tt-term'),
-  ttFull: document.getElementById('tt-full'),
-  ttBody: document.getElementById('tt-body'),
-  ttEdge: document.getElementById('tt-edge'),
-};
-
-// Number Format Helper
-function formatNumber(num) {
-  if (num === null || num === undefined || isNaN(num)) return '--';
-  return Number(num).toLocaleString('en-IN', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
-}
-
-function showToast(message, duration = 3000) {
-  el.toast.textContent = message;
-  el.toast.classList.add('show');
-  setTimeout(() => el.toast.classList.remove('show'), duration);
-}
-
-// ==========================================================================
-// Market Clock (IST)
-// ==========================================================================
-function updateMarketStatus() {
-  const now = new Date();
-  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-  const ist = new Date(utc + (3600000 * 5.5));
-  
-  const day = ist.getDay();
-  const hours = ist.getHours();
-  const minutes = ist.getMinutes();
-  const totalMinutes = hours * 60 + minutes;
-  
-  const isWeekend = (day === 0 || day === 6);
-  const isMarketHours = (!isWeekend && totalMinutes >= (9 * 60 + 15) && totalMinutes <= (15 * 60 + 30));
-  const isPreMarket = (!isWeekend && totalMinutes >= (9 * 60) && totalMinutes < (9 * 60 + 15));
-  const isPostClose = (!isWeekend && totalMinutes > (15 * 60 + 30));
-
-  el.marketStatusBadge.className = 'market-status';
-
-  if (isMarketHours) {
-    el.marketStatusBadge.classList.add('status-open');
-    el.marketStatusText.textContent = 'NSE Live (Closes 3:30 PM IST)';
-  } else if (isPreMarket) {
-    el.marketStatusBadge.classList.add('status-open');
-    el.marketStatusText.textContent = 'Pre-Market Session (Opens 9:15 AM)';
-  } else if (isWeekend) {
-    el.marketStatusBadge.classList.add('status-closed');
-    el.marketStatusText.textContent = 'Market Closed (Weekend)';
-  } else if (isPostClose) {
-    el.marketStatusBadge.classList.add('status-closed');
-    el.marketStatusText.textContent = 'Market Closed (Settled for Today)';
-  } else {
-    el.marketStatusBadge.classList.add('status-closed');
-    el.marketStatusText.textContent = 'Market Closed (Opens 9:15 AM IST)';
-  }
-}
-
-// ==========================================================================
-// Hover & Touch-Activated Term Tooltip Engine
-// ==========================================================================
-function initTermTooltips() {
-  let activeTarget = null;
-
-  function showTooltip(tipEl, clientX, clientY) {
-    activeTarget = tipEl;
-    const termKey = tipEl.dataset.term;
-    const item = GLOSSARY_DATA[termKey];
-    if (!item) return;
-
-    el.ttTerm.textContent = item.term;
-    el.ttFull.textContent = item.full;
-    el.ttBody.textContent = item.def;
-    el.ttEdge.textContent = item.edge;
-
-    el.termTooltip.style.display = 'block';
-    positionTooltip(clientX, clientY);
-    requestAnimationFrame(() => el.termTooltip.classList.add('visible'));
-  }
-
-  function hideTooltip() {
-    activeTarget = null;
-    el.termTooltip.classList.remove('visible');
-    setTimeout(() => {
-      if (!activeTarget) el.termTooltip.style.display = 'none';
-    }, 150);
-  }
-
-  // Desktop Hover
-  document.addEventListener('mouseover', e => {
-    const tipEl = e.target.closest('.term-tip');
-    if (!tipEl) return;
-    showTooltip(tipEl, e.clientX, e.clientY);
-  });
-
-  document.addEventListener('mousemove', e => {
-    if (activeTarget && el.termTooltip.classList.contains('visible') && window.innerWidth > 640) {
-      positionTooltip(e.clientX, e.clientY);
-    }
-  });
-
-  document.addEventListener('mouseout', e => {
-    const tipEl = e.target.closest('.term-tip');
-    if (tipEl && tipEl === activeTarget && window.innerWidth > 640) {
-      hideTooltip();
-    }
-  });
-
-  // Mobile Touch / Tap Support
-  document.addEventListener('click', e => {
-    const tipEl = e.target.closest('.term-tip');
-    if (tipEl) {
-      e.preventDefault();
-      if (activeTarget === tipEl && el.termTooltip.classList.contains('visible')) {
-        hideTooltip();
-      } else {
-        showTooltip(tipEl, e.clientX, e.clientY);
-      }
-      return;
-    }
-
-    // If click is outside tooltip and outside term-tip, hide
-    if (!e.target.closest('#term-tooltip')) {
-      if (el.termTooltip.classList.contains('visible')) {
-        hideTooltip();
-      }
-    }
-  });
-
-  if (el.ttCloseBtn) {
-    el.ttCloseBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      hideTooltip();
+  function fmtNum(val, digits = 2) {
+    if (val === undefined || val === null || isNaN(Number(val))) return '--';
+    return Number(val).toLocaleString('en-IN', {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
     });
   }
-}
 
-function positionTooltip(clientX, clientY) {
-  const tt = el.termTooltip;
-  if (!tt || window.innerWidth <= 640) return; // on mobile phones, CSS handles bottom drawer positioning
-
-  const pad = 16;
-  const dockBuffer = 32; // Buffer to guarantee macOS dock / taskbar never clips tooltip
-  const vh = window.innerHeight;
-  const vw = window.innerWidth;
-
-  // Set maximum height so tooltip never exceeds viewport
-  const maxH = vh - (pad * 2) - dockBuffer;
-  tt.style.maxHeight = `${Math.max(160, maxH)}px`;
-  tt.style.overflowY = 'auto';
-
-  const rect = tt.getBoundingClientRect();
-  let x = (clientX || vw / 2) + 16;
-  let y = (clientY || vh / 2) + 16;
-
-  // Horizontal fit: flip to left of cursor if overflowing right
-  if (x + rect.width + pad > vw) {
-    x = (clientX || vw / 2) - rect.width - 14;
-  }
-  x = Math.max(pad, Math.min(x, vw - rect.width - pad));
-
-  // Vertical fit: flip above cursor if extending into dock
-  if (y + rect.height + dockBuffer > vh) {
-    const flippedY = (clientY || vh / 2) - rect.height - 14;
-    if (flippedY >= pad) {
-      y = flippedY;
-    } else {
-      y = Math.max(pad, vh - rect.height - dockBuffer);
+  async function loadNiftyDataset() {
+    try {
+      const res = await fetch('data/nifty_data.json', { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      appState.dataset = data;
+      appState.entries = Array.isArray(data.data) ? data.data : [];
+      appState.latestEntry = data.latest || appState.entries[0] || null;
+      renderHeroCards();
+      renderCandlestickCanvas();
+      renderHistoricalTable();
+    } catch (err) {
+      console.warn('Could not fetch data/nifty_data.json:', err);
     }
   }
-  y = Math.max(pad, y);
 
-  tt.style.left = `${Math.round(x)}px`;
-  tt.style.top = `${Math.round(y)}px`;
-}
+  function renderHeroCards() {
+    const latest = appState.latestEntry;
+    if (!latest) return;
+    const meta = (appState.dataset && appState.dataset.meta) || {};
 
-// ==========================================================================
-// SMC Glossary Modal & Search
-// ==========================================================================
-function renderGlossary(filterText = '') {
-  if (!el.glossaryGrid) return;
+    const banner = document.getElementById('last-updated-banner');
+    if (banner && appState.dataset) {
+      banner.textContent = `NSE NIFTY 50 • Last EOD Sync: ${appState.dataset.last_updated || latest.date} • 52W Range: ${fmtNum(meta.fifty_two_week_high, 0)} - ${fmtNum(meta.fifty_two_week_low, 0)}`;
+    }
 
-  const query = filterText.toLowerCase().trim();
-  const entries = Object.values(GLOSSARY_DATA).filter(item => {
-    if (!query) return true;
-    return (
-      item.term.toLowerCase().includes(query) ||
-      item.full.toLowerCase().includes(query) ||
-      item.def.toLowerCase().includes(query) ||
-      item.cat.toLowerCase().includes(query)
+    const setEl = (id, text) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    };
+
+    setEl('val-day-high', fmtNum(latest.high));
+    setEl('sub-day-high', `Prev High (PDH): ${fmtNum(latest.prev_high)} | Upper Wick: ${fmtNum(latest.upper_wick, 1)} pts`);
+    setEl(
+      'diff-prev-high',
+      latest.pdh_sweep ? 'PDH SWEEP TRAP' : latest.bullish_bos ? 'BULLISH BOS' : 'Inside PDH'
     );
-  });
 
-  if (entries.length === 0) {
-    el.glossaryGrid.innerHTML = `
-      <div style="grid-column: 1 / -1; padding: 2rem; text-align: center; color: var(--text-muted);">
-        No matching SMC concepts found for "${filterText}".
-      </div>
-    `;
-    return;
+    setEl('val-day-low', fmtNum(latest.low));
+    setEl('sub-day-low', `Prev Low (PDL): ${fmtNum(latest.prev_low)} | Lower Wick: ${fmtNum(latest.lower_wick, 1)} pts`);
+    setEl(
+      'diff-prev-low',
+      latest.pdl_sweep ? 'PDL SPRING SWEEP' : latest.bearish_bos ? 'BEARISH BOS' : 'Above PDL'
+    );
+
+    setEl('val-day-range', `${fmtNum(latest.range, 1)} pts`);
+    setEl('sub-day-range', `20D ADR: ${fmtNum(meta.adr_20, 1)} pts | 5D ADR: ${fmtNum(meta.adr_5, 1)} pts`);
+    setEl('pill-range-type', latest.is_expansion_bar ? 'EXPANSION BAR' : latest.is_pinbar ? 'PINBAR REJECTION' : `${latest.range_pct}% Range`);
+
+    const chgPrefix = latest.change >= 0 ? '+' : '';
+    setEl('val-day-close', fmtNum(latest.close));
+    setEl('sub-day-close', `${chgPrefix}${fmtNum(latest.change)} (${chgPrefix}${latest.change_pct}%) • ${latest.smc_structure}`);
+    setEl('pill-smc-zone', `${latest.zone} Zone (Eq: ${fmtNum(latest.equilibrium, 0)})`);
+
+    setEl('val-cpr-pivot', fmtNum(latest.pivot));
+    setEl('sub-cpr-band', `TC: ${fmtNum(latest.tc)} | BC: ${fmtNum(latest.bc)} | R1: ${fmtNum(latest.r1)} | S1: ${fmtNum(latest.s1)}`);
+    setEl('pill-cpr-type', `Width: ${fmtNum(latest.cpr_width, 1)} pts`);
   }
 
-  el.glossaryGrid.innerHTML = entries.map(item => `
-    <div class="glossary-card">
-      <div class="glossary-card-top">
-        <span class="glossary-term">${item.term}</span>
-        <span class="glossary-cat">${item.cat}</span>
-      </div>
-      <div class="glossary-full-name">${item.full}</div>
-      <div class="glossary-def">${item.def}</div>
-      <div class="glossary-edge">
-        <strong style="color:var(--blue);">Smart Money Edge:</strong> ${item.edge}
-      </div>
-    </div>
-  `).join('');
-}
+  function renderCandlestickCanvas() {
+    const canvas = document.getElementById('nifty-ohlc-canvas');
+    if (!canvas || !appState.entries.length) return;
+    const ctx = canvas.getContext('2d');
+    const slice = appState.entries.slice(0, appState.chartRange).slice().reverse();
 
-// ==========================================================================
-// Trading Marks Management: Local Storage + GitHub Repository
-// ==========================================================================
-async function loadMarks() {
-  try {
-    const raw = localStorage.getItem('nifty_user_marks');
-    state.marks = raw ? JSON.parse(raw) : {};
-  } catch (e) {
-    console.error('Failed to load marks from localStorage:', e);
-    state.marks = {};
-  }
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
 
-  try {
-    const resp = await fetch('data/trading_marks.json?v=' + Date.now());
-    if (resp.ok) {
-      const repoData = await resp.json();
-      const repoMarks = repoData.marks || {};
-      let mergedCount = 0;
-      for (const [dt, m] of Object.entries(repoMarks)) {
-        if (!state.marks[dt]) {
-          state.marks[dt] = m;
-          mergedCount++;
-        }
-      }
-      if (mergedCount > 0) {
-        saveMarksToStorage(false);
-      }
+    const padLeft = 18;
+    const padRight = 72;
+    const padTop = 20;
+    const padBot = 28;
+    const plotW = w - padLeft - padRight;
+    const plotH = h - padTop - padBot;
+
+    const maxHigh = Math.max(...slice.map((d) => d.high));
+    const minLow = Math.min(...slice.map((d) => d.low));
+    const span = Math.max(maxHigh - minLow, 10);
+
+    const yOf = (price) => padTop + plotH - ((price - minLow) / span) * plotH;
+
+    // Horizontal grid lines & price labels
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.14)';
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '11px monospace';
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i <= 5; i++) {
+      const p = minLow + (span * i) / 5;
+      const y = yOf(p);
+      ctx.beginPath();
+      ctx.moveTo(padLeft, y);
+      ctx.lineTo(w - padRight, y);
+      ctx.stroke();
+      ctx.fillText(p.toFixed(0), w - padRight + 8, y + 4);
     }
-  } catch (e) {
-    console.log('No repository trading_marks.json loaded or file offline');
-  }
 
-  updateMarkedCount();
-  updateSyncButtonUI();
-}
+    const stepX = plotW / Math.max(slice.length, 1);
+    const bodyW = Math.max(3, Math.min(14, stepX * 0.64));
 
-function saveMarksToStorage(triggerGitHubSync = true) {
-  try {
-    localStorage.setItem('nifty_user_marks', JSON.stringify(state.marks));
-    updateMarkedCount();
-  } catch (e) {
-    console.error('Failed to save marks to localStorage:', e);
-  }
+    // Draw CPR Pivot Ribbon connecting sessions
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.55)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    slice.forEach((d, idx) => {
+      const x = padLeft + idx * stepX + stepX * 0.5;
+      const y = yOf(d.pivot);
+      if (idx === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
 
-  if (triggerGitHubSync && state.github.token && state.github.autoSync) {
-    pushMarksToGitHub(true);
-  }
-}
+    // Draw Candlesticks & Sweep Markers
+    slice.forEach((d, idx) => {
+      const x = padLeft + idx * stepX + stepX * 0.5;
+      const yH = yOf(d.high);
+      const yL = yOf(d.low);
+      const yO = yOf(d.open);
+      const yC = yOf(d.close);
+      const isBull = d.close >= d.open;
 
-function updateMarkedCount() {
-  const count = Object.keys(state.marks).length;
-  el.markedCount.textContent = count;
-}
+      ctx.strokeStyle = isBull ? '#10b981' : '#f43f5e';
+      ctx.fillStyle = isBull ? '#10b981' : '#f43f5e';
+      ctx.lineWidth = 1.3;
 
-// ==========================================================================
-// GitHub Repository Sync API Integration
-// ==========================================================================
-function updateSyncButtonUI() {
-  if (state.github.isSyncing) {
-    el.syncBtnLabel.textContent = 'Syncing...';
-    el.btnGithubSync.style.borderColor = 'var(--yellow)';
-  } else if (state.github.token) {
-    el.syncBtnLabel.textContent = '🟢 GitHub Synced';
-    el.btnGithubSync.style.borderColor = 'var(--green)';
-  } else {
-    el.syncBtnLabel.textContent = '☁️ GitHub Sync';
-    el.btnGithubSync.style.borderColor = 'var(--border-subtle)';
-  }
-}
+      ctx.beginPath();
+      ctx.moveTo(x, yH);
+      ctx.lineTo(x, yL);
+      ctx.stroke();
 
-async function getFileShaFromGitHub(repo, token) {
-  const url = `https://api.github.com/repos/${repo}/contents/data/trading_marks.json`;
-  const resp = await fetch(url, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Accept': 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28'
-    }
-  });
+      const topY = Math.min(yO, yC);
+      const boxH = Math.max(Math.abs(yC - yO), 2);
+      ctx.fillRect(x - bodyW / 2, topY, bodyW, boxH);
 
-  if (resp.status === 404) return null;
-  if (!resp.ok) {
-    const errData = await resp.json();
-    throw new Error(errData.message || `GitHub error ${resp.status}`);
-  }
-  const data = await resp.json();
-  return data.sha;
-}
-
-async function pushMarksToGitHub(silent = false) {
-  const { repo, token } = state.github;
-  if (!token || !repo) {
-    if (!silent) alert('Please configure your GitHub Repository and Token first.');
-    return;
-  }
-
-  state.github.isSyncing = true;
-  updateSyncButtonUI();
-  if (el.syncStatusMsg) el.syncStatusMsg.innerHTML = '<span style="color:var(--yellow)">⏳ Committing to GitHub repository...</span>';
-
-  try {
-    const sha = await getFileShaFromGitHub(repo, token);
-
-    const payload = {
-      version: '1.0',
-      last_updated: new Date().toISOString(),
-      marks: state.marks
-    };
-
-    const contentStr = JSON.stringify(payload, null, 2);
-    const contentB64 = btoa(unescape(encodeURIComponent(contentStr)));
-
-    const putUrl = `https://api.github.com/repos/${repo}/contents/data/trading_marks.json`;
-    const body = {
-      message: `Update trading marks (${Object.keys(state.marks).length} entries) [skip ci]`,
-      content: contentB64,
-    };
-    if (sha) body.sha = sha;
-
-    const resp = await fetch(putUrl, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github+json',
-        'Content-Type': 'application/json',
-        'X-GitHub-Api-Version': '2022-11-28'
-      },
-      body: JSON.stringify(body)
+      // Highlight PDH/PDL Liquidity Sweeps with a diamond dot
+      if (d.pdh_sweep || d.pdl_sweep) {
+        ctx.fillStyle = '#f59e0b';
+        ctx.beginPath();
+        ctx.arc(x, d.pdh_sweep ? yH - 5 : yL + 5, 3.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
     });
 
-    if (!resp.ok) {
-      const err = await resp.json();
-      throw new Error(err.message || `HTTP ${resp.status}`);
-    }
-
-    state.github.isSyncing = false;
-    updateSyncButtonUI();
-    if (el.syncStatusMsg) {
-      el.syncStatusMsg.innerHTML = `<span style="color:var(--green)">✅ Successfully committed to ${repo}!</span>`;
-    }
-    showToast(`☁️ Marks committed to GitHub (${repo})!`);
-  } catch (err) {
-    console.error('GitHub Push failed:', err);
-    state.github.isSyncing = false;
-    updateSyncButtonUI();
-    if (el.syncStatusMsg) {
-      el.syncStatusMsg.innerHTML = `<span style="color:var(--red)">❌ Sync failed: ${err.message}</span>`;
-    }
-    if (!silent) alert(`GitHub Sync error: ${err.message}`);
-  }
-}
-
-async function pullMarksFromGitHub() {
-  const { repo, token } = state.github;
-  if (!repo) return;
-
-  if (el.syncStatusMsg) el.syncStatusMsg.innerHTML = '<span style="color:var(--yellow)">⏳ Fetching from GitHub...</span>';
-
-  try {
-    const url = `https://api.github.com/repos/${repo}/contents/data/trading_marks.json`;
-    const headers = { 'Accept': 'application/vnd.github+json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-
-    const resp = await fetch(url, { headers });
-    if (!resp.ok) {
-      throw new Error(`Could not fetch data/trading_marks.json (${resp.status})`);
-    }
-
-    const data = await resp.json();
-    const jsonStr = decodeURIComponent(escape(atob(data.content)));
-    const parsed = JSON.parse(jsonStr);
-    const incomingMarks = parsed.marks || {};
-
-    let added = 0;
-    for (const [dt, m] of Object.entries(incomingMarks)) {
-      state.marks[dt] = m;
-      added++;
-    }
-
-    localStorage.setItem('nifty_user_marks', JSON.stringify(state.marks));
-    updateMarkedCount();
-    updateChartMarkers();
-    applyFilter(state.activeFilter);
-
-    if (el.syncStatusMsg) {
-      el.syncStatusMsg.innerHTML = `<span style="color:var(--green)">✅ Pulled ${added} marks from GitHub!</span>`;
-    }
-    showToast(`☁️ Pulled latest marks from GitHub!`);
-  } catch (err) {
-    console.error('GitHub Pull failed:', err);
-    if (el.syncStatusMsg) {
-      el.syncStatusMsg.innerHTML = `<span style="color:var(--red)">❌ Pull failed: ${err.message}</span>`;
-    }
-  }
-}
-
-// ==========================================================================
-// Data Fetching: NIFTY 50 Daily Data
-// ==========================================================================
-async function loadNiftyData() {
-  try {
-    const response = await fetch('data/nifty_data.json?v=' + Date.now());
-    if (!response.ok) {
-      throw new Error(`HTTP error ${response.status}`);
-    }
-    const data = await response.json();
-    state.data = data;
-    state.history = data.history || [];
-    state.displayHistory = [...state.history].reverse();
-    state.filteredHistory = [...state.displayHistory];
-    
-    renderHeroMetrics();
-    renderSmcPrediction();
-    renderChart();
-    applyFilter(state.activeFilter);
-    el.lastSyncText.textContent = `Sync: ${data.last_updated || 'Updated'}`;
-  } catch (err) {
-    console.error('Error loading NIFTY data:', err);
-    el.tableBody.innerHTML = `
-      <tr>
-        <td colspan="11" class="text-center" style="padding: 2rem; color: var(--red);">
-          ⚠️ Could not load <code>data/nifty_data.json</code>.
-        </td>
-      </tr>
-    `;
-    el.lastSyncText.textContent = 'Sync: Failed';
-  }
-}
-
-// ==========================================================================
-// Render Hero & Levels
-// ==========================================================================
-function renderHeroMetrics() {
-  const latest = state.data?.latest;
-  const prev = state.data?.prev_day;
-  const meta = state.data?.meta;
-
-  if (!latest) return;
-
-  // Daily High
-  el.valDayHigh.textContent = formatNumber(latest.high);
-  if (prev) {
-    const diffHigh = round(latest.high - prev.high, 2);
-    const sign = diffHigh >= 0 ? '+' : '';
-    el.diffPrevHigh.textContent = `${sign}${formatNumber(diffHigh)} pts`;
-    el.diffPrevHigh.style.color = diffHigh >= 0 ? 'var(--green)' : 'var(--red)';
-  }
-
-  // Daily Low
-  el.valDayLow.textContent = formatNumber(latest.low);
-  if (prev) {
-    const diffLow = round(latest.low - prev.low, 2);
-    const sign = diffLow >= 0 ? '+' : '';
-    el.diffPrevLow.textContent = `${sign}${formatNumber(diffLow)} pts`;
-    el.diffPrevLow.style.color = diffLow >= 0 ? 'var(--green)' : 'var(--red)';
-  }
-
-  // Daily Range
-  el.valDayRange.textContent = `${formatNumber(latest.range)} pts`;
-  el.pillRangeType.textContent = `${latest.range_pct}%`;
-  el.valAdr20.textContent = `${formatNumber(meta?.adr_20 || latest.range)} pts`;
-
-  // Close & Net Change
-  el.valDayClose.textContent = formatNumber(latest.close);
-  const changeSign = latest.change >= 0 ? '+' : '';
-  el.valNetChange.textContent = `${changeSign}${formatNumber(latest.change)} pts`;
-  el.valNetChange.style.color = latest.change >= 0 ? 'var(--green)' : 'var(--red)';
-  el.pillCloseChange.textContent = `${changeSign}${latest.change_pct}%`;
-  el.pillCloseChange.className = `card-pill ${latest.change >= 0 ? 'pill-high' : 'pill-low'}`;
-
-  // 52-Week Range Positioning
-  const low52 = meta?.fifty_two_week_low || latest.low;
-  const high52 = meta?.fifty_two_week_high || latest.high;
-  el.val52wLow.textContent = formatNumber(low52);
-  el.val52wHigh.textContent = formatNumber(high52);
-
-  const rangeSpan = high52 - low52;
-  const posPct = rangeSpan > 0 ? Math.min(Math.max(((latest.close - low52) / rangeSpan) * 100, 2), 98) : 50;
-  el.pin52w.style.left = `${posPct}%`;
-  el.pin52w.title = `Current Close: ${formatNumber(latest.close)} (${posPct.toFixed(1)}% of 52W Range)`;
-
-  // CPR & Pivots
-  el.badgeCprType.textContent = `CPR: ${latest.cpr_type || 'Normal'} (${latest.cpr_width || '--'} pts)`;
-  el.pS1.textContent = formatNumber(latest.s1);
-  el.pBc.textContent = formatNumber(latest.bc);
-  el.pPivot.textContent = formatNumber(latest.pivot);
-  el.pTc.textContent = formatNumber(latest.tc);
-  el.pR1.textContent = formatNumber(latest.r1);
-}
-
-// ==========================================================================
-// Render SMC Prediction & Liquidity Radar
-// ==========================================================================
-function renderSmcPrediction() {
-  const pred = state.data?.next_day_prediction;
-  const latest = state.data?.latest;
-  const meta = state.data?.meta;
-  const scorecard = state.data?.validation_scorecard;
-
-  // Render Historical Validation Scorecard
-  if (scorecard) {
-    if (el.valOverallAcc) el.valOverallAcc.textContent = `⚡ ${scorecard.overall_accuracy_pct}% Verified Accuracy`;
-    if (el.valSampleInfo) el.valSampleInfo.textContent = `Across ${scorecard.total_sessions_evaluated} historical NIFTY sessions (${scorecard.total_verified_hits} hits)`;
-    if (el.valOosAcc) el.valOosAcc.textContent = `${scorecard.out_of_sample_accuracy_pct || 75.3}%`;
-    if (el.valGateAcc) el.valGateAcc.textContent = `${scorecard.gate_confirmed_accuracy_pct || 84.1}%`;
-    if (el.valBslAcc) el.valBslAcc.textContent = `${scorecard.setups?.['BSL Sweep Reversal']?.win_rate_pct || 92.1}%`;
-    if (el.valSslAcc) el.valSslAcc.textContent = `${scorecard.setups?.['SSL Sweep Reversal']?.win_rate_pct || 86.0}%`;
-    if (el.valInsideAcc) el.valInsideAcc.textContent = `${scorecard.setups?.['Inside Compression']?.win_rate_pct || 95.0}%`;
-    if (el.valBearBosAcc) el.valBearBosAcc.textContent = `${scorecard.setups?.['Bearish BOS']?.win_rate_pct || 76.4}%`;
-    if (el.valBullBosAcc) el.valBullBosAcc.textContent = `${scorecard.setups?.['Bullish BOS']?.win_rate_pct || 67.4}%`;
-  }
-
-  if (!pred || !latest) return;
-
-  // Bias Headline & Setup Name
-  el.smcBiasBadge.textContent = pred.bias;
-  el.predBiasText.textContent = pred.bias;
-  if (el.predSetupName) el.predSetupName.textContent = pred.setup_name || 'SMC Setup';
-  el.predConfidence.textContent = pred.historical_win_rate || `${pred.confidence} Confidence`;
-
-  const isBull = pred.bias.toLowerCase().includes('bull');
-  const isBear = pred.bias.toLowerCase().includes('bear');
-  el.predBiasText.style.color = isBull ? 'var(--green)' : (isBear ? 'var(--red)' : 'var(--yellow)');
-
-  // Rationale, Playbook & Event Warning
-  el.predRationale.textContent = pred.rationale;
-  if (el.predPlaybook) el.predPlaybook.textContent = pred.playbook || 'Watch opening rotation around CPR';
-  if (el.predEventRule) el.predEventRule.textContent = pred.event_rule;
-
-  // 9:15 AM Opening Execution Gate
-  if (pred.opening_gate) {
-    if (el.gateWinRate) el.gateWinRate.textContent = pred.opening_gate.gate_win_rate || '84.1% Confirmed';
-    if (el.gateConditionText) el.gateConditionText.textContent = pred.opening_gate.condition || '--';
-    if (el.gateActionText) el.gateActionText.textContent = pred.opening_gate.invalidation_action || 'Stand down if violated';
-  }
-
-  // Targets, Risk-Reward & Invalidation
-  el.predPrimaryTarget.textContent = pred.primary_liquidity_target;
-  el.predSecondaryTarget.textContent = pred.secondary_target;
-  if (el.predInvalidation) el.predInvalidation.textContent = pred.invalidation_level || '--';
-  if (el.predRrRatio) el.predRrRatio.textContent = pred.risk_reward_ratio || '1 : 2.0';
-  el.predAdrExp.textContent = `${meta?.adr_20 || '--'} pts`;
-  el.predCprExp.textContent = latest.cpr_type || 'Normal';
-
-  // Matrix: PDH, PDL, PWH, PWL, Zone, Structure
-  el.smcPdh.textContent = formatNumber(latest.high);
-  el.smcPdl.textContent = formatNumber(latest.low);
-  el.smcPwh.textContent = latest.pwh ? formatNumber(latest.pwh) : '--';
-  el.smcPwl.textContent = latest.pwl ? formatNumber(latest.pwl) : '--';
-
-  const zoneText = `${latest.zone || 'Discount'} Zone`;
-  el.smcZone.innerHTML = `<span class="term-tip" data-term="${latest.zone || 'Discount'}">${zoneText}</span>`;
-
-  let structBadge = latest.smc_structure || 'Normal';
-  el.smcStructureEvent.innerHTML = `<span class="term-tip" data-term="BOS">${structBadge}</span>`;
-
-  // Render Overnight Macro Radar & Cues
-  renderOvernightMacro(state.data?.overnight_macro, pred);
-}
-
-function renderOvernightMacro(macro, pred) {
-  if (!macro || !el.overnightMacroCard) return;
-
-  const score = macro.macro_score ?? 0;
-  const isTailwind = score > 0.5;
-  const isHeadwind = score < -0.5;
-
-  // Macro Bias Pill
-  if (el.macroBiasBadge) {
-    el.macroBiasBadge.textContent = macro.bias || 'Neutral';
-    el.macroBiasBadge.className = 'macro-badge ' + (isTailwind ? '' : (isHeadwind ? 'badge-headwind' : 'badge-neutral'));
-  }
-
-  // Geopolitical Shock Pill on Bar
-  const geo = macro.geopolitical_risk;
-  if (geo && el.macroGeoBadge) {
-    const isElevated = (geo.risk_level || '').includes('Elevated') || (geo.risk_level || '').includes('Crisis');
-    const isModerate = (geo.risk_level || '').includes('Moderate');
-    el.macroGeoBadge.textContent = isElevated ? '⚔️ Geopolitics: Elevated' : (isModerate ? '⚠️ Geopolitics: Moderate' : '🛡️ Geopolitics: Stable');
-    el.macroGeoBadge.className = 'macro-badge badge-geo ' + (isElevated ? 'danger' : (isModerate ? 'alert' : ''));
-  }
-
-  // Gap Expectation
-  if (el.macroGapBadge) {
-    el.macroGapBadge.textContent = macro.gap_expectation || 'Flat / Range Open';
-  }
-
-  // Score Pill
-  if (el.macroScorePill) {
-    const sign = score > 0 ? '+' : '';
-    el.macroScorePill.textContent = `${sign}${score.toFixed(1)}`;
-    el.macroScorePill.style.color = isTailwind ? 'var(--green)' : (isHeadwind ? 'var(--red)' : 'var(--text-muted)');
-  }
-
-  // Synthesis text on bar
-  if (el.macroSynthesisText) {
-    if (pred?.overnight_synthesis?.adjustment_note) {
-      el.macroSynthesisText.textContent = pred.overnight_synthesis.adjustment_note;
-    } else {
-      el.macroSynthesisText.textContent = `${macro.bias} • Expected: ${macro.gap_expectation}`;
-    }
-  }
-
-  // Enhance the prediction box event rule with dynamic overnight status
-  if (el.predEventRule && pred?.overnight_synthesis) {
-    el.predEventRule.innerHTML = `<strong>Overnight Global Synthesis (${pred.overnight_synthesis.alignment}):</strong> ${pred.overnight_synthesis.adjustment_note}`;
-  }
-
-  // Populate Popover Contents
-  if (el.macroPopSync) el.macroPopSync.textContent = `Sync: ${macro.last_checked_ist || 'Active'}`;
-  if (el.macroPopBiasTag) {
-    const sign = score > 0 ? '+' : '';
-    el.macroPopBiasTag.textContent = `${macro.bias} (${sign}${score.toFixed(1)})`;
-    el.macroPopBiasTag.style.color = isTailwind ? 'var(--green)' : (isHeadwind ? 'var(--red)' : 'var(--text-muted)');
-  }
-  if (el.macroPopGap) el.macroPopGap.textContent = macro.gap_expectation || '--';
-
-  if (el.macroPopRationale) {
-    if (pred?.overnight_synthesis?.adjustment_note) {
-      el.macroPopRationale.innerHTML = `<strong>SMC Setup Alignment (${pred.overnight_synthesis.alignment}):</strong> ${pred.overnight_synthesis.adjustment_note}`;
-    } else {
-      el.macroPopRationale.textContent = 'Global markets overnight establish early momentum, liquidity shifts, and currency direction.';
-    }
-  }
-
-  // Factors List
-  if (el.macroPopFactors && Array.isArray(macro.decision_factors)) {
-    el.macroPopFactors.innerHTML = macro.decision_factors.map(f => `<li>${f}</li>`).join('');
-  }
-
-  // Geopolitical & Black-Swan Conflict Risk Box
-  if (geo && el.geoShockBox) {
-    if (el.geoShockPill) {
-      el.geoShockPill.textContent = geo.risk_level || 'Stable';
-      const isElevated = (geo.risk_level || '').includes('Elevated') || (geo.risk_level || '').includes('Crisis');
-      el.geoShockPill.style.color = isElevated ? 'var(--red)' : '#fbbf24';
-    }
-    if (el.geoShockDetail) {
-      if (geo.flagged_events && geo.flagged_events.length > 0) {
-        const top = geo.flagged_events[0];
-        el.geoShockDetail.innerHTML = `
-          <strong>${geo.status_description}:</strong> Active trigger: <em>"${top.headline}"</em> (${top.source}). 
-          Military conflict and geopolitical friction elevate crude oil supply vulnerability and trigger flight-to-safety capital flows.
-        `;
-      } else {
-        el.geoShockDetail.textContent = 'Continuous real-time wire monitoring: No emergency war declarations, military strikes, sanctions, or black-swan crises detected overnight.';
+    canvas.onmousemove = (ev) => {
+      const rect = canvas.getBoundingClientRect();
+      const relX = ((ev.clientX - rect.left) / rect.width) * w;
+      const idx = Math.floor((relX - padLeft) / stepX);
+      if (idx >= 0 && idx < slice.length) {
+        const d = slice[idx];
+        const readout = document.getElementById('chart-hover-readout');
+        if (readout) {
+          readout.textContent = `${d.date} (${d.day.slice(0, 3)}) • O:${d.open} H:${d.high} L:${d.low} C:${d.close} (${d.change >= 0 ? '+' : ''}${d.change}) • CPR:${d.pivot} • ${d.smc_structure}`;
+        }
       }
-    }
-  }
-
-  // Tickers Grid (8 Factors)
-  if (el.macroTickersGrid && macro.market_data) {
-    const contextLabels = {
-      'Brent Crude': 'Crude drop eases India import cost & inflation',
-      'US Dollar Index': 'Dollar soft stabilizes INR & halts FII selling',
-      'US 10Y Yield': 'Yield shift influences equity valuation multiples',
-      'Nasdaq 100': 'Tech lead sets momentum for Indian IT heavyweights',
-      'S&P 500': 'Broad US equity benchmark sentiment',
-      'Dow Jones': 'US industrial & blue-chip performance',
-      'Nikkei 225': 'Early Asian morning risk appetite lead',
-      'Hang Seng': 'Greater China emerging market liquidity cues'
     };
-
-    el.macroTickersGrid.innerHTML = Object.entries(macro.market_data).map(([name, item]) => {
-      const chg = item.change_pct ?? 0;
-      const isUp = chg >= 0;
-      const sign = isUp ? '+' : '';
-      const cls = chg > 0.05 ? 'up' : (chg < -0.05 ? 'down' : '');
-      const sub = contextLabels[name] || item.category || '';
-      const priceStr = item.price != null ? item.price.toLocaleString('en-US') : '--';
-
-      return `
-        <div class="macro-ticker-card">
-          <div class="tc-top">
-            <span class="tc-name">${name}</span>
-            <span class="tc-chg ${cls}">${sign}${chg.toFixed(2)}%</span>
-          </div>
-          <div class="tc-price">${priceStr}</div>
-          <div class="tc-sub">${sub}</div>
-        </div>
-      `;
-    }).join('');
   }
 
-  // News List with Categorization (Market, War/Conflict, Crisis/Policy)
-  if (el.macroNewsList && Array.isArray(macro.news_headlines)) {
-    if (macro.news_headlines.length === 0) {
-      el.macroNewsList.innerHTML = `<div style="font-size:0.75rem; color:var(--text-dim);">No overnight breaking headlines flagged.</div>`;
-    } else {
-      el.macroNewsList.innerHTML = macro.news_headlines.map(n => {
-        let catClass = 'cat-market';
-        const cat = n.category || 'Market';
-        if (cat.includes('War') || cat.includes('Geopolitical')) catClass = 'cat-geo';
-        else if (cat.includes('Crisis') || cat.includes('Policy')) catClass = 'cat-crisis';
+  function renderHistoricalTable() {
+    const tbody = document.getElementById('historical-table-body');
+    if (!tbody) return;
 
+    const searchInput = document.getElementById('table-search-input');
+    const structFilter = document.getElementById('table-structure-filter');
+    const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
+    const sType = structFilter ? structFilter.value : 'ALL';
+
+    const filtered = appState.entries.filter((row) => {
+      if (sType === 'Sweep' && !(row.pdh_sweep || row.pdl_sweep)) return false;
+      if (sType === 'BOS' && !(row.bullish_bos || row.bearish_bos)) return false;
+      if (sType === 'Narrow' && !String(row.cpr_type).includes('Narrow')) return false;
+      if (sType === 'Pinbar' && !(row.is_pinbar || row.is_expansion_bar)) return false;
+
+      if (!query) return true;
+      const hay = `${row.date} ${row.day} ${row.smc_structure} ${row.cpr_type} ${row.gap_type} ${row.zone}`.toLowerCase();
+      return hay.includes(query);
+    });
+
+    tbody.innerHTML = filtered
+      .slice(0, 120)
+      .map((r) => {
+        const isPos = r.change >= 0;
+        const chgCls = isPos ? 'text-success' : 'text-danger';
+        const noteObj = appState.journalMarks[r.date];
+        const noteTxt = noteObj ? `${noteObj.setup}: ${noteObj.note}` : '';
         return `
-          <a class="macro-news-item" href="${n.link || '#'}" target="_blank" rel="noopener noreferrer">
-            <span class="news-cat-pill ${catClass}">${cat}</span>
-            <span class="news-source-tag">${n.source || 'News'}</span>
-            <div class="news-title-wrap">
-              <div class="news-title">${n.title}</div>
-              <div class="news-time">${n.pub_date || ''}</div>
-            </div>
-          </a>
+          <tr>
+            <td style="font-family:var(--font-mono);font-weight:700;">${r.date}</td>
+            <td>${r.day.slice(0, 3)}</td>
+            <td style="font-family:var(--font-mono);">${fmtNum(r.open)}</td>
+            <td style="font-family:var(--font-mono);">${fmtNum(r.high)}</td>
+            <td style="font-family:var(--font-mono);">${fmtNum(r.low)}</td>
+            <td style="font-family:var(--font-mono);font-weight:700;">${fmtNum(r.close)}</td>
+            <td class="${chgCls}" style="font-family:var(--font-mono);font-weight:700;">
+              ${isPos ? '+' : ''}${fmtNum(r.change)} (${isPos ? '+' : ''}${r.change_pct}%)
+            </td>
+            <td style="font-family:var(--font-mono);">${fmtNum(r.range, 1)} (${r.clq})</td>
+            <td><span class="badge-pill">${r.smc_structure}</span></td>
+            <td style="font-family:var(--font-mono);">${fmtNum(r.pivot)} (${fmtNum(r.cpr_width, 1)}w)</td>
+            <td style="font-family:var(--font-mono);">${fmtNum(r.r1, 0)} / ${fmtNum(r.s1, 0)}</td>
+            <td>${r.zone}</td>
+            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;">${noteTxt}</td>
+          </tr>
         `;
-      }).join('');
-    }
+      })
+      .join('');
   }
-}
 
-function openMarkModalWithPrediction() {
-  const latest = state.data?.latest;
-  const pred = state.data?.next_day_prediction;
-  openMarkModal(latest?.date);
-
-  if (pred) {
-    if (el.markPredBias) {
-      if (pred.bias.toLowerCase().includes('bull')) el.markPredBias.value = 'Bullish Continuation';
-      else if (pred.bias.toLowerCase().includes('bear')) el.markPredBias.value = 'Bearish Continuation';
-      else if (pred.bias.toLowerCase().includes('revers')) el.markPredBias.value = 'BSL Sweep & Reverse';
-      else el.markPredBias.value = 'Rangebound / Inside Value';
-    }
-    if (el.markPredTarget) {
-      el.markPredTarget.value = pred.primary_liquidity_target;
-    }
-  }
-}
-
-function round(val, dec = 2) {
-  return Number(Math.round(val + 'e' + dec) + 'e-' + dec);
-}
-
-// ==========================================================================
-// Lightweight Chart
-// ==========================================================================
-function renderChart() {
-  if (!window.LightweightCharts || !el.tvChart) return;
-
-  el.tvChart.innerHTML = '';
-
-  const isDark = state.activeTheme === 'dark';
-  const bgColor = isDark ? '#141721' : '#ffffff';
-  const textColor = isDark ? '#94a3b8' : '#475569';
-  const gridColor = isDark ? '#1c2130' : '#f1f5f9';
-
-  state.chart = LightweightCharts.createChart(el.tvChart, {
-    width: el.tvChart.clientWidth,
-    height: 420,
-    layout: {
-      background: { color: bgColor },
-      textColor: textColor,
-      fontFamily: 'Inter, sans-serif',
-      fontSize: 12,
-    },
-    grid: {
-      vertLines: { color: gridColor },
-      horzLines: { color: gridColor },
-    },
-    rightPriceScale: {
-      borderColor: isDark ? '#23293a' : '#e2e8f0',
-      scaleMargins: { top: 0.1, bottom: 0.1 },
-    },
-    timeScale: {
-      borderColor: isDark ? '#23293a' : '#e2e8f0',
-      timeVisible: true,
-      secondsVisible: false,
-    },
-    crosshair: {
-      mode: LightweightCharts.CrosshairMode.Normal,
-    },
-  });
-
-  state.candleSeries = state.chart.addCandlestickSeries({
-    upColor: '#10b981',
-    downColor: '#ef4444',
-    borderDownColor: '#ef4444',
-    borderUpColor: '#10b981',
-    wickDownColor: '#ef4444',
-    wickUpColor: '#10b981',
-  });
-
-  const chartData = state.history.map(item => ({
-    time: item.date,
-    open: item.open,
-    high: item.high,
-    low: item.low,
-    close: item.close,
-  }));
-
-  state.candleSeries.setData(chartData);
-  updateChartMarkers();
-  setTimeframeDays(90);
-
-  state.chart.subscribeCrosshairMove(param => {
-    if (!param || !param.time || !param.seriesData) {
-      const latest = state.data?.latest;
-      if (latest) {
-        el.chartLegend.innerHTML = `<strong>${latest.date}</strong> | O: <strong>${formatNumber(latest.open)}</strong> H: <strong style="color:var(--green)">${formatNumber(latest.high)}</strong> L: <strong style="color:var(--red)">${formatNumber(latest.low)}</strong> C: <strong>${formatNumber(latest.close)}</strong> | Range: <strong>${formatNumber(latest.range)}</strong>`;
-      }
-      return;
-    }
-    const candle = param.seriesData.get(state.candleSeries);
-    if (candle) {
-      const dRange = round(candle.high - candle.low, 2);
-      el.chartLegend.innerHTML = `<strong>${param.time}</strong> | O: <strong>${formatNumber(candle.open)}</strong> H: <strong style="color:var(--green)">${formatNumber(candle.high)}</strong> L: <strong style="color:var(--red)">${formatNumber(candle.low)}</strong> C: <strong>${formatNumber(candle.close)}</strong> | Range: <strong>${formatNumber(dRange)}</strong>`;
-    }
-  });
-
-  window.addEventListener('resize', () => {
-    if (state.chart && el.tvChart) {
-      state.chart.applyOptions({ width: el.tvChart.clientWidth });
-    }
-  });
-}
-
-function updateChartMarkers() {
-  if (!state.candleSeries) return;
-
-  const markers = [];
-  for (const [date, mark] of Object.entries(state.marks)) {
-    const isBull = mark.sentiment === 'Bullish';
-    const isBear = mark.sentiment === 'Bearish';
-    markers.push({
-      time: date,
-      position: isBear ? 'aboveBar' : 'belowBar',
-      color: isBull ? '#10b981' : (isBear ? '#ef4444' : '#3b82f6'),
-      shape: isBear ? 'arrowDown' : 'arrowUp',
-      text: mark.sentiment ? mark.sentiment.charAt(0) : 'M',
+  function bindDashboardEvents() {
+    // Chart range buttons
+    document.querySelectorAll('.chart-range-btns button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.chart-range-btns button').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        appState.chartRange = Number(btn.getAttribute('data-range') || 60);
+        renderCandlestickCanvas();
+      });
     });
-  }
 
-  markers.sort((a, b) => (a.time > b.time ? 1 : -1));
-  state.candleSeries.setMarkers(markers);
-}
+    const searchInput = document.getElementById('table-search-input');
+    const structFilter = document.getElementById('table-structure-filter');
+    if (searchInput) searchInput.addEventListener('input', renderHistoricalTable);
+    if (structFilter) structFilter.addEventListener('change', renderHistoricalTable);
 
-function setTimeframeDays(days) {
-  if (!state.chart || state.history.length === 0) return;
-
-  if (days === 'all') {
-    state.chart.timeScale().fitContent();
-    return;
-  }
-
-  const count = parseInt(days, 10);
-  const total = state.history.length;
-  const startIndex = Math.max(0, total - count);
-  const fromTime = state.history[startIndex].date;
-  const toTime = state.history[total - 1].date;
-
-  state.chart.timeScale().setVisibleRange({
-    from: fromTime,
-    to: toTime,
-  });
-}
-
-// ==========================================================================
-// Table Rendering & Filtering
-// ==========================================================================
-function applyFilter(filterName) {
-  state.activeFilter = filterName;
-
-  el.filterAll.classList.toggle('active', filterName === 'all');
-  el.filterMarked.classList.toggle('active', filterName === 'marked');
-  if (el.filterSmc) el.filterSmc.classList.toggle('active', filterName === 'smc');
-  el.filterInside.classList.toggle('active', filterName === 'inside');
-
-  let list = [...state.displayHistory];
-
-  if (filterName === 'marked') {
-    list = list.filter(item => Boolean(state.marks[item.date]));
-  } else if (filterName === 'inside') {
-    list = list.filter(item => item.is_inside_day);
-  } else if (filterName === 'smc') {
-    list = list.filter(item => item.pdh_sweep || item.pdl_sweep || item.bullish_bos || item.bearish_bos);
-  }
-
-  if (state.searchQuery.trim() !== '') {
-    const q = state.searchQuery.toLowerCase().trim();
-    list = list.filter(item => {
-      const mark = state.marks[item.date];
-      const matchDate = item.date.includes(q);
-      const matchNotes = mark?.notes?.toLowerCase().includes(q);
-      const matchPattern = (mark?.pattern || item.candle_type || item.smc_structure)?.toLowerCase().includes(q);
-      const matchTags = mark?.tags?.toLowerCase().includes(q);
-      const matchLevels = mark?.levels?.toLowerCase().includes(q);
-      return matchDate || matchNotes || matchPattern || matchTags || matchLevels;
-    });
-  }
-
-  state.filteredHistory = list;
-  state.currentPage = 1;
-  renderTable();
-}
-
-function renderTable() {
-  const totalItems = state.filteredHistory.length;
-  el.tableCountBadge.textContent = `${totalItems} trading days`;
-
-  if (totalItems === 0) {
-    el.tableBody.innerHTML = `
-      <tr>
-        <td colspan="11" class="text-center" style="padding: 2.5rem; color: var(--text-muted);">
-          No records found matching the active filter or search query.
-        </td>
-      </tr>
-    `;
-    el.paginationInfo.textContent = 'Showing 0 records';
-    el.btnPrevPage.disabled = true;
-    el.btnNextPage.disabled = true;
-    return;
-  }
-
-  const totalPages = Math.ceil(totalItems / state.pageSize);
-  const startIdx = (state.currentPage - 1) * state.pageSize;
-  const endIdx = Math.min(startIdx + state.pageSize, totalItems);
-  const pageItems = state.filteredHistory.slice(startIdx, endIdx);
-
-  el.tableBody.innerHTML = pageItems.map(item => {
-    const mark = state.marks[item.date];
-    const isUp = item.change >= 0;
-    const changeSign = isUp ? '+' : '';
-
-    // Standard Badges
-    const insideBadge = item.is_inside_day ? `<span class="pill-badge badge-inside term-tip" data-term="Inside Bar">Inside Bar</span>` : '';
-    const outsideBadge = item.is_outside_day ? `<span class="pill-badge badge-outside term-tip" data-term="Outside Bar">Outside Bar</span>` : '';
-    const gapBadge = item.gap_type === 'Gap Up' ? `<span class="pill-badge badge-gap-up">Gap Up (${item.gap})</span>`
-                   : (item.gap_type === 'Gap Down' ? `<span class="pill-badge badge-gap-down">Gap Down (${item.gap})</span>` : '');
-
-    // SMC Structure Badge
-    let smcBadge = '';
-    if (item.pdh_sweep) {
-      smcBadge = `<span class="pill-badge badge-sweep-bear term-tip" data-term="Sweep">⚡ BSL Swept (Reversal)</span>`;
-    } else if (item.pdl_sweep) {
-      smcBadge = `<span class="pill-badge badge-sweep-bull term-tip" data-term="Sweep">⚡ SSL Swept (Turtle Soup)</span>`;
-    } else if (item.bullish_bos) {
-      smcBadge = `<span class="pill-badge badge-bos-bull term-tip" data-term="BOS">Bullish BOS</span>`;
-    } else if (item.bearish_bos) {
-      smcBadge = `<span class="pill-badge badge-bos-bear term-tip" data-term="BOS">Bearish BOS</span>`;
-    } else if (item.is_expansion_bar) {
-      smcBadge = `<span class="pill-badge badge-inside term-tip" data-term="Expansion Bar">Expansion (${item.body_pct}% body)</span>`;
-    } else {
-      smcBadge = `<span style="font-size:0.7rem; color:var(--text-dim);">${item.zone || 'Normal'}</span>`;
+    // Theme toggle
+    const btnTheme = document.getElementById('btn-theme-toggle');
+    if (btnTheme) {
+      btnTheme.addEventListener('click', () => {
+        const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+        const next = cur === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+      });
     }
 
-    // User Mark Cell
-    let markCellHtml = '';
-    if (mark) {
-      const sentimentClass = `sentiment-${mark.sentiment || 'Neutral'}`;
-      const tagList = mark.tags ? mark.tags.split(',').map(t => `<span class="mark-tag-pill">${t.trim()}</span>`).join(' ') : '';
-      const predHtml = mark.predBias ? `<span style="font-size:0.68rem; color:var(--blue); font-weight:700;">Pred: ${mark.predBias}</span>` : '';
-      const eventPill = mark.isEvent ? `<span style="font-size:0.68rem; color:var(--yellow); font-weight:700;">⚠️ Event</span>` : '';
+    // Journal Modal
+    const jModal = document.getElementById('journal-modal');
+    const btnQuickMark = document.getElementById('btn-quick-mark');
+    const btnCloseJournal = document.getElementById('btn-close-journal');
+    const btnSaveJournal = document.getElementById('btn-save-journal');
 
-      markCellHtml = `
-        <div class="mark-cell-content" onclick="openMarkModal('${item.date}')" style="cursor: pointer;" title="Click to view/edit mark">
-          <span class="badge-sentiment ${sentimentClass}">${mark.sentiment || 'Marked'}</span>
-          ${predHtml}
-          ${eventPill}
-          <span class="mark-notes-snippet">${mark.notes ? escapeHtml(mark.notes) : (mark.pattern || 'Marked day')}</span>
-          ${tagList}
-        </div>
-      `;
-    } else {
-      markCellHtml = `
-        <button class="btn btn-sm btn-outline" onclick="openMarkModal('${item.date}')">
-          + Mark Info
-        </button>
-      `;
+    if (btnQuickMark && jModal) {
+      btnQuickMark.addEventListener('click', () => {
+        const dateEl = document.getElementById('journal-date');
+        if (dateEl && appState.latestEntry) dateEl.value = appState.latestEntry.date;
+        jModal.classList.remove('hidden');
+      });
     }
-
-    return `
-      <tr id="row-${item.date}">
-        <td>
-          <div style="font-weight: 700;">${item.date}</div>
-          <div style="font-size: 0.72rem; color: var(--text-dim);">${item.day}</div>
-        </td>
-        <td class="text-right num-mono td-high">${formatNumber(item.high)}</td>
-        <td class="text-right num-mono td-low">${formatNumber(item.low)}</td>
-        <td class="text-right num-mono">
-          <div>${formatNumber(item.range)}</div>
-          <div style="font-size: 0.7rem; color: var(--text-dim);">${item.range_pct}%</div>
-        </td>
-        <td class="text-right num-mono">${formatNumber(item.open)}</td>
-        <td class="text-right num-mono" style="font-weight: 700;">${formatNumber(item.close)}</td>
-        <td class="text-right num-mono ${isUp ? 'td-up' : 'td-down'}">
-          <div>${changeSign}${formatNumber(item.change)}</div>
-          <div style="font-size: 0.7rem;">${changeSign}${item.change_pct}%</div>
-        </td>
-        <td>
-          ${insideBadge}
-          ${outsideBadge}
-          ${gapBadge}
-          <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">
-            P: ${formatNumber(item.pivot)} | CPR: ${item.cpr_width} pts
-          </div>
-        </td>
-        <td>
-          ${smcBadge}
-        </td>
-        <td>${markCellHtml}</td>
-        <td class="text-center">
-          <button class="btn btn-sm btn-outline" onclick="openMarkModal('${item.date}')" title="Edit Trading Mark">
-            ✍️
-          </button>
-        </td>
-      </tr>
-    `;
-  }).join('');
-
-  el.paginationInfo.textContent = `Showing ${startIdx + 1}–${endIdx} of ${totalItems} records`;
-  el.pageNum.textContent = `${state.currentPage} / ${totalPages}`;
-  el.btnPrevPage.disabled = state.currentPage <= 1;
-  el.btnNextPage.disabled = state.currentPage >= totalPages;
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-// ==========================================================================
-// Mark Trading Info Modal
-// ==========================================================================
-function openMarkModal(dateStr) {
-  const targetDate = dateStr || state.data?.latest?.date || new Date().toISOString().split('T')[0];
-  el.markDate.value = targetDate;
-  el.modalDateSubtitle.textContent = `Date: ${targetDate}`;
-
-  const record = state.history.find(d => d.date === targetDate);
-  if (record) {
-    el.snapHigh.textContent = formatNumber(record.high);
-    el.snapLow.textContent = formatNumber(record.low);
-    el.snapRange.textContent = `${formatNumber(record.range)} pts`;
-    el.snapClose.textContent = formatNumber(record.close);
-  } else {
-    el.snapHigh.textContent = '--';
-    el.snapLow.textContent = '--';
-    el.snapRange.textContent = '--';
-    el.snapClose.textContent = '--';
-  }
-
-  const existing = state.marks[targetDate];
-  if (existing) {
-    const radio = document.querySelector(`input[name="sentiment"][value="${existing.sentiment || 'Bullish'}"]`);
-    if (radio) radio.checked = true;
-
-    el.markPattern.value = existing.pattern || 'Trend Day (Unidirectional)';
-    el.markTradeTaken.value = existing.tradeTaken || 'No';
-    el.markOutcome.value = existing.outcome || 'N/A';
-    el.markLevels.value = existing.levels || '';
-    if (el.markPredBias) el.markPredBias.value = existing.predBias || 'Bullish Continuation';
-    if (el.markPredTarget) el.markPredTarget.value = existing.predTarget || '';
-    if (el.markEventCheck) el.markEventCheck.checked = Boolean(existing.isEvent);
-    el.markNotes.value = existing.notes || '';
-    el.markTags.value = existing.tags || '';
-    el.btnDeleteMark.style.display = 'inline-block';
-  } else {
-    const defaultRadio = document.querySelector('input[name="sentiment"][value="Bullish"]');
-    if (defaultRadio) defaultRadio.checked = true;
-    el.markPattern.value = record?.is_inside_day ? 'Inside Bar Setup (Harami)' : 'Trend Day (Unidirectional)';
-    el.markTradeTaken.value = 'No';
-    el.markOutcome.value = 'N/A';
-    el.markLevels.value = record ? `PDH: ${record.high}, PDL: ${record.low}` : '';
-    if (el.markPredBias) {
-      el.markPredBias.value = record?.close > record?.open ? 'Bullish Continuation' : 'Bearish Continuation';
+    if (btnCloseJournal && jModal) {
+      btnCloseJournal.addEventListener('click', () => jModal.classList.add('hidden'));
     }
-    if (el.markPredTarget) {
-      el.markPredTarget.value = record ? `Sweep PDH: ${record.high}` : '';
-    }
-    if (el.markEventCheck) el.markEventCheck.checked = false;
-    el.markNotes.value = '';
-    el.markTags.value = record?.pdh_sweep ? '#BSL-Sweep' : (record?.pdl_sweep ? '#SSL-Sweep' : '');
-    el.btnDeleteMark.style.display = 'none';
-  }
-
-  el.markModal.style.display = 'flex';
-}
-
-function closeMarkModal() {
-  el.markModal.style.display = 'none';
-}
-
-function appendLevel(text) {
-  const current = el.markLevels.value.trim();
-  el.markLevels.value = current ? `${current}, ${text}` : text;
-}
-
-function appendTarget(text) {
-  const current = el.markPredTarget.value.trim();
-  el.markPredTarget.value = current ? `${current}, ${text}` : text;
-}
-
-function appendTag(tag) {
-  const current = el.markTags.value.trim();
-  if (!current.includes(tag)) {
-    el.markTags.value = current ? `${current}, ${tag}` : tag;
-  }
-}
-
-// ==========================================================================
-// Event Listeners & Interactions
-// ==========================================================================
-function setupEventListeners() {
-  // Theme Toggle
-  el.btnThemeToggle.addEventListener('click', () => {
-    const isDark = document.body.classList.contains('theme-dark');
-    const newTheme = isDark ? 'light' : 'dark';
-    document.body.className = `theme-${newTheme}`;
-    state.activeTheme = newTheme;
-    localStorage.setItem('nifty_theme', newTheme);
-    renderChart();
-  });
-
-  // Timeframe selector buttons
-  const tfContainer = document.getElementById('timeframe-buttons');
-  if (tfContainer) {
-    tfContainer.addEventListener('click', e => {
-      const btn = e.target.closest('.btn-tf');
-      if (!btn) return;
-      tfContainer.querySelectorAll('.btn-tf').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      setTimeframeDays(btn.dataset.days);
-    });
-  }
-
-  // Filter Buttons
-  el.filterAll.addEventListener('click', () => applyFilter('all'));
-  el.filterMarked.addEventListener('click', () => applyFilter('marked'));
-  if (el.filterSmc) el.filterSmc.addEventListener('click', () => applyFilter('smc'));
-  el.filterInside.addEventListener('click', () => applyFilter('inside'));
-
-  // Search input with debounce
-  let debounceTimer;
-  el.filterSearch.addEventListener('input', e => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      state.searchQuery = e.target.value;
-      applyFilter(state.activeFilter);
-    }, 200);
-  });
-
-  // Pagination
-  el.btnPrevPage.addEventListener('click', () => {
-    if (state.currentPage > 1) {
-      state.currentPage--;
-      renderTable();
-    }
-  });
-
-  el.btnNextPage.addEventListener('click', () => {
-    const totalPages = Math.ceil(state.filteredHistory.length / state.pageSize);
-    if (state.currentPage < totalPages) {
-      state.currentPage++;
-      renderTable();
-    }
-  });
-
-  // Quick Mark Button
-  el.btnQuickMark.addEventListener('click', () => openMarkModal());
-
-  // Modal Close
-  el.btnCloseModal.addEventListener('click', closeMarkModal);
-  el.btnCancelModal.addEventListener('click', closeMarkModal);
-  el.markModal.addEventListener('click', e => {
-    if (e.target === el.markModal) closeMarkModal();
-  });
-
-  el.markDate.addEventListener('change', e => {
-    openMarkModal(e.target.value);
-  });
-
-  // Form Submit: Save Mark
-  el.markForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const date = el.markDate.value;
-    if (!date) return;
-
-    const sentiment = document.querySelector('input[name="sentiment"]:checked')?.value || 'Bullish';
-    const markData = {
-      date: date,
-      sentiment: sentiment,
-      pattern: el.markPattern.value,
-      tradeTaken: el.markTradeTaken.value,
-      outcome: el.markOutcome.value,
-      levels: el.markLevels.value.trim(),
-      predBias: el.markPredBias ? el.markPredBias.value : '',
-      predTarget: el.markPredTarget ? el.markPredTarget.value.trim() : '',
-      isEvent: el.markEventCheck ? el.markEventCheck.checked : false,
-      notes: el.markNotes.value.trim(),
-      tags: el.markTags.value.trim(),
-      savedAt: new Date().toISOString(),
-    };
-
-    state.marks[date] = markData;
-    saveMarksToStorage(true);
-    updateChartMarkers();
-    applyFilter(state.activeFilter);
-    closeMarkModal();
-    showToast(`✅ Trading mark saved for ${date}!`);
-  });
-
-  // Delete Mark
-  el.btnDeleteMark.addEventListener('click', () => {
-    const date = el.markDate.value;
-    if (!date || !state.marks[date]) return;
-    if (confirm(`Are you sure you want to delete your trading mark for ${date}?`)) {
-      delete state.marks[date];
-      saveMarksToStorage(true);
-      updateChartMarkers();
-      applyFilter(state.activeFilter);
-      closeMarkModal();
-      showToast(`🗑️ Trading mark removed for ${date}`);
-    }
-  });
-
-  // ========================================================================
-  // Glossary Modal & Search Handlers
-  // ========================================================================
-  if (el.btnOpenGlossary) {
-    el.btnOpenGlossary.addEventListener('click', () => {
-      renderGlossary('');
-      if (el.glossarySearch) el.glossarySearch.value = '';
-      el.glossaryModal.style.display = 'flex';
-    });
-  }
-
-  if (el.btnCloseGlossaryModal) {
-    el.btnCloseGlossaryModal.addEventListener('click', () => {
-      el.glossaryModal.style.display = 'none';
-    });
-  }
-
-  if (el.glossaryModal) {
-    el.glossaryModal.addEventListener('click', e => {
-      if (e.target === el.glossaryModal) el.glossaryModal.style.display = 'none';
-    });
-  }
-
-  if (el.glossarySearch) {
-    el.glossarySearch.addEventListener('input', e => {
-      renderGlossary(e.target.value);
-    });
-  }
-
-  // ========================================================================
-  // GitHub Sync Modal Handlers
-  // ========================================================================
-  el.btnGithubSync.addEventListener('click', () => {
-    el.ghRepoInput.value = state.github.repo;
-    el.ghTokenInput.value = state.github.token;
-    el.ghAutoSyncToggle.checked = state.github.autoSync;
-    el.btnDisconnectGithub.style.display = state.github.token ? 'inline-block' : 'none';
-    el.syncStatusMsg.innerHTML = state.github.token ? `<span style="color:var(--green)">Connected to repository ${state.github.repo}</span>` : '<span>Not connected to GitHub</span>';
-    el.syncModal.style.display = 'flex';
-  });
-
-  el.btnCloseSyncModal.addEventListener('click', () => {
-    el.syncModal.style.display = 'none';
-  });
-
-  el.syncModal.addEventListener('click', e => {
-    if (e.target === el.syncModal) el.syncModal.style.display = 'none';
-  });
-
-  el.btnSaveGhToken.addEventListener('click', async () => {
-    const repo = el.ghRepoInput.value.trim();
-    const token = el.ghTokenInput.value.trim();
-    const autoSync = el.ghAutoSyncToggle.checked;
-
-    if (!repo) {
-      alert('Please enter your GitHub repository (e.g. sagnikseal/nifty-tracker)');
-      return;
-    }
-
-    state.github.repo = repo;
-    state.github.token = token;
-    state.github.autoSync = autoSync;
-
-    localStorage.setItem('nifty_gh_repo', repo);
-    localStorage.setItem('nifty_gh_token', token);
-    localStorage.setItem('nifty_gh_autosync', String(autoSync));
-
-    updateSyncButtonUI();
-    el.btnDisconnectGithub.style.display = token ? 'inline-block' : 'none';
-
-    if (token) {
-      el.syncStatusMsg.innerHTML = '<span style="color:var(--yellow)">Testing GitHub connection...</span>';
-      try {
-        await getFileShaFromGitHub(repo, token);
-        el.syncStatusMsg.innerHTML = `<span style="color:var(--green)">✅ Connected successfully to ${repo}!</span>`;
-        showToast('Connected to GitHub!');
-      } catch (err) {
-        el.syncStatusMsg.innerHTML = `<span style="color:var(--yellow)">⚠️ Connected to repo: ${err.message}</span>`;
-      }
-    } else {
-      el.syncStatusMsg.innerHTML = '<span>Saved. Operating in local-only mode.</span>';
-    }
-  });
-
-  el.btnPushToGithub.addEventListener('click', () => pushMarksToGitHub(false));
-  if (el.btnPullFromGithub) {
-    el.btnPullFromGithub.addEventListener('click', () => pullMarksFromGitHub());
-  }
-
-  el.btnDisconnectGithub.addEventListener('click', () => {
-    if (confirm('Disconnect GitHub token? Your marks will remain stored safely locally.')) {
-      state.github.token = '';
-      localStorage.removeItem('nifty_gh_token');
-      el.ghTokenInput.value = '';
-      el.btnDisconnectGithub.style.display = 'none';
-      updateSyncButtonUI();
-      el.syncStatusMsg.innerHTML = '<span>Disconnected. Operating locally.</span>';
-      showToast('GitHub token disconnected.');
-    }
-  });
-
-  // Export Journal JSON
-  el.btnExportJournal.addEventListener('click', () => {
-    const count = Object.keys(state.marks).length;
-    if (count === 0) {
-      alert('You have no saved trading marks yet. Add some marks first!');
-      return;
-    }
-    const exportData = {
-      version: '1.0',
-      exportedAt: new Date().toISOString(),
-      totalMarks: count,
-      marks: state.marks,
-    };
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `nifty_trading_journal_${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast(`Exported ${count} trading marks to JSON.`);
-  });
-
-  // Import Journal JSON
-  el.btnImportJournal.addEventListener('click', () => {
-    el.importFileInput.click();
-  });
-
-  el.importFileInput.addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = event => {
-      try {
-        const parsed = JSON.parse(event.target.result);
-        const importedMarks = parsed.marks || parsed;
-        let addedCount = 0;
-        for (const [dt, mark] of Object.entries(importedMarks)) {
-          if (dt && typeof mark === 'object') {
-            state.marks[dt] = mark;
-            addedCount++;
-          }
+    if (btnSaveJournal && jModal) {
+      btnSaveJournal.addEventListener('click', () => {
+        const d = document.getElementById('journal-date').value;
+        const s = document.getElementById('journal-setup').value;
+        const n = document.getElementById('journal-note').value;
+        if (d) {
+          appState.journalMarks[d] = { setup: s, note: n, updated: new Date().toISOString() };
+          localStorage.setItem('nifty_trading_marks', JSON.stringify(appState.journalMarks));
+          renderHistoricalTable();
         }
-        saveMarksToStorage(true);
-        updateChartMarkers();
-        applyFilter(state.activeFilter);
-        showToast(`✅ Successfully imported ${addedCount} trading marks!`);
-      } catch (err) {
-        alert('Invalid JSON file format. Please upload a valid journal JSON backup.');
-      }
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-  });
-
-  // Download CSV
-  el.btnDownloadCsv.addEventListener('click', () => {
-    if (!state.history.length) return;
-    const headers = ['Date', 'Day', 'Open', 'High', 'Low', 'Close', 'Range', 'Change', 'Change_Pct', 'Pivot', 'CPR_Width', 'Structure_Event', 'Zone'];
-    const rows = state.history.map(d => [
-      d.date,
-      d.day,
-      d.open,
-      d.high,
-      d.low,
-      d.close,
-      d.range,
-      d.change,
-      d.change_pct,
-      d.pivot,
-      d.cpr_width,
-      d.smc_structure || '',
-      d.zone || ''
-    ]);
-    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `nifty50_daily_history_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-}
-
-function initMacroPopover() {
-  if (!el.overnightMacroCard || !el.macroPopover) return;
-
-  let closeTimer = null;
-
-  function updatePosition() {
-    if (window.innerWidth <= 640) {
-      // Mobile style reset so responsive bottom drawer applies cleanly
-      el.macroPopover.style.left = '';
-      el.macroPopover.style.top = '';
-      el.macroPopover.style.bottom = '';
-      el.macroPopover.style.width = '';
-      el.macroPopover.style.maxHeight = '';
-      return;
+        jModal.classList.add('hidden');
+      });
     }
 
-    const rect = el.overnightMacroCard.getBoundingClientRect();
-    const vh = window.innerHeight;
-    const vw = window.innerWidth;
-    const dockBuffer = 32; // Generous safety buffer so macOS dock never cuts off popover
-    const topBuffer = 18;
+    // Glossary Modal
+    const gModal = document.getElementById('glossary-modal');
+    const btnOpenGlossary = document.getElementById('btn-open-glossary');
+    const btnCloseGlossary = document.getElementById('btn-close-glossary');
+    if (btnOpenGlossary && gModal) {
+      btnOpenGlossary.addEventListener('click', () => gModal.classList.remove('hidden'));
+    }
+    if (btnCloseGlossary && gModal) {
+      btnCloseGlossary.addEventListener('click', () => gModal.classList.add('hidden'));
+    }
 
-    // Horizontal positioning: Center with card, clamped within screen margins
-    const popWidth = Math.min(620, vw - 32);
-    let left = rect.left + (rect.width / 2) - (popWidth / 2);
-    left = Math.max(16, Math.min(left, vw - popWidth - 16));
-    el.macroPopover.style.left = `${Math.round(left)}px`;
-    el.macroPopover.style.width = `${Math.round(popWidth)}px`;
+    // Export / Import Journal JSON
+    const btnExport = document.getElementById('btn-export-journal');
+    const btnImport = document.getElementById('btn-import-journal');
+    const fileInput = document.getElementById('import-file-input');
 
-    // Vertical positioning: evaluate available space above and below
-    const spaceBelow = vh - rect.bottom - dockBuffer;
-    const spaceAbove = rect.top - topBuffer;
-
-    if (spaceBelow >= 360) {
-      // Comfortably fits below trigger card
-      const maxH = Math.min(spaceBelow, 620);
-      el.macroPopover.style.top = `${Math.round(rect.bottom + 8)}px`;
-      el.macroPopover.style.bottom = 'auto';
-      el.macroPopover.style.maxHeight = `${Math.round(maxH)}px`;
-    } else if (spaceAbove > spaceBelow && spaceAbove >= 280) {
-      // More room above: flip ABOVE trigger card!
-      const maxH = Math.min(spaceAbove, 620);
-      el.macroPopover.style.top = 'auto';
-      el.macroPopover.style.bottom = `${Math.round(vh - rect.top + 8)}px`;
-      el.macroPopover.style.maxHeight = `${Math.round(maxH)}px`;
-    } else {
-      // Screen is tight vertically: clamp within topBuffer and dockBuffer
-      const maxH = Math.max(220, vh - topBuffer - dockBuffer);
-      const top = Math.max(topBuffer, Math.min(rect.bottom + 8, vh - maxH - dockBuffer));
-      el.macroPopover.style.top = `${Math.round(top)}px`;
-      el.macroPopover.style.bottom = 'auto';
-      el.macroPopover.style.maxHeight = `${Math.round(maxH)}px`;
+    if (btnExport) {
+      btnExport.addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(appState.journalMarks, null, 2)], {
+          type: 'application/json',
+        });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'nifty_trading_journal.json';
+        a.click();
+      });
+    }
+    if (btnImport && fileInput) {
+      btnImport.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const parsed = JSON.parse(ev.target.result);
+            Object.assign(appState.journalMarks, parsed);
+            localStorage.setItem('nifty_trading_marks', JSON.stringify(appState.journalMarks));
+            renderHistoricalTable();
+          } catch (_) {}
+        };
+        reader.readAsText(file);
+      });
     }
   }
 
-  function showPopover() {
-    clearTimeout(closeTimer);
-    el.macroPopover.style.display = 'flex';
-    updatePosition();
-
-    requestAnimationFrame(() => {
-      el.macroPopover.classList.add('visible');
-    });
-  }
-
-  function scheduleHide() {
-    clearTimeout(closeTimer);
-    closeTimer = setTimeout(() => {
-      hidePopover();
-    }, 220); // 220ms grace period so moving mouse into popover is smooth
-  }
-
-  function hidePopover() {
-    clearTimeout(closeTimer);
-    el.macroPopover.classList.remove('visible');
-    closeTimer = setTimeout(() => {
-      if (!el.macroPopover.classList.contains('visible')) {
-        el.macroPopover.style.display = 'none';
-      }
-    }, 200);
-  }
-
-  // Desktop Hover on Card and Button
-  el.overnightMacroCard.addEventListener('mouseenter', () => {
-    if (window.innerWidth > 640) showPopover();
+  document.addEventListener('DOMContentLoaded', () => {
+    bindDashboardEvents();
+    loadNiftyDataset();
   });
-
-  el.overnightMacroCard.addEventListener('mouseleave', e => {
-    if (window.innerWidth > 640) {
-      if (e.relatedTarget && (el.macroPopover.contains(e.relatedTarget) || el.macroPopover === e.relatedTarget)) return;
-      scheduleHide();
-    }
-  });
-
-  el.macroPopover.addEventListener('mouseenter', () => {
-    clearTimeout(closeTimer);
-  });
-
-  el.macroPopover.addEventListener('mouseleave', e => {
-    if (window.innerWidth > 640) {
-      if (e.relatedTarget && (el.overnightMacroCard.contains(e.relatedTarget) || el.overnightMacroCard === e.relatedTarget)) return;
-      scheduleHide();
-    }
-  });
-
-  // Dynamic repositioning on window resize or scroll
-  window.addEventListener('resize', () => {
-    if (el.macroPopover.classList.contains('visible')) {
-      updatePosition();
-    }
-  });
-
-  window.addEventListener('scroll', () => {
-    if (el.macroPopover.classList.contains('visible') && window.innerWidth > 640) {
-      const rect = el.overnightMacroCard.getBoundingClientRect();
-      if (rect.bottom < 0 || rect.top > window.innerHeight) {
-        hidePopover();
-      } else {
-        updatePosition();
-      }
-    }
-  }, { passive: true });
-
-  // Mobile Click / Tap
-  el.overnightMacroCard.addEventListener('click', e => {
-    if (e.target.closest('.macro-pop-close')) return;
-    if (el.macroPopover.classList.contains('visible')) {
-      hidePopover();
-    } else {
-      showPopover();
-    }
-  });
-
-  if (el.macroPopClose) {
-    el.macroPopClose.addEventListener('click', e => {
-      e.stopPropagation();
-      hidePopover();
-    });
-  }
-
-  // Close when clicking outside
-  document.addEventListener('click', e => {
-    if (el.macroPopover.classList.contains('visible')) {
-      if (!el.macroPopover.contains(e.target) && !el.overnightMacroCard.contains(e.target)) {
-        hidePopover();
-      }
-    }
-  });
-}
-
-// ==========================================================================
-// Initialization
-// ==========================================================================
-document.addEventListener('DOMContentLoaded', () => {
-  document.body.className = `theme-${state.activeTheme}`;
-
-  updateMarketStatus();
-  setInterval(updateMarketStatus, 60000);
-
-  initTermTooltips();
-  initMacroPopover();
-  loadMarks();
-  setupEventListeners();
-  loadNiftyData();
-});
+})();

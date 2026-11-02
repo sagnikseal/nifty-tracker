@@ -1,757 +1,508 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NIFTY 50 Daily High-Low Tracker & Trading Journal</title>
-  <meta name="description" content="Automated daily tracker for NIFTY 50 High, Low, Range, CPR, and personal trading journal markings.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <!-- Lightweight Charts by TradingView -->
-  <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NIFTY 50 Institutional Tracker & 4-Pillar AI Prediction Terminal</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="theme-dark">
+<body>
+  <!-- Top Institutional Navigation & Action Header -->
+  <header class="top-navbar">
+    <div class="brand-cluster">
+      <div class="brand-logo">N50</div>
+      <div>
+        <h1 class="brand-title">NIFTY 50 <span>QUANT &amp; 4-PILLAR AI TERMINAL</span></h1>
+        <p class="brand-subtitle" id="last-updated-banner">NSE India • SMC Liquidity • Options GEX • Macro &amp; Geopolitical NLP</p>
+      </div>
+    </div>
 
-  <!-- TOP HEADER -->
-  <header class="app-header">
-    <div class="header-container">
-      <div class="brand">
-        <div class="brand-logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
-            <polyline points="16 7 22 7 22 13"></polyline>
-          </svg>
-        </div>
-        <div>
-          <h1 class="brand-title">NIFTY 50 <span class="badge-index">NSE</span></h1>
-          <p class="brand-subtitle">Daily High-Low Tracker & Trading Marks</p>
-        </div>
+    <div class="nav-actions">
+      <!-- Live Broker Connection Status Pill (Never gets stuck on CONNECTING...) -->
+      <div class="conn-status-cluster" id="rt-conn-cluster">
+        <span class="conn-dot conn-dot-connecting" id="rt-conn-dot"></span>
+        <span class="conn-status-text" id="rt-conn-text">INITIALIZING ENGINE...</span>
+        <span class="conn-latency-pill" id="rt-latency-pill">-- ms</span>
       </div>
 
-      <div class="header-meta">
-        <div class="market-status" id="market-status-badge">
-          <span class="status-dot"></span>
-          <span id="market-status-text">Checking market...</span>
-        </div>
-        <div class="last-sync" id="last-sync-text">
-          Sync: Fetching...
-        </div>
-        <div class="header-actions">
-          <button id="btn-quick-mark" class="btn btn-primary btn-action-main" title="Add trading note / mark for today">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 20h9"></path>
-              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-            </svg>
-            <span class="btn-text">Mark Info</span>
-          </button>
-          <button id="btn-open-glossary" class="btn btn-outline" title="Open SMC & Trading Terminology Cheat Sheet">
-            📖 <span class="btn-text">Glossary</span>
-          </button>
-          <button id="btn-github-sync" class="btn btn-outline" title="Sync marks directly to your GitHub repository">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M19 18a3.5 3.5 0 0 0 0-7h-1A5 5 0 0 0 8 7.2 3.5 3.5 0 0 0 5 13a3.5 3.5 0 0 0 0 7h14z"></path>
-            </svg>
-            <span id="sync-btn-label" class="btn-text">Sync</span>
-          </button>
-          <button id="btn-export-journal" class="btn btn-outline btn-desktop-only" title="Export your journal and marks">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            <span class="btn-text">Export</span>
-          </button>
-          <button id="btn-import-journal" class="btn btn-outline btn-desktop-only" title="Import backup of marks">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="17 8 12 3 7 8"></polyline>
-              <line x1="12" y1="3" x2="12" y2="15"></line>
-            </svg>
-            <span class="btn-text">Import</span>
-          </button>
-          <input type="file" id="import-file-input" accept=".json" style="display:none;">
-          <button id="btn-theme-toggle" class="btn btn-icon" title="Toggle Dark/Light theme">
-            <span class="icon-sun">☀️</span>
-            <span class="icon-moon">🌙</span>
-          </button>
-        </div>
-      </div>
+      <button class="btn-outline" id="btn-rt-settings" title="Configure Live Broker API &amp; Geopolitical Wire">
+        ⚙ Broker API &amp; Feeds
+      </button>
+      <button class="btn-action-main" id="btn-quick-mark" title="Add Intraday / EOD Trading Journal Note">
+        + Quick Journal Mark
+      </button>
+      <button class="btn-outline btn-desktop-only" id="btn-open-glossary">
+        SMC &amp; Quant Guide
+      </button>
+      <button class="btn-outline btn-desktop-only" id="btn-github-sync">
+        <span id="sync-btn-label">Cloud Sync</span>
+      </button>
+      <button class="btn-outline btn-desktop-only" id="btn-export-journal">Export</button>
+      <button class="btn-outline btn-desktop-only" id="btn-import-journal">Import</button>
+      <input type="file" id="import-file-input" accept=".json" style="display:none;" />
+      <button class="btn-icon" id="btn-theme-toggle" title="Toggle Dark/Light Theme">
+        <span class="icon-sun">☀</span>
+      </button>
     </div>
   </header>
 
+  <!-- Geopolitical War & Macro Shock Alert Banner (Dynamic) -->
+  <div class="crisis-alert-banner hidden" id="rt-crisis-banner">
+    <div class="crisis-alert-icon">⚠ GEOPOLITICAL / MACRO SHOCK ACTIVE</div>
+    <div class="crisis-alert-body" id="rt-crisis-text">
+      Elevated tail-risk detected across Geopolitical News Wire or India VIX velocity. Stop-loss buffers widened automatically.
+    </div>
+  </div>
+
   <main class="main-content">
-
-    <!-- HERO METRICS: SPOTLIGHT ON HIGH & LOW -->
-    <section class="hero-grid">
-      <!-- High Card -->
-      <div class="stat-card card-high">
-        <div class="card-header">
-          <span class="card-label">Daily High</span>
-          <span class="card-pill pill-high">High of Day</span>
+    <!-- =================================================================== -->
+    <!-- SECTION 1: LIVE 4-PILLAR AI INTRADAY PREDICTION & EXECUTION COCKPIT -->
+    <!-- =================================================================== -->
+    <section class="terminal-section" id="realtime-cockpit-section">
+      <div class="section-header-bar">
+        <div>
+          <h2 class="section-title">LIVE 4-PILLAR AI INTRADAY PREDICTION ENGINE</h2>
+          <p class="section-subtitle" id="rt-session-window">Session Window: Detecting IST Market Regime...</p>
         </div>
-        <div class="card-value" id="val-day-high">--</div>
-        <div class="card-sub" id="sub-day-high">
-          <span>vs Prev High:</span> <span id="diff-prev-high">--</span>
-        </div>
-      </div>
-
-      <!-- Low Card -->
-      <div class="stat-card card-low">
-        <div class="card-header">
-          <span class="card-label">Daily Low</span>
-          <span class="card-pill pill-low">Low of Day</span>
-        </div>
-        <div class="card-value" id="val-day-low">--</div>
-        <div class="card-sub" id="sub-day-low">
-          <span>vs Prev Low:</span> <span id="diff-prev-low">--</span>
+        <div class="header-badges">
+          <span class="badge-pill" id="rt-provider-badge">Feed: Auto-Detect</span>
+          <span class="badge-pill" id="rt-calibration-badge">Isotonic Calibrated Ensemble v2.0</span>
+          <button class="btn-sm" id="btn-rt-reconnect">↻ Reconnect / Refresh</button>
+          <button class="btn-sm" id="btn-stress-sim">⚡ Simulate War / Macro Shock</button>
         </div>
       </div>
 
-      <!-- Daily Range Card -->
-      <div class="stat-card card-range">
-        <div class="card-header">
-          <span class="card-label">Daily Range (H - L)</span>
-          <span class="card-pill" id="pill-range-type">Range</span>
+      <!-- Primary Signal & Option Execution Grid -->
+      <div class="rt-primary-grid">
+        <!-- Card 1: Master Directional Stance & Calibrated Win Probability -->
+        <div class="rt-card rt-card-stance">
+          <div class="rt-card-top">
+            <span class="rt-label">MASTER AI STANCE</span>
+            <span class="rt-conviction-tag" id="rt-conviction-badge">CALIBRATING</span>
+          </div>
+          <div class="rt-stance-main">
+            <span id="rt-stance-badge" class="rt-stance-badge rt-stance-NO_TRADE_CASH">INITIALIZING...</span>
+            <div class="rt-spot-cluster">
+              <div class="rt-spot-label">NIFTY 50 LIVE SPOT</div>
+              <div class="rt-spot-value" id="rt-spot-price">25,122.25</div>
+            </div>
+          </div>
+
+          <div class="prob-meter-wrap">
+            <div class="prob-meter-labels">
+              <span id="rt-bull-prob-lbl">Bullish: 50.0%</span>
+              <span id="rt-win-prob-center">Calibrated Edge: 50.0%</span>
+              <span id="rt-bear-prob-lbl">Bearish: 50.0%</span>
+            </div>
+            <div class="prob-bar-track">
+              <div class="prob-bar-fill-bull" id="rt-prob-bar-bull" style="width: 50%;"></div>
+            </div>
+          </div>
+
+          <div class="rt-levels-row">
+            <div class="rt-level-box sl-box">
+              <span class="lvl-title">DYNAMIC STOP LOSS</span>
+              <span class="lvl-val" id="rt-sl-val">--</span>
+            </div>
+            <div class="rt-level-box tp1-box">
+              <span class="lvl-title">TARGET 1 (1.75x ATR)</span>
+              <span class="lvl-val" id="rt-tp1-val">--</span>
+            </div>
+            <div class="rt-level-box tp2-box">
+              <span class="lvl-title">TARGET 2 (RUNNER)</span>
+              <span class="lvl-val" id="rt-tp2-val">--</span>
+            </div>
+            <div class="rt-level-box rr-box">
+              <span class="lvl-title">RISK : REWARD</span>
+              <span class="lvl-val" id="rt-rr-val">--</span>
+            </div>
+          </div>
         </div>
-        <div class="card-value" id="val-day-range">--</div>
-        <div class="card-sub" id="sub-day-range">
-          <span>20D ADR:</span> <strong id="val-adr-20">-- pts</strong>
+
+        <!-- Card 2: Weekly Option Strike Recommender & Kelly Sizing -->
+        <div class="rt-card rt-card-options">
+          <div class="rt-card-top">
+            <span class="rt-label">OPTIMAL WEEKLY OPTION CONTRACT</span>
+            <span class="rt-tag-subtle" id="rt-opt-expiry">Weekly Thursday Expiry</span>
+          </div>
+          <div class="opt-contract-banner" id="rt-opt-contract">NIFTY 25100 CE</div>
+          <div class="opt-metrics-grid">
+            <div class="opt-metric">
+              <span class="opt-k">Est. Premium LTP</span>
+              <span class="opt-v" id="rt-opt-ltp">₹148.50</span>
+            </div>
+            <div class="opt-metric">
+              <span class="opt-k">Black-Scholes Delta</span>
+              <span class="opt-v" id="rt-opt-delta">0.56</span>
+            </div>
+            <div class="opt-metric">
+              <span class="opt-k">Option Stop Loss</span>
+              <span class="opt-v text-danger" id="rt-opt-sl">₹128.00</span>
+            </div>
+            <div class="opt-metric">
+              <span class="opt-k">Option Target 1</span>
+              <span class="opt-v text-success" id="rt-opt-tp1">₹179.50</span>
+            </div>
+            <div class="opt-metric">
+              <span class="opt-k">Half-Kelly Allocation</span>
+              <span class="opt-v text-accent" id="rt-opt-kelly">6.5% Cap</span>
+            </div>
+            <div class="opt-metric">
+              <span class="opt-k">Writer Regime</span>
+              <span class="opt-v" id="rt-writer-regime">BALANCED</span>
+            </div>
+          </div>
+          <div class="rt-reasons-box">
+            <div class="rt-label-sm">TOP SHAP LOG-ODDS ATTRIBUTION DRIVERS</div>
+            <div class="rt-reasons-list" id="rt-reasons-list"></div>
+          </div>
+        </div>
+
+        <!-- Card 3: 4-Pillar Contribution Radar & Attribution Meters -->
+        <div class="rt-card rt-card-pillars">
+          <div class="rt-card-top">
+            <span class="rt-label">4-PILLAR ENSEMBLE CONFLUENCE BREAKDOWN</span>
+            <span class="rt-tag-subtle">Weights: 28% Tech • 34% Opt/HW • 18% Macro • 20% Geo/News</span>
+          </div>
+
+          <div class="pillar-bars-container">
+            <div class="pillar-bar-item">
+              <div class="pillar-bar-header">
+                <span>1. Technical, SMC &amp; Volume VWAP (28%)</span>
+                <span class="pillar-score-val" id="p1-score-val">+0.0</span>
+              </div>
+              <div class="pillar-track"><div class="pillar-fill" id="p1-bar-fill"></div></div>
+              <div class="pillar-sub-metrics" id="p1-sub-metrics">Supertrend 5m/15m • VWAP Z • PDH/PDL Sweep • CPR</div>
+            </div>
+
+            <div class="pillar-bar-item">
+              <div class="pillar-bar-header">
+                <span>2. Options GEX, PCR Velocity &amp; Heavyweights (34%)</span>
+                <span class="pillar-score-val" id="p2-score-val">+0.0</span>
+              </div>
+              <div class="pillar-track"><div class="pillar-fill" id="p2-bar-fill"></div></div>
+              <div class="pillar-sub-metrics" id="p2-sub-metrics">Net GEX • Gamma Flip • 5m PCR • Top-6 Heavyweights</div>
+            </div>
+
+            <div class="pillar-bar-item">
+              <div class="pillar-bar-header">
+                <span>3. Global Macro, Crude, USD/INR &amp; VIX (18%)</span>
+                <span class="pillar-score-val" id="p3-score-val">+0.0</span>
+              </div>
+              <div class="pillar-track"><div class="pillar-fill" id="p3-bar-fill"></div></div>
+              <div class="pillar-sub-metrics" id="p3-sub-metrics">Brent Crude • USD/INR • US 10Y • S&amp;P 500 • India VIX</div>
+            </div>
+
+            <div class="pillar-bar-item">
+              <div class="pillar-bar-header">
+                <span>4. Geopolitical Conflict &amp; Live News NLP (20%)</span>
+                <span class="pillar-score-val" id="p4-score-val">+0.0</span>
+              </div>
+              <div class="pillar-track"><div class="pillar-fill" id="p4-bar-fill"></div></div>
+              <div class="pillar-sub-metrics" id="p4-sub-metrics">War/Conflict Escalation • RBI/Fed Policy • FinBERT Wire</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Close & Net Change Card -->
-      <div class="stat-card card-close">
-        <div class="card-header">
-          <span class="card-label">Settled Close</span>
-          <span class="card-pill" id="pill-close-change">--%</span>
-        </div>
-        <div class="card-value" id="val-day-close">--</div>
-        <div class="card-sub" id="sub-day-change">
-          <span>Change:</span> <strong id="val-net-change">--</strong>
-        </div>
-      </div>
-    </section>
-
-    <!-- 52-WEEK RANGE GAUGE & CPR BAR -->
-    <section class="levels-strip">
-      <div class="levels-item range-meter-wrapper">
-        <div class="levels-header">
-          <span>52-Week Range Positioning</span>
-          <span class="levels-detail"><strong id="val-52w-low">--</strong> to <strong id="val-52w-high">--</strong></span>
-        </div>
-        <div class="range-track">
-          <div class="range-progress" id="track-52w-progress" style="width: 50%;"></div>
-          <div class="range-pin" id="pin-52w" style="left: 50%;" title="Current Price"></div>
-        </div>
-      </div>
-
-      <div class="levels-item pivots-strip">
-        <div class="levels-header">
-          <span>Next Session <span class="term-tip" data-term="CPR">CPR</span> & Key <span class="term-tip" data-term="Pivots">Pivots</span></span>
-          <span class="badge-cpr" id="badge-cpr-type">CPR: --</span>
-        </div>
-        <div class="pivots-pills">
-          <div class="pivot-chip"><span class="lbl">S1:</span><span id="p-s1">--</span></div>
-          <div class="pivot-chip"><span class="lbl">BC:</span><span id="p-bc">--</span></div>
-          <div class="pivot-chip highlight"><span class="lbl">Pivot:</span><span id="p-pivot">--</span></div>
-          <div class="pivot-chip"><span class="lbl">TC:</span><span id="p-tc">--</span></div>
-          <div class="pivot-chip"><span class="lbl">R1:</span><span id="p-r1">--</span></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SMART MONEY CONCEPTS (SMC) & NEXT-DAY PREDICTION RADAR -->
-    <section class="smc-prediction-card card-container">
-      <div class="smc-header">
-        <div class="smc-title-group">
-          <div class="smc-radar-icon">
-            <span class="radar-pulse"></span>
-            🔮
+      <!-- Secondary Deep-Dive Grid: Macro Radar + Heavyweight Basket + Live Geopolitical & Financial News Wire -->
+      <div class="rt-secondary-grid">
+        <!-- Panel A: Global Macro & Economic Cross-Asset Radar -->
+        <div class="rt-subcard">
+          <div class="rt-card-top">
+            <span class="rt-label">GLOBAL MACRO, COMMODITY &amp; FX SHOCK RADAR</span>
+            <span class="badge-pill" id="rt-vix-badge">India VIX: 14.25 (-0.8%)</span>
           </div>
-          <div>
-            <div class="smc-badge-bar">
-              <h2 class="section-title">Next-Session Bias & <span class="term-tip" data-term="SMC">SMC</span> Liquidity Radar</h2>
-              <span class="badge-smc-tag" id="smc-bias-badge">Calculating...</span>
-            </div>
-            <p class="section-subtitle">Algorithmic next-day forecast based on Trend Inertia, <span class="term-tip" data-term="ERL">External Liquidity</span>, and <span class="term-tip" data-term="BOS">Structure</span></p>
+          <div class="macro-grid" id="rt-macro-grid">
+            <!-- Populated dynamically -->
           </div>
-        </div>
-        <div class="smc-header-action">
-          <button class="btn btn-sm btn-outline" onclick="openMarkModalWithPrediction()">
-            ✍️ Plan Tomorrow's Trade
-          </button>
-        </div>
-      </div>
-
-      <!-- Statistical Historical Validation Banner -->
-      <div class="validation-score-bar">
-        <div class="score-main">
-          <span class="score-badge" id="val-overall-acc">⚡ 76.4% Verified Accuracy</span>
-          <span class="score-sub" id="val-sample-info">Across 246 historical NIFTY sessions</span>
-        </div>
-        <div class="score-pills">
-          <span class="pill-stat stat-proof" title="Unseen Out-of-Sample Walk-Forward Test"><span class="lbl">Out-of-Sample:</span> <strong id="val-oos-acc">75.3%</strong></span>
-          <span class="pill-stat stat-gate" title="Accuracy when 9:15 AM Opening Gate Confirms"><span class="lbl">Gate Confirmed:</span> <strong id="val-gate-acc">84.1%</strong></span>
-          <span class="pill-stat" title="Turtle Soup Bearish Reversal"><span class="lbl">BSL Sweep:</span> <strong id="val-bsl-acc">92.1%</strong></span>
-          <span class="pill-stat" title="Turtle Soup Bullish Reversal"><span class="lbl">SSL Sweep:</span> <strong id="val-ssl-acc">86.0%</strong></span>
-          <span class="pill-stat" title="Inside Compression Breakout"><span class="lbl">Inside Bar:</span> <strong id="val-inside-acc">95.0%</strong></span>
-          <span class="pill-stat" title="Bearish Break of Structure"><span class="lbl">Bearish BOS:</span> <strong id="val-bear-bos-acc">76.4%</strong></span>
-          <span class="pill-stat" title="Bullish Break of Structure"><span class="lbl">Bullish BOS:</span> <strong id="val-bull-bos-acc">67.4%</strong></span>
-        </div>
-      </div>
-
-      <!-- OVERNIGHT GLOBAL & MACRO CATALYST RADAR -->
-      <div class="overnight-macro-bar" id="overnight-macro-card">
-        <div class="macro-bar-left">
-          <div class="macro-pulse-wrapper">
-            <span class="macro-radar-pulse"></span>
-            <span class="macro-globe-icon">🌐</span>
-          </div>
-          <div class="macro-summary-text">
-            <div class="macro-title-row">
-              <span class="macro-bar-title">Overnight Global & Macro Radar</span>
-              <span class="macro-badge" id="macro-bias-badge">Analyzing Global Cues...</span>
-              <span class="macro-badge badge-geo" id="macro-geo-badge">🛡️ Geopolitics: Low</span>
-              <span class="macro-gap-badge" id="macro-gap-badge">--</span>
-            </div>
-            <div class="macro-synthesis-note" id="macro-synthesis-text">
-              Tracking US markets, Asian morning cues, Brent Crude, DXY dollar index, and overnight financial headlines...
-            </div>
-          </div>
-        </div>
-        <div class="macro-bar-right">
-          <button class="btn btn-sm btn-macro-hover" id="btn-macro-breakdown" aria-label="Inspect Global Factor Breakdown">
-            <span class="btn-macro-text">🔍 Global Factor Breakdown & News</span>
-            <span class="macro-btn-pill" id="macro-score-pill">--</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="smc-grid">
-        <!-- Col 1: Algorithmic Direction & Momentum -->
-        <div class="smc-box box-bias">
-          <div class="box-label">
-            <span>Next-Day Directional Bias</span>
-            <span class="box-sub-badge" id="pred-confidence">-- Confidence</span>
-          </div>
-          <div class="setup-identifier">
-            <span class="setup-tag" id="pred-setup-name">SMC Setup</span>
-          </div>
-          <div class="bias-headline" id="pred-bias-text">Loading Forecast...</div>
-          <div class="bias-rationale" id="pred-rationale">Analyzing candle dominance, closing acceptance, and liquidity sweep patterns...</div>
-          
-          <div class="bias-playbook">
-            <span class="playbook-lbl">📋 Actionable Session Playbook:</span>
-            <span class="playbook-text" id="pred-playbook">Calculating playbook...</span>
-          </div>
-
-          <!-- 9:15 AM Opening Execution Gate -->
-          <div class="opening-gate-box">
-            <div class="gate-header">
-              <span class="gate-icon">🚦</span>
-              <span class="gate-title">9:15 AM Opening Execution Gate</span>
-              <span class="gate-win-badge" id="gate-win-rate">84.1% Confirmed</span>
-            </div>
-            <div class="gate-condition">
-              <span class="gate-condition-lbl">Execution Trigger:</span>
-              <span class="gate-condition-val" id="gate-condition-text">Loading trigger...</span>
-            </div>
-            <div class="gate-rule" id="gate-action-text">
-              If opening print violates gate, stand down (prevents false breakouts).
-            </div>
-          </div>
-
-          <div class="bias-event-rule">
-            <span class="icon-warning">⚠️</span>
-            <span id="pred-event-rule">Notice: Major overnight events, breaking news, or opening gaps > 60 pts invalidate technical continuation.</span>
+          <div class="gex-summary-strip" id="rt-gex-strip">
+            <span>Net Dealer GEX: <strong id="rt-gex-val">+142 Cr</strong></span>
+            <span>Gamma Flip: <strong id="rt-gex-flip">25,100</strong></span>
+            <span>Call Wall: <strong id="rt-call-wall">25,300</strong></span>
+            <span>Put Wall: <strong id="rt-put-wall">24,900</strong></span>
+            <span>PCR (OI): <strong id="rt-pcr-val">1.12</strong></span>
           </div>
         </div>
 
-        <!-- Col 2: The Fuel: Target Liquidity Pools -->
-        <div class="smc-box box-targets">
-          <div class="box-label">
-            <span>Target Liquidity Pools (<span class="term-tip" data-term="Fuel">Market Fuel</span>)</span>
-            <span class="term-tip icon-info" data-term="BSL">ℹ️</span>
+        <!-- Panel B: NIFTY Top 6 Heavyweights Order-Flow Basket (~42% Index Weight) -->
+        <div class="rt-subcard">
+          <div class="rt-card-top">
+            <span class="rt-label">TOP 6 NIFTY HEAVYWEIGHTS ORDER-FLOW BASKET</span>
+            <span class="badge-pill" id="rt-hw-summary">Weighted Delta: +0.18%</span>
           </div>
-          <div class="target-row">
-            <span class="target-tag tag-primary">Primary Target</span>
-            <div class="target-val" id="pred-primary-target">--</div>
-          </div>
-          <div class="target-row">
-            <span class="target-tag tag-secondary">Opposing Guard</span>
-            <div class="target-val" id="pred-secondary-target">--</div>
-          </div>
-          <div class="target-row target-inval">
-            <span class="target-tag tag-invalidation">Invalidation / Stop</span>
-            <div class="target-val" id="pred-invalidation">--</div>
-          </div>
-          <div class="target-sub-stats">
-            <div><span class="sub-lbl"><span class="term-tip" data-term="ADR">20D ADR</span> Exp:</span> <strong id="pred-adr-exp">-- pts</strong></div>
-            <div><span class="sub-lbl">Risk:Reward:</span> <strong id="pred-rr-ratio" style="color:var(--green)">--</strong></div>
-          </div>
-          <div class="target-sub-stats" style="margin-top:0.35rem; padding-top:0.35rem;">
-            <div><span class="sub-lbl"><span class="term-tip" data-term="CPR">CPR</span> Volatility:</span> <strong id="pred-cpr-exp">--</strong></div>
+          <div class="hw-grid" id="rt-hw-grid">
+            <!-- Populated dynamically -->
           </div>
         </div>
 
-        <!-- Col 3: External Range Liquidity & Structure Matrix -->
-        <div class="smc-box box-matrix">
-          <div class="box-label">
-            <span><span class="term-tip" data-term="ERL">External Liquidity (ERL)</span> Matrix</span>
-            <span class="term-tip icon-info" data-term="ERL">ℹ️</span>
+        <!-- Panel C: Geopolitical War, Central Bank & Live News NLP Sentiment Wire -->
+        <div class="rt-subcard">
+          <div class="rt-card-top">
+            <span class="rt-label">GEOPOLITICAL &amp; FINANCIAL NEWS NLP WIRE</span>
+            <span class="badge-pill" id="rt-crisis-level-badge">Regime: CALM</span>
           </div>
-          <div class="matrix-grid">
-            <div class="matrix-item">
-              <span class="matrix-lbl"><span class="term-tip" data-term="PDH">PDH</span> (Buy Stops):</span>
-              <span class="matrix-val td-high" id="smc-pdh">--</span>
-            </div>
-            <div class="matrix-item">
-              <span class="matrix-lbl"><span class="term-tip" data-term="PDL">PDL</span> (Sell Stops):</span>
-              <span class="matrix-val td-low" id="smc-pdl">--</span>
-            </div>
-            <div class="matrix-item">
-              <span class="matrix-lbl"><span class="term-tip" data-term="PWH">PWH</span> (Weekly BSL):</span>
-              <span class="matrix-val" id="smc-pwh">--</span>
-            </div>
-            <div class="matrix-item">
-              <span class="matrix-lbl"><span class="term-tip" data-term="PWL">PWL</span> (Weekly SSL):</span>
-              <span class="matrix-val" id="smc-pwl">--</span>
-            </div>
-            <div class="matrix-item matrix-span-2">
-              <span class="matrix-lbl">Market Zone:</span>
-              <span class="matrix-val" id="smc-zone"><span class="term-tip" data-term="Discount">--</span></span>
-            </div>
-            <div class="matrix-item matrix-span-2">
-              <span class="matrix-lbl">Structure Event:</span>
-              <span class="matrix-val" id="smc-structure-event"><span class="term-tip" data-term="BOS">--</span></span>
-            </div>
+          <div class="news-wire-list" id="rt-news-wire-list">
+            <!-- Populated dynamically -->
+          </div>
+          <div class="custom-headline-bar">
+            <input type="text" id="rt-custom-headline-input" placeholder="Test custom breaking headline (e.g. 'Missile strike in Red Sea spikes Brent crude 6%')..." />
+            <button class="btn-sm" id="btn-inject-headline">Inject News</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- CHART CONTAINER -->
-    <section class="chart-section card-container">
-      <div class="section-toolbar">
-        <div class="toolbar-left">
-          <h2 class="section-title">NIFTY 50 Price Action & High/Low Range</h2>
-          <div class="chart-legend" id="chart-legend">
-            Hover candle to view OHLC
-          </div>
-        </div>
-        <div class="toolbar-right">
-          <div class="timeframe-selector" id="timeframe-buttons">
-            <button class="btn-tf" data-days="30">1M</button>
-            <button class="btn-tf active" data-days="90">3M</button>
-            <button class="btn-tf" data-days="180">6M</button>
-            <button class="btn-tf" data-days="365">1Y</button>
-            <button class="btn-tf" data-days="all">All</button>
-          </div>
+    <!-- =================================================================== -->
+    <!-- SECTION 2: EOD HISTORICAL SMC, CPR & DAILY TRACKER (100% COMPATIBLE) -->
+    <!-- =================================================================== -->
+    <section class="terminal-section">
+      <div class="section-header-bar">
+        <div>
+          <h2 class="section-title">HISTORICAL EOD SMART MONEY CONCEPTS (SMC) &amp; CPR ANALYZER</h2>
+          <p class="section-subtitle">248-Session Structural Database • Central Pivot Range • Liquidity Sweeps • Interactive Price Canvas</p>
         </div>
       </div>
-      <div id="tv-chart" class="chart-canvas"></div>
+
+      <!-- Hero EOD Cards (Preserves original IDs: val-day-high, val-day-low, val-day-range, etc.) -->
+      <div class="hero-grid">
+        <div class="stat-card">
+          <div class="card-header">
+            <span class="card-label">LATEST SESSION HIGH</span>
+            <span class="card-pill pill-high" id="diff-prev-high">PDH Check</span>
+          </div>
+          <div class="card-value" id="val-day-high">--</div>
+          <div class="card-sub" id="sub-day-high">--</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="card-header">
+            <span class="card-label">LATEST SESSION LOW</span>
+            <span class="card-pill pill-low" id="diff-prev-low">PDL Check</span>
+          </div>
+          <div class="card-value" id="val-day-low">--</div>
+          <div class="card-sub" id="sub-day-low">--</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="card-header">
+            <span class="card-label">SESSION RANGE &amp; ADR</span>
+            <span class="card-pill" id="pill-range-type">ADR 20</span>
+          </div>
+          <div class="card-value" id="val-day-range">--</div>
+          <div class="card-sub" id="sub-day-range">--</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="card-header">
+            <span class="card-label">SETTLED CLOSE &amp; SMC</span>
+            <span class="card-pill" id="pill-smc-zone">Zone</span>
+          </div>
+          <div class="card-value" id="val-day-close">--</div>
+          <div class="card-sub" id="sub-day-close">--</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="card-header">
+            <span class="card-label">NEXT-DAY CPR PIVOT</span>
+            <span class="card-pill" id="pill-cpr-type">CPR Width</span>
+          </div>
+          <div class="card-value" id="val-cpr-pivot">--</div>
+          <div class="card-sub" id="sub-cpr-band">--</div>
+        </div>
+      </div>
+
+      <!-- Interactive Candlestick + CPR + PDH/PDL Canvas Chart -->
+      <div class="chart-panel">
+        <div class="chart-toolbar">
+          <div class="chart-title-group">
+            <span class="rt-label">NIFTY 50 OHLC + CPR + SMC LIQUIDITY SWEEP CHART</span>
+            <span class="chart-hover-readout" id="chart-hover-readout">Hover over candles to inspect OHLC, CPR &amp; SMC sweeps</span>
+          </div>
+          <div class="chart-range-btns">
+            <button class="btn-sm active" data-range="30">30D</button>
+            <button class="btn-sm" data-range="60">60D</button>
+            <button class="btn-sm" data-range="120">120D</button>
+            <button class="btn-sm" data-range="248">1Y (All)</button>
+          </div>
+        </div>
+        <div class="canvas-container">
+          <canvas id="nifty-ohlc-canvas" width="1280" height="360"></canvas>
+        </div>
+      </div>
+
+      <!-- Filterable Historical Session Log & Trade Journal Table -->
+      <div class="table-panel">
+        <div class="table-toolbar">
+          <input type="text" id="table-search-input" placeholder="Filter by date, day, Bullish BOS, PDH Sweep, Narrow CPR, Gap Up..." />
+          <select id="table-structure-filter">
+            <option value="ALL">All SMC Structures</option>
+            <option value="Sweep">Liquidity Sweeps Only (PDH/PDL)</option>
+            <option value="BOS">Break of Structure (BOS) Only</option>
+            <option value="Narrow">Narrow CPR Trend Days</option>
+            <option value="Pinbar">Pinbar / Expansion Bars</option>
+          </select>
+        </div>
+        <div class="table-scroll">
+          <table class="quant-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Day</th>
+                <th>Open</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>Close</th>
+                <th>Change</th>
+                <th>Range (CLQ)</th>
+                <th>SMC Structure &amp; Sweeps</th>
+                <th>CPR Pivot (TC / BC)</th>
+                <th>R1 / S1</th>
+                <th>Zone</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody id="historical-table-body">
+              <!-- Populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
     </section>
-
-    <!-- DATA TABLE & JOURNAL MARKS -->
-    <section class="table-section card-container">
-      <div class="section-toolbar table-toolbar">
-        <div class="toolbar-left">
-          <h2 class="section-title">Daily Market Records & Trading Marks</h2>
-          <span class="badge-count" id="table-count-badge">0 days</span>
-        </div>
-        <div class="toolbar-right table-controls">
-          <div class="search-box">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input type="text" id="filter-search" placeholder="Search date, notes, #tags...">
-          </div>
-          <div class="filter-group">
-            <button class="btn-filter active" id="filter-all">All Days</button>
-            <button class="btn-filter" id="filter-marked">My Marks (<span id="marked-count">0</span>)</button>
-            <button class="btn-filter" id="filter-smc">SMC Sweeps & BOS</button>
-            <button class="btn-filter" id="filter-inside">Inside Bars</button>
-          </div>
-          <button id="btn-download-csv" class="btn btn-outline btn-sm" title="Download historical data as CSV">
-            Download CSV
-          </button>
-        </div>
-      </div>
-
-      <div class="mobile-table-hint">
-        <span>👈 Swipe table horizontally to view all metrics 👉</span>
-      </div>
-
-      <div class="table-wrapper">
-        <table class="data-table" id="nifty-table">
-          <thead>
-            <tr>
-              <th>Date & Day</th>
-              <th class="text-right">Daily High</th>
-              <th class="text-right">Daily Low</th>
-              <th class="text-right">Daily Range</th>
-              <th class="text-right">Open</th>
-              <th class="text-right">Close</th>
-              <th class="text-right">Net Change</th>
-              <th>Pattern / <span class="term-tip" data-term="CPR">CPR</span></th>
-              <th><span class="term-tip" data-term="SMC">SMC</span> Structure & <span class="term-tip" data-term="Sweep">Sweeps</span></th>
-              <th>My Trading Marks & Prediction</th>
-              <th class="text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody id="table-body">
-            <tr>
-              <td colspan="10" class="loading-cell">Loading historical records...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="table-footer">
-        <div class="pagination-info" id="pagination-info">Showing records</div>
-        <div class="pagination-controls">
-          <button id="btn-prev-page" class="btn btn-sm btn-outline" disabled>Previous</button>
-          <span id="page-number" class="page-num">1</span>
-          <button id="btn-next-page" class="btn btn-sm btn-outline">Next</button>
-        </div>
-      </div>
-    </section>
-
   </main>
 
-  <!-- MODAL: MARK TRADING INFO -->
-  <div class="modal-overlay" id="mark-modal" style="display: none;">
-    <div class="modal-box">
+  <!-- =================================================================== -->
+  <!-- MODAL 1: BROKER API & LIVE STREAMING CONFIGURATION                  -->
+  <!-- =================================================================== -->
+  <div class="modal-backdrop hidden" id="rt-settings-modal">
+    <div class="modal-card">
       <div class="modal-header">
-        <div>
-          <h3 class="modal-title">Mark Trading Info</h3>
-          <p class="modal-subtitle" id="modal-date-subtitle">Record daily observations, levels, setups & psychology</p>
-        </div>
-        <button class="btn-close" id="btn-close-modal">&times;</button>
+        <h3>Configure Live Broker API &amp; Prediction Engine</h3>
+        <button class="btn-close" id="btn-close-rt-settings">✕</button>
       </div>
-
-      <form id="mark-form" class="modal-form">
-        <!-- Date & Reference Preview -->
-        <div class="form-row form-row-split">
-          <div class="form-group">
-            <label for="mark-date">Trading Date</label>
-            <input type="date" id="mark-date" required>
-          </div>
-          <div class="form-group">
-            <label>Market Snapshot</label>
-            <div class="mini-snapshot" id="modal-snapshot">
-              <span>H: <strong id="snap-high">--</strong></span>
-              <span>L: <strong id="snap-low">--</strong></span>
-              <span>Range: <strong id="snap-range">--</strong></span>
-              <span>Close: <strong id="snap-close">--</strong></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sentiment & Pattern -->
-        <div class="form-row form-row-split">
-          <div class="form-group">
-            <label>Day Sentiment / Bias</label>
-            <div class="radio-pill-group">
-              <label class="radio-pill sentiment-bullish">
-                <input type="radio" name="sentiment" value="Bullish" checked>
-                <span>🟢 Bullish</span>
-              </label>
-              <label class="radio-pill sentiment-bearish">
-                <input type="radio" name="sentiment" value="Bearish">
-                <span>🔴 Bearish</span>
-              </label>
-              <label class="radio-pill sentiment-neutral">
-                <input type="radio" name="sentiment" value="Neutral">
-                <span>🟡 Range / Chop</span>
-              </label>
-              <label class="radio-pill sentiment-volatile">
-                <input type="radio" name="sentiment" value="Volatile">
-                <span>⚡ High Volatility</span>
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="mark-pattern">Price Action Setup / Structure</label>
-            <select id="mark-pattern" class="form-select">
-              <option value="Trend Day (Unidirectional)">Trend Day (One-way Trend)</option>
-              <option value="Rangebound / Inside Value">Rangebound / Inside Value</option>
-              <option value="Inside Bar Setup (Harami)">Inside Bar Setup</option>
-              <option value="Outside Bar / Engulfing">Outside Bar / Expansion</option>
-              <option value="Gap & Go">Gap & Go</option>
-              <option value="Gap Fill & Reversal">Gap Fill & Reversal</option>
-              <option value="PDH Breakout / Expansion">PDH (Prev Day High) Breakout</option>
-              <option value="PDL Breakdown / Expansion">PDL (Prev Day Low) Breakdown</option>
-              <option value="CPR Rejection / Bounce">CPR Bounce / Rejection</option>
-              <option value="Fake Breakout / Bull Trap / Bear Trap">Fake Breakout / Trap</option>
-              <option value="Expiry 0DTE Volatility">Expiry Special Gamma Move</option>
-              <option value="Other / Custom">Other</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Trade Execution & Outcome -->
-        <div class="form-row form-row-split">
-          <div class="form-group">
-            <label for="mark-trade-taken">Traded Today?</label>
-            <select id="mark-trade-taken" class="form-select">
-              <option value="No">No (Observer / No trade taken)</option>
-              <option value="Yes - Long">Yes (Long / Call Buyer / Put Seller)</option>
-              <option value="Yes - Short">Yes (Short / Put Buyer / Call Seller)</option>
-              <option value="Yes - Non-Directional">Yes (Non-directional Strangle/Straddle)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="mark-outcome">Trade Outcome / P&L Status</label>
-            <select id="mark-outcome" class="form-select">
-              <option value="N/A">N/A (No trade)</option>
-              <option value="Profit">🟢 Target Hit / In Profit</option>
-              <option value="Loss">🔴 Stop Loss Hit / In Loss</option>
-              <option value="Breakeven">⚪ Breakeven</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Key Levels Watched -->
+      <div class="modal-body">
         <div class="form-group">
-          <label for="mark-levels">Key Levels Tested / Watched</label>
-          <input type="text" id="mark-levels" placeholder="e.g. 22960 PDH rejection, 22650 Support hold, 22800 CPR">
-          <div class="chip-hints">
-            <span class="chip-hint" onclick="appendLevel('PDH Tested')">+ PDH Tested</span>
-            <span class="chip-hint" onclick="appendLevel('PDL Tested')">+ PDL Tested</span>
-            <span class="chip-hint" onclick="appendLevel('CPR Respected')">+ CPR Respected</span>
-            <span class="chip-hint" onclick="appendLevel('VWAP Rejection')">+ VWAP Rejection</span>
-            <span class="chip-hint" onclick="appendLevel('Round Number Level')">+ Round Number</span>
-          </div>
+          <label for="rt-input-url">FastAPI Realtime Engine URL</label>
+          <input type="text" id="rt-input-url" placeholder="http://localhost:8000" />
+          <small>Run <code>python scripts/realtime_engine.py</code> locally. If offline, the terminal automatically runs its built-in In-Browser 4-Pillar Quant Engine so it never hangs on CONNECTING.</small>
         </div>
 
-        <!-- Next-Day Prediction & SMC Plan -->
-        <div class="form-section-divider">
-          <span>🔮 Next-Day Prediction & SMC Plan ("Where It Goes Next")</span>
+        <div class="form-group">
+          <label for="rt-input-broker">Broker Market Data Adapter</label>
+          <select id="rt-input-broker">
+            <option value="auto">Auto-Detect (Upstox / AngelOne / Public NSE Fallback)</option>
+            <option value="upstox">Upstox API v2/v3 (Live Spot, VIX, 1m Candles &amp; Option Chain)</option>
+            <option value="angelone">AngelOne SmartAPI (JWT_TOKEN|API_KEY)</option>
+            <option value="groww">Groww Live API</option>
+            <option value="public">Public NSE / Yahoo Finance Zero-Key Mode</option>
+          </select>
         </div>
 
-        <div class="form-row form-row-split">
-          <div class="form-group">
-            <label for="mark-pred-bias">Tomorrow's Expected Direction</label>
-            <select id="mark-pred-bias" class="form-select">
-              <option value="Bullish Continuation">🟢 Bullish Continuation (Follow-Through)</option>
-              <option value="Bearish Continuation">🔴 Bearish Continuation (Follow-Through)</option>
-              <option value="BSL Sweep & Reverse">⚡ Sweep PDH (BSL) & Reverse Down</option>
-              <option value="SSL Sweep & Bounce">⚡ Sweep PDL (SSL) & Reverse Up</option>
-              <option value="Rangebound / Inside Value">🟡 Rangebound / Sideways Chop</option>
-              <option value="Event Volatility Expansion">⚡ High Volatility / Event Expansion</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="mark-pred-target">Target Liquidity Pool (The Fuel)</label>
-            <input type="text" id="mark-pred-target" placeholder="e.g. Sweep PDH at 22,960 or Retrace to CPR">
-            <div class="chip-hints">
-              <span class="chip-hint" onclick="appendTarget('Target PDH')">+ PDH</span>
-              <span class="chip-hint" onclick="appendTarget('Target PDL')">+ PDL</span>
-              <span class="chip-hint" onclick="appendTarget('Target CPR')">+ CPR</span>
-              <span class="chip-hint" onclick="appendTarget('Target PWH')">+ PWH</span>
-            </div>
-          </div>
+        <div class="form-group">
+          <label for="rt-input-token">Manual Broker Access Token (Optional if Auto-TOTP is filled below)</label>
+          <input type="password" id="rt-input-token" placeholder="Paste manual Bearer Token OR use Auto-TOTP Refresh below..." />
         </div>
 
-        <div class="form-group" style="flex-direction: row; align-items: center; gap: 0.5rem;">
-          <input type="checkbox" id="mark-event-check" style="width: auto;">
-          <label for="mark-event-check" style="text-transform: none; font-size: 0.8rem; cursor: pointer; color: var(--yellow);">
-            ⚠️ Upcoming Macro Event / Catalyst expected (RBI, Fed, CPI, Earnings, Breaking News)
+        <div class="form-group" style="border:1px solid var(--border-color);padding:10px;border-radius:8px;">
+          <label>Automated Daily 03:30 AM IST Token Refresh (Upstox / AngelOne TOTP)</label>
+          <input type="text" id="rt-input-apikey" placeholder="OAuth API Key (UPSTOX_API_KEY / ANGELONE_API_KEY)" style="margin-top:4px;" />
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;">
+            <input type="password" id="rt-input-userpin" placeholder="6-Digit Login PIN" />
+            <input type="password" id="rt-input-totpsecret" placeholder="Base32 TOTP Secret Key" />
+          </div>
+          <small>Uses <code>POST /v2/totp-login/authorization/token</code> to fetch &amp; refresh your daily token automatically in code.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="rt-input-pin">Engine Admin PIN (Default: <code>1234</code>)</label>
+          <input type="password" id="rt-input-pin" value="1234" placeholder="1234" />
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" id="rt-input-block-synth" />
+            Strict Live-Only Lock (Force <code>NO_TRADE_CASH</code> if option chain falls back to synthetic data)
           </label>
         </div>
 
-        <!-- Detailed Journal Notes -->
-        <div class="form-group">
-          <label for="mark-notes">Trading Notes, Psychology & Key Learnings</label>
-          <textarea id="mark-notes" rows="4" placeholder="Write your market observations: morning opening price action, sector support (BankNifty, IT), market breadth, execution discipline, lessons learned..."></textarea>
+        <div class="diagnostic-box" id="rt-diag-box">
+          Status: Ready to test connection.
         </div>
-
-        <!-- Tags -->
-        <div class="form-group">
-          <label for="mark-tags">Tags & SMC Setup Chips</label>
-          <input type="text" id="mark-tags" placeholder="#expiry, #trend, #reversal, #BSL-Sweep, #BOS">
-          <div class="chip-hints">
-            <span class="chip-hint" onclick="appendTag('#BSL-Sweep')">+ #BSL-Sweep</span>
-            <span class="chip-hint" onclick="appendTag('#SSL-Sweep')">+ #SSL-Sweep</span>
-            <span class="chip-hint" onclick="appendTag('#Bullish-BOS')">+ #Bullish-BOS</span>
-            <span class="chip-hint" onclick="appendTag('#Bearish-BOS')">+ #Bearish-BOS</span>
-            <span class="chip-hint" onclick="appendTag('#Expansion-Bar')">+ #Expansion-Bar</span>
-            <span class="chip-hint" onclick="appendTag('#Event-Day')">+ #Event-Day</span>
-          </div>
-        </div>
-
-        <!-- Form Actions -->
-        <div class="modal-actions">
-          <button type="button" id="btn-delete-mark" class="btn btn-danger" style="display:none;">Delete Mark</button>
-          <div class="actions-right">
-            <button type="button" class="btn btn-outline" id="btn-cancel-modal">Cancel</button>
-            <button type="submit" class="btn btn-primary">Save Trading Mark</button>
-          </div>
-        </div>
-      </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" id="btn-test-rt-conn">Test Backend</button>
+        <button class="btn-outline" id="btn-auto-totp-refresh">⚡ Auto-Fetch Token via TOTP</button>
+        <button class="btn-action-main" id="btn-save-rt-settings">Save &amp; Reconnect</button>
+      </div>
     </div>
   </div>
 
-  <!-- MODAL: GITHUB SYNC SETTINGS -->
-  <div class="modal-overlay" id="sync-modal" style="display: none;">
-    <div class="modal-box">
+  <!-- =================================================================== -->
+  <!-- MODAL 2: QUICK TRADING JOURNAL MARK                                 -->
+  <!-- =================================================================== -->
+  <div class="modal-backdrop hidden" id="journal-modal">
+    <div class="modal-card">
       <div class="modal-header">
-        <div>
-          <h3 class="modal-title">GitHub Repository Sync</h3>
-          <p class="modal-subtitle">Save marks directly to <code>data/trading_marks.json</code> in your repository</p>
-        </div>
-        <button class="btn-close" id="btn-close-sync-modal">&times;</button>
+        <h3>Add Trading Journal Annotation</h3>
+        <button class="btn-close" id="btn-close-journal">✕</button>
       </div>
-      <div class="modal-form">
-        <p style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.5;">
-          Marks are always saved locally in your browser. Connect a GitHub Personal Access Token to also save, version-control, and sync your marks across all your devices directly inside your GitHub repository!
-        </p>
-
+      <div class="modal-body">
         <div class="form-group">
-          <label for="gh-repo-input">GitHub Repository (Owner/Repo)</label>
-          <input type="text" id="gh-repo-input" value="sagnikseal/nifty-tracker" placeholder="sagnikseal/nifty-tracker">
+          <label for="journal-date">Session Date</label>
+          <input type="date" id="journal-date" />
         </div>
-
         <div class="form-group">
-          <label for="gh-token-input">Personal Access Token (PAT)</label>
-          <input type="password" id="gh-token-input" placeholder="ghp_... or github_pat_...">
-          <span style="font-size: 0.72rem; color: var(--text-dim); margin-top: 2px;">
-            Token is stored strictly in your browser's private localStorage. Only needs <code>Contents: Read and write</code> (or classic <code>repo</code>) scope.
-          </span>
+          <label for="journal-setup">Setup / Regime Tag</label>
+          <select id="journal-setup">
+            <option value="PDL Sweep + Bullish BOS">PDL Sweep + Bullish BOS</option>
+            <option value="PDH Sweep + Bearish Reversal">PDH Sweep + Bearish Reversal</option>
+            <option value="Narrow CPR Trend Breakout">Narrow CPR Trend Breakout</option>
+            <option value="Call Writer Short-Covering Squeeze">Call Writer Short-Covering Squeeze</option>
+            <option value="Geopolitical / Macro Shock Hedge">Geopolitical / Macro Shock Hedge</option>
+          </select>
         </div>
-
-        <div class="form-group" style="flex-direction: row; align-items: center; gap: 0.5rem; margin-top: 0.25rem;">
-          <input type="checkbox" id="gh-auto-sync-toggle" checked style="width: auto;">
-          <label for="gh-auto-sync-toggle" style="text-transform: none; font-size: 0.8rem; cursor: pointer; color: var(--text-main);">
-            Auto-commit to GitHub whenever I add, edit, or delete a mark
-          </label>
+        <div class="form-group">
+          <label for="journal-note">Execution Notes &amp; Post-Trade Review</label>
+          <textarea id="journal-note" rows="3" placeholder="Entered 25100 CE on PDL sweep + positive HDFC/ICICI delta..."></textarea>
         </div>
-
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
-          <button type="button" id="btn-save-gh-token" class="btn btn-primary btn-sm">Save & Connect</button>
-          <button type="button" id="btn-push-to-github" class="btn btn-outline btn-sm">Push Local Marks to GitHub</button>
-          <button type="button" id="btn-pull-from-github" class="btn btn-outline btn-sm">Pull from GitHub</button>
-          <button type="button" id="btn-disconnect-github" class="btn btn-danger btn-sm" style="display: none;">Disconnect Token</button>
-        </div>
-
-        <div id="sync-status-msg" style="font-size: 0.78rem; font-family: var(--font-mono); margin-top: 0.5rem; min-height: 1.2rem;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action-main" id="btn-save-journal">Save Journal Entry</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: SMC & TRADING GLOSSARY -->
-  <div class="modal-overlay" id="glossary-modal" style="display: none;">
-    <div class="modal-box modal-lg">
+  <!-- =================================================================== -->
+  <!-- MODAL 3: SMC & 4-PILLAR QUANT ARCHITECTURE CHEAT SHEET              -->
+  <!-- =================================================================== -->
+  <div class="modal-backdrop hidden" id="glossary-modal">
+    <div class="modal-card modal-wide">
       <div class="modal-header">
-        <div>
-          <h3 class="modal-title">📖 Smart Money Concepts (SMC) & Trading Cheat Sheet</h3>
-          <p class="modal-subtitle">Beginner guide to institutional liquidity, market structure, and pivot terminology</p>
-        </div>
-        <button class="btn-close" id="btn-close-glossary-modal">&times;</button>
+        <h3>NIFTY 50 Institutional 4-Pillar Quant &amp; SMC Cheat Sheet</h3>
+        <button class="btn-close" id="btn-close-glossary">✕</button>
       </div>
-      <div class="modal-form">
-        <div class="search-box" style="margin-bottom: 1rem; width: 100%;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" id="glossary-search" placeholder="Search terms (e.g. BSL, Sweep, BOS, CPR, Liquidity...)" style="width: 100%;">
+      <div class="modal-body glossary-grid">
+        <div class="glossary-item">
+          <h4>Pillar 1: SMC Sweeps, CPR &amp; Futures VWAP (28% Weight)</h4>
+          <p>Tracks Previous Day High/Low (PDH/PDL) liquidity traps, 3-candle Fair Value Gaps (FVG), Break of Structure (BOS), Central Pivot Range (TC/Pivot/BC width), and Volume-Weighted Average Price Z-Score.</p>
         </div>
-
-        <div class="glossary-grid" id="glossary-grid">
-          <!-- Populated by app.js -->
+        <div class="glossary-item">
+          <h4>Pillar 2: Dealer GEX, PCR Velocity &amp; Heavyweights (34% Weight)</h4>
+          <p>Computes analytical Black-Scholes Gamma Exposure (GEX), Zero-Gamma Flip strike, 5-minute rolling Put-Call Ratio velocity, Trapped Writer panic unwinding, and the top 6 NIFTY Heavyweights (HDFCBANK, RELIANCE, ICICIBANK, INFY, LT, TCS ~42% weight).</p>
+        </div>
+        <div class="glossary-item">
+          <h4>Pillar 3: Cross-Asset Macro &amp; Economic Shocks (18% Weight)</h4>
+          <p>Monitors Brent Crude oil spikes (inverse impact on India CAD/inflation), USD/INR &amp; DXY currency pressure (FII flow trigger), US 10Y yields, S&amp;P 500 E-Mini futures, GIFT Nifty spread, and India VIX velocity.</p>
+        </div>
+        <div class="glossary-item">
+          <h4>Pillar 4: Geopolitical Conflict &amp; FinBERT News Wire (20% Weight)</h4>
+          <p>Scans live market RSS feeds and custom wire headlines for military escalation, missile/border conflicts, trade sanctions, and RBI/Fed central bank rate shocks. Automatically widens ATR stop-losses during crisis regimes.</p>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- FLOATING TERM TOOLTIP (Hover & Touch Activated) -->
-  <div id="term-tooltip" class="term-tooltip" style="display: none;">
-    <div class="tt-header">
-      <div style="display:flex; align-items:baseline; gap:0.5rem; flex:1;">
-        <span class="tt-term" id="tt-term">TERM</span>
-        <span class="tt-full" id="tt-full">Full Term Name</span>
-      </div>
-      <button class="tt-close-btn" id="tt-close-btn" title="Close">&times;</button>
-    </div>
-    <div class="tt-body" id="tt-body">Definition text goes here.</div>
-    <div class="tt-smc" id="tt-smc">
-      <span class="tt-smc-label">Smart Money Edge:</span>
-      <span id="tt-edge">Why algorithms watch this level.</span>
-    </div>
-  </div>
-
-  <!-- OVERNIGHT GLOBAL & MACRO FACTORS POPOVER (Hover & Touch Activated) -->
-  <div id="macro-popover" class="macro-popover" style="display: none;">
-    <div class="macro-pop-header">
-      <div class="macro-pop-title-wrap">
-        <span class="macro-pop-icon">🌐</span>
-        <div>
-          <div class="macro-pop-title">Overnight Global Catalysts & Market Intelligence</div>
-          <div class="macro-pop-sync" id="macro-pop-sync">Updated: --</div>
-        </div>
-      </div>
-      <button class="macro-pop-close" id="macro-pop-close" title="Close">&times;</button>
-    </div>
-
-    <div class="macro-pop-body">
-      <!-- Algorithmic Decision Synthesis Box -->
-      <div class="macro-impact-box">
-        <div class="impact-box-header">
-          <span class="impact-tag" id="macro-pop-bias-tag">Strong Global Tailwind (+10.0)</span>
-          <span class="impact-gap" id="macro-pop-gap">Gap-Up Favored</span>
-        </div>
-        <div class="impact-box-rationale" id="macro-pop-rationale">
-          Analyzing how overnight US, Asian, crude oil, and currency factors alter the 9:15 AM opening...
-        </div>
-        <ul class="impact-factors-list" id="macro-pop-factors">
-          <!-- Populated dynamically with live bullet points -->
-        </ul>
-      </div>
-
-      <!-- Geopolitical & Black-Swan Conflict Alert Box -->
-      <div class="geo-shock-box" id="geo-shock-box">
-        <div class="geo-shock-header">
-          <span class="geo-shock-title">⚔️ Geopolitical & Black-Swan Conflict Risk</span>
-          <span class="geo-shock-pill" id="geo-shock-pill">Scanning...</span>
-        </div>
-        <div class="geo-shock-detail" id="geo-shock-detail">
-          Continuous scanning of war declarations, military strikes, missile attacks, trade sanctions, and emergency economic shocks.
-        </div>
-      </div>
-
-      <!-- Live Global Factors Grid -->
-      <div class="macro-grid-heading">Global Factor Matrix (Cues between 3:30 PM & 9:15 AM)</div>
-      <div class="macro-tickers-grid" id="macro-tickers-grid">
-        <!-- Populated dynamically: S&P, Nasdaq, Dow, Nikkei, Hang Seng, Crude, DXY, 10Y Yield -->
-      </div>
-
-      <!-- Overnight Breaking News Headlines -->
-      <div class="macro-news-heading">Overnight Financial Headlines & Market Drivers</div>
-      <div class="macro-news-list" id="macro-news-list">
-        <!-- Populated dynamically with RSS items -->
-      </div>
-    </div>
-  </div>
-
-  <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="toast"></div>
-
-  <!-- FOOTER -->
-  <footer class="app-footer">
-    <div class="footer-container">
-      <p>NIFTY 50 High-Low Tracker & Trading Journal • Automatically updated via GitHub Actions after NSE Market Close (15:30 IST).</p>
-      <p class="footer-sub">Data source: Yahoo Finance (^NSEI). Designed for disciplined index traders.</p>
-    </div>
-  </footer>
 
   <script src="app.js"></script>
   <script src="realtime_client.js"></script>
 </body>
 </html>
-
