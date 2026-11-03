@@ -51,6 +51,15 @@ class ModelSpec:
     gbm_lr: float = 0.03
     logit_C: float = 0.05
     max_missing: float = 0.2
+    members: tuple = ()          # non-empty -> zoo ensemble of these members (see zoo.py)
+    combine: str = "mean"        # zoo combine: "mean" or "stack"
+
+
+def make_model(spec: "ModelSpec"):
+    if spec.members:
+        from .zoo import ZooEnsemble
+        return ZooEnsemble(list(spec.members), spec.combine, spec.max_missing)
+    return Ensemble(spec)
 
 
 CANDIDATES: List[ModelSpec] = [
@@ -121,9 +130,11 @@ class PlattCalibrator:
 
 # ----------------------------------------------------------------------------- walk-forward
 def walk_forward(F: pd.DataFrame, cfg: EngineConfig, spec: ModelSpec,
-                 start: Optional[str] = None) -> pd.DataFrame:
+                 start: Optional[str] = None, model_factory=None) -> pd.DataFrame:
     """Expanding-window walk-forward. Returns one OOS prediction per test day."""
     cols = feature_columns(F)
+    from .zoo import set_context
+    set_context(F[cols])
     data = F.dropna(subset=["y_ret"]).copy()
     data = data[data.index >= pd.Timestamp(cfg.history_start)]
     # Need ~200 sessions of warm-up for the slow features
@@ -144,7 +155,7 @@ def walk_forward(F: pd.DataFrame, cfg: EngineConfig, spec: ModelSpec,
         if len(train) < 150 or train["y_up"].nunique() < 2:
             i = j
             continue
-        model = Ensemble(spec).fit(train[cols], train["y_up"].astype(int))
+        model = (model_factory() if model_factory else make_model(spec)).fit(train[cols], train["y_up"].astype(int))
         p_raw = model.predict_proba(test[cols])
         cal = PlattCalibrator().fit(np.array(past_p), np.array(past_y))
         p_cal = cal(p_raw)
@@ -264,11 +275,13 @@ def train_and_register(F: pd.DataFrame, cfg: EngineConfig, specs: Optional[List[
             best = champion["spec_name"]
 
     r = results[best]
-    spec = ModelSpec(**r["spec"])
+    spec = ModelSpec(**{**r["spec"], "members": tuple(r["spec"].get("members", ()))})
     cols = feature_columns(F)
     full = F.dropna(subset=["y_ret"])
     full = full[full["y_ret"].abs() >= cfg.deadzone_bps / 1e4]
-    model = Ensemble(spec).fit(full[cols], full["y_up"].astype(int))
+    from .zoo import set_context
+    set_context(F[cols])
+    model = make_model(spec).fit(full[cols], full["y_up"].astype(int))
     oos = r["oos"]
     cal = PlattCalibrator().fit(oos["p_raw"].values, oos["y_up"].values.astype(int))
     has_edge = bool(r["recent"]["skill_vs_baserate"] > 0 and r["metrics"]["skill_vs_baserate"] > 0
@@ -307,6 +320,8 @@ def load_champion(name: str = "champion"):
 def predict_today(F: pd.DataFrame, bundle, meta) -> Dict:
     """Score the latest row of F (features for the decision day)."""
     row = F.iloc[[-1]]
+    from .zoo import set_context
+    set_context(F[feature_columns(F)])
     p_raw = bundle["model"].predict_proba(row[feature_columns(F)])
     p = float(bundle["calibrator"](p_raw)[0])
     return {"date": str(row.index[-1].date()), "p_up": p, "p_raw": float(p_raw[0]),

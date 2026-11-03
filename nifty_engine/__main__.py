@@ -10,6 +10,8 @@
   fetch-expired-options  (Upstox Plus) real 5-min prices of the expired weekly options the
                     strategy would have traded since --since -> store/options_hist/
   replay-real       replay the options book on those real prices vs the modeled replay
+  zoo               walk-forward every model (logit, hgb, rf, et, mlp, svm, xgb, lgbm, cat, lstm,
+                    cnn, transformer) + mean/stacked/best-3 ensembles -> store/zoo/
   variants          run the pre-declared strategy grid (all variants reported) -> VARIANTS.md
   fetch-intraday    (Upstox token) download NIFTY & India VIX 5-minute bars since Jan-2022 for the
                     phase-2 intraday model -> store/intraday/
@@ -29,7 +31,11 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="nifty_engine")
     ap.add_argument("command", choices=["update-data", "train", "backtest", "signal", "run", "serve", "all",
                                         "collect-news", "fetch-intraday", "variants",
-                                        "fetch-expired-options", "replay-real"])
+                                        "fetch-expired-options", "replay-real", "zoo"])
+    ap.add_argument("--members", help="comma list for `zoo` (default: every installed model)")
+    ap.add_argument("--no-deep", action="store_true", help="zoo without PyTorch models")
+    ap.add_argument("--fresh", action="store_true", help="zoo: discard cached member predictions (use after new data)")
+    ap.add_argument("--promote", action="store_true", help="zoo: deploy best-3 ensemble if it beats the champion")
     ap.add_argument("--max-expiries", type=int)
     ap.add_argument("--since", default="2024-10-01")
     ap.add_argument("--mode", default="itm", choices=["itm", "wings"])
@@ -89,6 +95,18 @@ def main(argv=None) -> int:
         from .paper.real_replay import replay_real
         res = replay_real(cfg, start=a.since)
         print(json.dumps(res["summary"], indent=1, default=str))
+    if a.command == "zoo":
+        from .pipeline import build_frame
+        from .zoo import run_zoo
+        import shutil
+        if a.fresh:
+            shutil.rmtree(DATA_DIR / "zoo", ignore_errors=True)
+        F = build_frame(cfg)
+        res = run_zoo(F, cfg, members=a.members.split(",") if a.members else None, include_deep=not a.no_deep)
+        print(json.dumps(res["metrics"], indent=1))
+        if a.promote:
+            from .zoo import promote_best3
+            print(json.dumps(promote_best3(F, cfg, res), indent=1, default=str))
     if a.command == "variants":
         from .research import run_grid
         run_grid(cfg)

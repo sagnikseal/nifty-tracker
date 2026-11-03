@@ -51,6 +51,14 @@ def retrain(cfg: EngineConfig) -> Dict:
         mr = train_and_register(build_range_frame(cfg), c2, name="champion_range")
         log.info("range model %s acc=%.4f base=%.4f", mr["version"], mr["metrics"]["accuracy"], mr["metrics"]["up_rate"])
         meta["range_model"] = {k: mr[k] for k in ("version", "has_edge")}
+    if cfg.use_zoo:
+        import shutil
+        from .config import DATA_DIR
+        from .zoo import promote_best3, run_zoo
+        shutil.rmtree(DATA_DIR / "zoo", ignore_errors=True)      # new data -> fresh walk-forwards
+        res = run_zoo(F, cfg)
+        meta["zoo"] = promote_best3(F, cfg, res)
+        log.info("zoo: %s", meta["zoo"])
     log.info("retrained %s edge=%s acc=%.4f", meta["version"], meta["has_edge"], meta["metrics"]["accuracy"])
     return meta
 
@@ -64,7 +72,11 @@ def backtest(cfg: EngineConfig, last_days: int = 22, capitals=(50_000, 100_000, 
     if meta and not spec_name:
         from .model import CANDIDATES
         spec = next((s for s in CANDIDATES if s.name == meta["spec_name"]), spec)
-    oos = walk_forward(F, cfg, spec)
+    if meta and meta.get("spec_name") == "zoo_best3" and not spec_name:
+        from .model import REGISTRY
+        oos = pd.read_csv(REGISTRY / meta["version"] / "oos_predictions.csv", index_col=0, parse_dates=True)
+    else:
+        oos = walk_forward(F, cfg, spec)
     metrics = evaluate(oos)
     out = {"config": cfg.to_dict(), "model_spec": spec.__dict__, "prediction_metrics": metrics,
            "replays": {}}

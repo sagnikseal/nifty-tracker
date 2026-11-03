@@ -60,6 +60,7 @@ class EngineConfig:
     prob_threshold: float = 0.56         # trade only if p>=thr (long) or p<=1-thr (short)
     deadzone_bps: float = 5.0            # labels: |ret| below this counted as no-edge (dropped)
     retrain_every_days: int = 21
+    use_zoo: bool = True                 # weekly retrain also runs the model zoo and may deploy best-3
     min_train_days: int = 750
     history_start: str = "2008-01-01"
 
