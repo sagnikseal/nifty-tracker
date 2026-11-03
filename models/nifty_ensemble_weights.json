@@ -1,6 +1,6 @@
 {
   "model_name": "NIFTY-50-v3-RegimeGated-MoE-Bayesian-Ensemble",
-  "trained_at_utc": "2026-11-03T10:30:05.412431+00:00",
+  "trained_at_utc": "2026-11-03T17:59:23.968271+00:00",
   "training_samples": 2160,
   "validation_samples": 720,
   "corpus_breakdown": {
