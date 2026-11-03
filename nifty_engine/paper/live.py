@@ -126,6 +126,16 @@ class LivePaperTrader:
         if not meta["has_edge"]:
             sig["stance"] += " | UNPROVEN EDGE (log-loss skill not significant at 5%)"
         sig["open"] = o
+        if self.cfg.extra.get("news_overlay", True):
+            try:
+                from ..news import premarket_overlay
+                ov = premarket_overlay(sig["direction"])
+                sig["news"] = ov
+                if ov.get("veto"):
+                    sig["stance"] += " | VETOED BY NEWS SHOCK"
+                    sig["direction"] = 0
+            except Exception as e:  # noqa: BLE001
+                sig["news"] = {"error": str(e)[:200]}
         sig["ts"] = now_ist().isoformat()
         sig["top_features"] = dict(list(meta.get("explain", {}).items())[:8])
         self.ledger.log_signal(sig["ts"], sig)

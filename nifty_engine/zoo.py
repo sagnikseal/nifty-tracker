@@ -230,15 +230,109 @@ class TorchSeqClassifier:
         return np.vstack([1 - p, p]).T
 
 
+class TabMClassifier:
+    """TabM (Gorishniy et al., ICLR 2025): parameter-efficient ensemble of 32 MLPs, state of the art
+    among tabular deep models. pip install tabm. Uses CUDA / Apple MPS when available."""
+
+    def __init__(self, k: int = 32, epochs: int = 120, lr: float = 2e-3, wd: float = 3e-4, seed: int = 7):
+        self.k, self.epochs, self.lr, self.wd, self.seed = k, epochs, lr, wd, seed
+
+    def _prep(self, X: pd.DataFrame) -> np.ndarray:
+        a = (X.to_numpy(dtype=np.float32) - self.mu) / self.sd
+        return np.clip(np.nan_to_num(a, nan=0.0), -6, 6).astype(np.float32)
+
+    def fit(self, X: pd.DataFrame, y) -> "TabMClassifier":
+        import tabm
+        import torch
+        torch.manual_seed(self.seed)
+        a = X.to_numpy(dtype=np.float32)
+        self.mu = np.nan_to_num(np.nanmean(a, axis=0)).astype(np.float32)
+        sd = np.nanstd(a, axis=0)
+        self.sd = np.where((sd < 1e-8) | np.isnan(sd), 1.0, sd).astype(np.float32)
+        Xa, yv = self._prep(X), np.asarray(y, dtype=np.float32)
+        cut = int(len(Xa) * 0.85)
+        dev = torch_device()
+        net = tabm.TabM.make(n_num_features=Xa.shape[1], cat_cardinalities=None, d_out=1, k=self.k).to(dev)
+        opt = torch.optim.AdamW(net.parameters(), lr=self.lr, weight_decay=self.wd)
+        lossf = torch.nn.BCEWithLogitsLoss()
+        Xt, yt = torch.tensor(Xa[:cut]), torch.tensor(yv[:cut])
+        Xv, yvt = torch.tensor(Xa[cut:]).to(dev), torch.tensor(yv[cut:]).to(dev)
+        best, state, bad = 1e9, None, 0
+        g = torch.Generator().manual_seed(self.seed)
+        for _ in range(self.epochs):
+            net.train()
+            perm = torch.randperm(len(Xt), generator=g)
+            for i in range(0, len(Xt), 256):
+                b = perm[i:i + 256]
+                out = net(Xt[b].to(dev)).squeeze(-1)                     # (B, k)
+                loss = lossf(out, yt[b].to(dev)[:, None].expand_as(out))  # train every member
+                opt.zero_grad()
+                loss.backward()
+                opt.step()
+            net.eval()
+            with torch.no_grad():
+                pv = torch.sigmoid(net(Xv).squeeze(-1)).mean(1).clamp(1e-6, 1 - 1e-6)
+                vl = float(-(yvt * pv.log() + (1 - yvt) * (1 - pv).log()).mean()) if len(Xv) else 0.0
+            if vl < best - 1e-4:
+                best, bad = vl, 0
+                state = {k_: v.detach().cpu().clone() for k_, v in net.state_dict().items()}
+            else:
+                bad += 1
+                if bad >= 10:
+                    break
+        if state is not None:
+            net.load_state_dict(state)
+        self.net = net.cpu()
+        return self
+
+    def predict_proba(self, X: pd.DataFrame) -> np.ndarray:
+        import torch
+        self.net.eval()
+        with torch.no_grad():
+            p = torch.sigmoid(self.net(torch.tensor(self._prep(X))).squeeze(-1)).mean(1).numpy()
+        return np.vstack([1 - p, p]).T
+
+
+class TabPFNMember:
+    """TabPFN (Hollmann et al., Nature 2025): pretrained transformer for small tabular data
+    (<= 10k rows, our case). Weights are gated on Hugging Face: accept the licence at
+    huggingface.co/Prior-Labs and set HF_TOKEN. Fast on GPU; ~1-2 h per walk-forward on CPU."""
+
+    def fit(self, X: pd.DataFrame, y) -> "TabPFNMember":
+        from tabpfn import TabPFNClassifier
+        dev = str(torch_device())
+        self.m = TabPFNClassifier(device="cuda" if dev == "cuda" else ("mps" if dev == "mps" else "cpu"),
+                                  n_estimators=4, random_state=7)
+        self.m.fit(X.to_numpy(dtype=np.float32), np.asarray(y).astype(int))
+        return self
+
+    def predict_proba(self, X: pd.DataFrame) -> np.ndarray:
+        return self.m.predict_proba(X.to_numpy(dtype=np.float32))
+
+
 def _deep_members() -> Dict[str, Callable]:
     try:
         import torch  # noqa: F401
     except Exception:  # noqa: BLE001
         return {}
     kinds = ["lstm", "cnn"]
-    if str(torch_device()) != "cpu":       # transformer is ~40+ min per walk-forward on a laptop CPU
+    gpu = str(torch_device()) != "cpu"
+    if gpu:                                # transformer is ~40+ min per walk-forward on a laptop CPU
         kinds.append("transformer")
-    return {k: (lambda k=k: TorchSeqClassifier(k)) for k in kinds}
+    out = {k: (lambda k=k: TorchSeqClassifier(k)) for k in kinds}
+    try:
+        import tabm  # noqa: F401
+        out["tabm"] = lambda: TabMClassifier()
+    except Exception:  # noqa: BLE001
+        pass
+    import os
+    try:
+        import tabpfn  # noqa: F401
+        if os.environ.get("HF_TOKEN") or gpu:
+            out["tabpfn"] = lambda: TabPFNMember()
+    except Exception:  # noqa: BLE001
+        pass
+    return out
 
 
 def available_members(include_deep: bool = True) -> Dict[str, Callable]:

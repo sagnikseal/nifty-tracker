@@ -136,6 +136,7 @@ class TestLivePaperCycle(unittest.TestCase):
         cfg = EngineConfig()
         cfg.min_train_days = 500
         cfg.prob_threshold = 0.5   # force a trade
+        cfg.extra["news_overlay"] = False   # no network in unit tests
         F = build_daily_features(raw, "oc")
         train_and_register(F, cfg, [ModelSpec("logit_only", use_gbm=False)])
         led = Ledger(os.path.join(os.environ["NE_DATA_DIR"], "test_ledger.sqlite"))
@@ -204,3 +205,16 @@ class TestCondor(unittest.TestCase):
         t = led.trades().iloc[-1]
         self.assertEqual(t["status"], "CLOSED")
         self.assertGreater(t["gross_pnl"], -1000)   # flat market: only ~4 legs x 2 sides of spread+slippage lost
+
+
+class TestNewsOverlay(unittest.TestCase):
+    def test_veto_logic(self):
+        import nifty_engine.news as nw
+        orig_fetch = nw.fetch_headlines
+        nw.fetch_headlines = lambda timeout=8.0: [{"title": "Markets crash as war escalation triggers selloff", "ts": None}] * 5
+        try:
+            ov = nw.premarket_overlay(direction=1)
+        finally:
+            nw.fetch_headlines = orig_fetch
+        self.assertLess(ov["composite"], 0)
+        self.assertIn("veto", ov)

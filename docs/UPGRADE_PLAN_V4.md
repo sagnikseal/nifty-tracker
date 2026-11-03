@@ -294,6 +294,39 @@ Every model was run through the same walk-forward test (3,094 unseen sessions, 2
 - **Bottom line:** the ensemble adds about +1.3 accuracy points and the first statistically significant skill. It does **not** change the conclusion of §4.6: the ceiling is ~54% on all days and ~58% on confident days.
 - **Weekly self-retraining** (`use_zoo: true`) re-runs the zoo from scratch on fresh data and re-picks the best 3. The Transformer only runs when a GPU (CUDA / Apple MPS) is available.
 
+### 4.8 Public strategies, newest models and the news overlay (4 Nov 2026)
+
+**A. Strategies people share publicly (GitHub, AlgoTest, Zerodha Varsity/marketcalls, Quantpedia, papers), tested on real NIFTY data with 2026 costs.** Futures round-trip costs about ₹960/lot (STT 0.05% plus fees plus 1 pt slippage per side). Options use real expired-contract prices.
+
+| Strategy (source) | Period | Trades | Win rate | Gross/trade | **Net/trade** | Verdict |
+|---|---|---|---|---|---|---|
+| Intraday momentum, first 30 min → last 30 min (Gao et al., JFE 2018) | 2022–26 | 1,191 | 33% | ₹6 | **−₹961** | No edge in NIFTY (India was excluded from the original study) |
+| Same + 14:30–15:00 confirmation | 2022–26 | 613 | 34% | ₹8 | −₹961 | Same |
+| Noise-area momentum (Zarattini et al. 2024) | 2022–26 | 648 | 36% | ₹614 | **−₹712** | Gross edge is real but smaller than costs |
+| Opening-range breakout 15 min, 2R target (AlgoTest/ORB guides) | 2022–26 | 1,144 | 42% | ₹185 | −₹781 | Fails after costs |
+| Gap fade ≥ 0.3% to previous close | 2022–26 | 530 | 49% | ₹227 | −₹711 | Fails after costs |
+| 9:20 short straddle, 25% stop per leg (AlgoTest) | Oct 24–Oct 26 | 503 | 51% | | −₹397 | Loses on 1–8-day options; expiry-day (0DTE) data isn't downloadable for expired weeks |
+| 9:20 straddle, 40% / 50% / no stop | Oct 24–Oct 26 | 503 | 55% / 51% / 58% | | −₹352 / −₹369 / −₹276 | Higher win rate, still a net loss |
+| **Turn-of-month: long close TD−2 → close TD+3 (Quantpedia; RFB 2023)** | **2007–26** | **229** | **59%** | **₹10,239** | **+₹9,220** | **The only survivor (t = 3.25).** Strong in 2007–13 and 2020–26, absent in 2014–19 |
+
+The turn-of-month windows averaged +0.75% (2020–26) against +0.22% for any 5-day window. It works for close-to-close returns, but **adding it as a feature did not improve the 09:20 open→close model** (RF 53.5→53.6%, logit 53.4→53.3%, ET 53.3→53.1%), so it was not added. It is best used as a separate swing book (futures or an ITM monthly call, about 12 trades a year), which is offered, not enabled.
+
+The SMC/ICT, Supertrend and VWAP strategies were skipped. The research found no audited evidence for them, and the popular Python SMC package has a look-ahead bug (centered swing points).
+
+**B. Newest tabular models for the user's hardware**
+
+- **TabM** (Gorishniy et al., ICLR 2025, an ensemble of 32 MLPs sharing weights): added as zoo member `tabm`. Its walk-forward was still running on the laptop CPU after 35+ minutes, so its result goes into the next zoo run. It is minutes on a CUDA GPU or Apple MPS.
+- **TabPFN** (Hollmann et al., Nature 2025, pretrained for ≤10k-row datasets like ours): added as member `tabpfn`. Its weights are **gated**: accept the licence at huggingface.co/Prior-Labs, then set `HF_TOKEN`. It is enabled automatically when a GPU or token is present.
+- Both join the best-3 selection. A member is deployed only if it earns a top-3 recent out-of-sample log-loss.
+
+**C. News overlay (pillar 4 restored)**
+
+- Every morning signal now runs the **v3 MultiEndpointMediaEngine**: 15 feeds, 8 transmission channels and the war/RBI/crude shock scanner, plus the v4 headline lexicon.
+- The signal shows the composite score, shock intensity, channel stances and top headlines.
+- **Risk gate:** if shock intensity ≥ 0.6 and the news points against the model's direction (|composite| ≥ 0.25), the trade is vetoed.
+- First live run (4 Nov, 01:10 IST): 10 of 15 feeds live; crisis level `SEVERE_WAR_ESCALATION` (West Asia); composite +0.15, shock 0.37, so no veto.
+- It is labelled **unvalidated**. Free feeds have no history, so its accuracy can only be measured going forward, or tested now with GDELT history on BigQuery if a Google Cloud account is available.
+
 ---
 
 ## 5. Upgrade roadmap

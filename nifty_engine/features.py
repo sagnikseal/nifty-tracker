@@ -143,6 +143,8 @@ def build_daily_features(raw: Dict[str, pd.DataFrame], target: str = "oc",
     F["is_expiry"] = [int(is_expiry_day(d)) for d in dates]
     F["dte"] = [days_to_expiry(d) for d in dates]
     F["month_turn"] = ((idx.day >= 27) | (idx.day <= 3)).astype(int)
+    # Turn-of-month (TD-2..TD+3) is real for close-to-close NIFTY returns (see docs 4.8) but added
+    # nothing to this open->close model in walk-forward tests, so it is not a feature here.
 
     # ---- labels
     if target == "range":

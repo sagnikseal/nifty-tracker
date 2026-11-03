@@ -19,6 +19,7 @@ import xml.etree.ElementTree as ET
 from email.utils import parsedate_to_datetime
 from typing import Dict, List
 
+import numpy as np
 import pandas as pd
 import requests
 
@@ -109,4 +110,61 @@ def load_news_series() -> Dict[str, pd.Series]:
             s = df[c].astype(float)
             s.index = s.index - pd.Timedelta(days=1)
             out[c] = s
+    return out
+
+
+# ----------------------------------------------------------------------------- pre-open overlay
+def premarket_overlay(direction: int = 0) -> Dict:
+    """Pre-open news overlay used at 09:20 (UNVALIDATED until enough history exists to test it).
+
+    Combines the legacy v3 MultiEndpointMediaEngine (15 feeds, 8 transmission channels,
+    war / central-bank / crude shock scanner) with the v4 lexicon collector. Returns a
+    composite score in [-1, 1], a shock intensity in [0, 1], top headlines, and a risk-gate
+    decision: if a strong shock points AGAINST the model's direction, the trade is vetoed.
+    """
+    out: Dict = {"validated": False, "sources": []}
+    composite, shock = 0.0, 0.0
+    try:
+        import importlib.util
+        from .config import ROOT
+        spec = importlib.util.spec_from_file_location("media_news_engine", ROOT / "scripts" / "media_news_engine.py")
+        import sys
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = mod          # dataclasses need the module registered
+        spec.loader.exec_module(mod)  # type: ignore[union-attr]
+        res = mod.MultiEndpointMediaEngine().analyze_media_ecosystem(force_refresh=True)
+        f = res.get("features", {})
+        gates = res.get("non_linear_gates", {})
+        shock = float(gates.get("news_shock_intensity", 0.0))
+        v3 = float(np.clip(0.5 * f.get("news_finbert_sentiment", 0.0) + 0.3 * f.get("geopolitical_war_shock", 0.0)
+                           + 0.2 * f.get("central_bank_event_shock", 0.0), -2, 2)) / 2
+        composite += v3
+        out.update({"v3_features": f, "crisis_level": res.get("crisis_level"),
+                    "geopolitical_alert": res.get("geopolitical_alert"),
+                    "channels": {k: v.get("stance") for k, v in res.get("channel_transmission", {}).items()},
+                    "headlines": [h.get("title") for h in res.get("scored_headlines", [])[:6]],
+                    "endpoints_live": res.get("endpoints_live")})
+        out["sources"].append("v3_media_engine")
+    except Exception as e:  # noqa: BLE001
+        out["v3_error"] = str(e)[:200]
+    try:
+        heads = fetch_headlines()
+        sc = [score_headline(h["title"]) for h in heads]
+        nz = [x for x in sc if x != 0]
+        lex = sum(nz) / len(nz) if nz else 0.0
+        composite = composite + lex if out["sources"] else lex
+        if out["sources"]:
+            composite /= 2
+        out["lexicon_score"] = round(lex, 3)
+        out["sources"].append("v4_lexicon")
+        out.setdefault("headlines", [h["title"] for h in heads[:6]])
+    except Exception as e:  # noqa: BLE001
+        out["lexicon_error"] = str(e)[:200]
+    out["composite"] = round(float(np.clip(composite, -1, 1)), 3)
+    out["shock_intensity"] = round(shock, 3)
+    veto = bool(direction != 0 and shock >= 0.6 and np.sign(out["composite"]) == -direction
+                and abs(out["composite"]) >= 0.25)
+    out["veto"] = veto
+    out["note"] = ("strong news shock against the model's direction -> trade vetoed" if veto else
+                   "overlay informational; not yet validated on history")
     return out
