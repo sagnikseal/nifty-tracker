@@ -14,3 +14,7 @@ try:  # pragma: no cover
     _truststore.inject_into_ssl()
 except Exception:  # noqa: BLE001
     pass
+
+# Load .env as soon as the package is imported, so every module (e.g. data.providers used on
+# its own) sees broker tokens. Previously only modules importing config triggered this.
+from . import config as _config  # noqa: E402,F401
