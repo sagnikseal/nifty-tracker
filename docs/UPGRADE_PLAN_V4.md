@@ -22,6 +22,7 @@ _Prepared 3 Nov 2026 for `sagnikseal/nifty-tracker`. All v4 numbers below come f
    - Modeled 12.6-year replay: 1,302 trades, **+₹5.55 lakh on 1 lot**, max drawdown −16%, 66% of months positive, median month +1.1%, worst month −7.2%.
    - The last 12 months were about +9%.
    - Treat these as **upper bounds**. Premiums are modeled, not historical quotes (see §4.4).
+   - **Real-premium check (§4.5):** on actual expired-option prices for Oct 2024–Oct 2026, the same strategy made about half the modeled profit: +₹43k on 1 lot over 64 trades, a 45% win rate and a −24% max drawdown on ₹1L.
 6. **A one-month paper test is too short to judge the trading results.** Recently the model is confident only about 2–4 times a month. The paper trader therefore also scores **every** daily prediction (about 22 a month). Pass/fail criteria are fixed in advance in §6.
 
 ---
@@ -180,6 +181,28 @@ What the grid shows:
 3. **Selection bias.** I tried 11 variants and the default is the best of them. Expect live results to be worse (deflated Sharpe; Bailey & López de Prado 2014).
 4. **Fixed lot size and today's charges** are applied to all history. This is conservative on costs but simplifies sizing.
 5. **The edge is mostly short-side and is fading.** The average intraday drift was +0.5 bps in 2025 versus about −10 bps in 2015–2021. If the night effect disappears, most of the edge goes with it.
+
+### 4.5 Real-premium check (added 3 Nov 2026, Upstox Plus expired-options data)
+
+The default strategy was replayed on **real 5-minute prices of the exact expired weekly contracts** for Oct 2024 – Oct 2026. That's 2,713 contracts, with entry and exit on actual option bars, and the model's 09:20 signals from the walk-forward. The same 64 trades were also run through the VIX-modeled replay.
+
+| | Real premiums | Modeled premiums (same days) |
+|---|---|---|
+| Trades | 64 (62 short / 2 long) | 64 |
+| Direction correct (open→close) | 64.1% | 64.1% |
+| Trades with net profit | **45.3%** | 59.4% |
+| Net P&L, 1 lot | **+₹43,387** (₹678/trade) | +₹88,694 (₹1,386/trade) |
+| Months positive (of 22 with trades) | 54.5% | 63.6% |
+| Max drawdown on ₹1L | **−23.8%** | — |
+| Charges | ₹4,433 | — |
+| Per-trade correlation, real vs model | 0.76 | |
+
+**What this means:**
+
+- **The modeled replay overstates profit by about 2×.** Real puts cost about 6 points more than the model at entry, because the market has a put skew and a forward below spot that the model misses. Real premiums also decay faster intraday than a constant-IV model assumes.
+- **The edge is positive but thin, and concentrated.** Oct–Nov 2024 produced ₹30k of the ₹43k. From Jan 2025 to Oct 2026 the strategy made only about +₹5k on 1 lot, with a −23.8% drawdown on ₹1L.
+- **Sample size is small.** 64 trades gives a 95% CI on the win rate of about ±12 points.
+- **Action:** treat modeled results before 2024 as roughly 50% too optimistic. Future model changes will be judged on the real-premium replay (`python -m nifty_engine replay-real`), not the modeled one. Before going live, the edge has to hold up in paper trading and in real-premium replays as more expiries accumulate.
 
 ---
 
