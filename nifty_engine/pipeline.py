@@ -36,9 +36,21 @@ def build_frame(cfg: EngineConfig, raw: Optional[dict] = None) -> pd.DataFrame:
     return build_daily_features(raw, cfg.target, extras())
 
 
+def build_range_frame(cfg: EngineConfig, raw: Optional[dict] = None) -> pd.DataFrame:
+    raw = raw or store.load_all()
+    return build_daily_features(raw, "range", extras(), range_k=cfg.condor_k)
+
+
 def retrain(cfg: EngineConfig) -> Dict:
     F = build_frame(cfg)
     meta = train_and_register(F, cfg)
+    if "condor" in cfg.book_list:
+        import copy
+        c2 = copy.deepcopy(cfg)
+        c2.target = "range"
+        mr = train_and_register(build_range_frame(cfg), c2, name="champion_range")
+        log.info("range model %s acc=%.4f base=%.4f", mr["version"], mr["metrics"]["accuracy"], mr["metrics"]["up_rate"])
+        meta["range_model"] = {k: mr[k] for k in ("version", "has_edge")}
     log.info("retrained %s edge=%s acc=%.4f", meta["version"], meta["has_edge"], meta["metrics"]["accuracy"])
     return meta
 

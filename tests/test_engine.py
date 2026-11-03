@@ -170,3 +170,37 @@ class TestScorecard(unittest.TestCase):
         self.assertEqual(sc["days"], 2)
         self.assertAlmostEqual(sc["accuracy_all_days"], 0.5)
         self.assertEqual(sc["accuracy_confident"], 1.0)
+
+
+class TestCondor(unittest.TestCase):
+    def test_range_label_and_live_condor_cycle(self):
+        from nifty_engine.data import store
+        from nifty_engine.model import train_and_register
+        from nifty_engine.paper.ledger import Ledger
+        from nifty_engine.paper.live import LivePaperTrader
+        raw = make_market(n=1100, seed=21)
+        for k, v in raw.items():
+            store.save(k, v)
+        F = build_daily_features(raw, "range", range_k=1.25)
+        self.assertTrue(set(F["y_up"].dropna().unique()) <= {0.0, 1.0})
+        cfg = EngineConfig()
+        cfg.min_train_days, cfg.target, cfg.books = 500, "range", "condor"
+        cfg.condor_p_threshold = 0.0
+        train_and_register(F, cfg, [ModelSpec("logit_only", use_gbm=False)], name="champion_range")
+        led = Ledger(os.path.join(os.environ["NE_DATA_DIR"], "condor.sqlite"))
+        tr = LivePaperTrader(cfg, led)
+        tr.upstox.token = ""
+        os.environ.pop("UPSTOX_TOTP_SECRET", None)
+        px = {"spot": 23000.0, "vix": 14.0, "source": "test"}
+        tr.spot_and_vix = lambda: px
+        tr.today_open = lambda: 23000.0
+        rs = tr.range_signal()
+        self.assertEqual(rs["action"], "SELL_CONDOR")
+        tid = tr.enter_condor(rs)
+        self.assertIsNotNone(tid)
+        t = led.trades().iloc[-1]
+        self.assertLess(t["entry_value"], 0)          # credit received
+        tr.mark_and_manage(force_exit=True)           # immediate exit at same spot
+        t = led.trades().iloc[-1]
+        self.assertEqual(t["status"], "CLOSED")
+        self.assertGreater(t["gross_pnl"], -1000)   # flat market: only ~4 legs x 2 sides of spread+slippage lost

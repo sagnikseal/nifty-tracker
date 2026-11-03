@@ -71,7 +71,9 @@ def sessions_per_expiry(expiries: List[dt.date], days: List[dt.date]) -> Dict[dt
 
 
 def download(start: str = "2024-10-01", neighbours: int = 1, sleep: float = 0.9,
-             max_expiries: int | None = None) -> Dict:
+             max_expiries: int | None = None, mode: str = "itm") -> Dict:
+    """mode 'itm': ATM +/- (neighbours+1) strikes, both types (directional buying).
+    mode 'wings': OTM calls ATM+100..+600 and OTM puts ATM-100..-600 (option selling / condors)."""
     up = UpstoxProvider()
     nifty = store.load("nifty")
     days = [d.date() for d in nifty.index if d >= pd.Timestamp(start)]
@@ -96,9 +98,17 @@ def download(start: str = "2024-10-01", neighbours: int = 1, sleep: float = 0.9,
         for d in sess:
             o = float(nifty.loc[pd.Timestamp(d), "open"])
             atm = round(o / STEP) * STEP
-            for k in range(-neighbours - 1, neighbours + 2):   # ITM strikes are atm -/+ 50
-                need.add(atm + k * STEP)
-        sel = contracts[contracts["strike"].isin(need) & ~contracts["instrument_key"].isin(have_keys)]
+            if mode == "wings":
+                for k in range(2, 13):
+                    need.add((atm + k * STEP, "CE"))
+                    need.add((atm - k * STEP, "PE"))
+            else:
+                for k in range(-neighbours - 1, neighbours + 2):   # ITM strikes are atm -/+ 50
+                    need.add((atm + k * STEP, "CE"))
+                    need.add((atm + k * STEP, "PE"))
+        pairs = list(zip(contracts["strike"].astype(float), contracts["type"]))
+        mask = pd.Series([pt in need for pt in pairs], index=contracts.index)
+        sel = contracts[mask & ~contracts["instrument_key"].isin(have_keys)]
         if sel.empty:
             stats["skipped_existing"] += 1
             continue

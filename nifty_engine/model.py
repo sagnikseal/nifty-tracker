@@ -235,7 +235,7 @@ def evaluate(oos: pd.DataFrame, thresholds=(0.5, 0.53, 0.55, 0.56, 0.58, 0.6)) -
 
 # ----------------------------------------------------------------------------- registry
 def train_and_register(F: pd.DataFrame, cfg: EngineConfig, specs: Optional[List[ModelSpec]] = None,
-                       recent_days: int = 500, promote_margin: float = 0.0005) -> Dict:
+                       recent_days: int = 500, promote_margin: float = 0.0005, name: str = "champion") -> Dict:
     """Run walk-forward for each candidate, pick the best on recent OOS log-loss, compare with
     the current champion and promote only if better. Then fit the winner on all data."""
     specs = specs or CANDIDATES
@@ -254,7 +254,7 @@ def train_and_register(F: pd.DataFrame, cfg: EngineConfig, specs: Optional[List[
         raise RuntimeError("Not enough data to train. Run `python -m nifty_engine update-data` first.")
     best = min(results, key=lambda k: results[k]["recent"]["logloss"])
 
-    champ_file = REGISTRY / "champion.json"
+    champ_file = REGISTRY / f"{name}.json"
     champion = json.loads(champ_file.read_text()) if champ_file.exists() else None
     promote = True
     if champion and champion.get("spec_name") in results and champion["spec_name"] != best:
@@ -274,7 +274,7 @@ def train_and_register(F: pd.DataFrame, cfg: EngineConfig, specs: Optional[List[
     has_edge = bool(r["recent"]["skill_vs_baserate"] > 0 and r["metrics"]["skill_vs_baserate"] > 0
                     and r["metrics"]["skill_p_value"] < 0.05)
 
-    version = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
+    version = dt.datetime.now().strftime("%Y%m%d-%H%M%S") + ("" if name == "champion" else f"-{name}")
     vdir = REGISTRY / version
     vdir.mkdir(parents=True, exist_ok=True)
     joblib.dump({"model": model, "calibrator": cal, "target": cfg.target}, vdir / "model.joblib")
@@ -293,8 +293,8 @@ def train_and_register(F: pd.DataFrame, cfg: EngineConfig, specs: Optional[List[
     return meta
 
 
-def load_champion():
-    champ_file = REGISTRY / "champion.json"
+def load_champion(name: str = "champion"):
+    champ_file = REGISTRY / f"{name}.json"
     if not champ_file.exists():
         return None, None
     c = json.loads(champ_file.read_text())

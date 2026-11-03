@@ -48,6 +48,13 @@ class EngineConfig:
     paper_trade_without_edge: bool = True  # paper mode may trade an unproven model (flagged)
     max_trades_per_day: int = 1
 
+    # ---- iron condor book ("condor" in books) --------------------------------
+    condor_k: float = 1.25               # short strikes at k x VIX-implied daily sigma from spot
+    condor_wing: int = 200               # long wings this many points beyond the shorts
+    condor_stop_mult: float = 1.5        # exit if loss reaches this multiple of the credit
+    condor_p_threshold: float = 0.80     # trade only when range model P(stays inside) >= this
+    condor_max_loss_pct: float = 15.0    # max defined loss per trade (% of equity)
+
     # ---- signal ------------------------------------------------------------
     target: str = "oc"                   # "oc" = today open->close, "cc" = close->next close
     prob_threshold: float = 0.56         # trade only if p>=thr (long) or p<=1-thr (short)

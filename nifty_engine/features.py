@@ -55,7 +55,7 @@ def _align_backward(target_index: pd.DatetimeIndex, s: pd.Series, avail_lag_days
 
 
 def build_daily_features(raw: Dict[str, pd.DataFrame], target: str = "oc",
-                         extra: Optional[Dict[str, pd.Series]] = None) -> pd.DataFrame:
+                         extra: Optional[Dict[str, pd.Series]] = None, range_k: float = 1.25) -> pd.DataFrame:
     """Return a frame indexed by NIFTY trading date with features, label columns and the
     day's OHLC (for the paper-trading replay). Labels: `y_ret`, `y_up`."""
     nf = raw["nifty"].copy().sort_index()
@@ -67,7 +67,7 @@ def build_daily_features(raw: Dict[str, pd.DataFrame], target: str = "oc",
 
     # "lag" = 1 for oc (decide at open of t, so yesterday's close is the latest close)
     # "lag" = 0 for cc (decide near close of t)
-    lag = 1 if target == "oc" else 0
+    lag = 0 if target == "cc" else 1     # "oc" and "range" decide at 09:20
 
     r = lc.diff()
     gk = _gk_vol(nf)
@@ -145,12 +145,17 @@ def build_daily_features(raw: Dict[str, pd.DataFrame], target: str = "oc",
     F["month_turn"] = ((idx.day >= 27) | (idx.day <= 3)).astype(int)
 
     # ---- labels
-    if target == "oc":
-        y = np.log(c / o)
+    if target == "range":
+        # 1 = NIFTY never moved more than range_k x (VIX-implied daily sigma) from the open all day
+        vprev = raw["indiavix"]["close"].reindex(idx).ffill(limit=3).shift(1) if "indiavix" in raw else None
+        sig = vprev / 100 / np.sqrt(252)
+        exc = np.maximum(np.log(h / o), -np.log(l / o))
+        F["y_ret"] = pd.Series(1.0, index=idx).where(sig.notna() & exc.notna())
+        F["y_up"] = (exc < range_k * sig).astype(float).where(sig.notna() & exc.notna())
     else:
-        y = lc.shift(-1) - lc
-    F["y_ret"] = y
-    F["y_up"] = (y > 0).astype(float).where(y.notna())
+        y = np.log(c / o) if target == "oc" else lc.shift(-1) - lc
+        F["y_ret"] = y
+        F["y_up"] = (y > 0).astype(float).where(y.notna())
     for col in ("open", "high", "low", "close"):
         F[f"px_{col}"] = nf[col]
     F["px_prev_close"] = c.shift(1)
@@ -161,3 +166,46 @@ def build_daily_features(raw: Dict[str, pd.DataFrame], target: str = "oc",
 
 def feature_columns(F: pd.DataFrame) -> list:
     return [c for c in F.columns if not c.startswith(("y_", "px_"))]
+
+
+def add_price_structure_features(F: pd.DataFrame, nifty: pd.DataFrame, target: str = "oc") -> pd.DataFrame:
+    """Legacy 'pillar 1' daily structure (CPR, PDH/PDL, sweeps, BOS, FVG, inside/outside days),
+    re-expressed with strict timing: for target 'oc' only bars <= t-1 plus today's open are used."""
+    nf = nifty.reindex(F.index)
+    o, h, l, c = nf["open"], nf["high"], nf["low"], nf["close"]
+    lag = 0 if target == "cc" else 1     # "oc" and "range" decide at 09:20
+    H, L, C = h.shift(lag), l.shift(lag), c.shift(lag)          # "previous day" relative to decision
+    H2, L2, C2 = h.shift(lag + 1), l.shift(lag + 1), c.shift(lag + 1)
+    atr = (h - l).rolling(14).mean().shift(lag)
+    ref = o if target == "oc" else c                            # price at decision time
+    pivot = (H + L + C) / 3
+    bc = (H + L) / 2
+    tc = 2 * pivot - bc
+    top, bot = np.maximum(tc, bc), np.minimum(tc, bc)
+    X = pd.DataFrame(index=F.index)
+    X["cpr_width"] = (top - bot) / pivot
+    X["cpr_width_z"] = (X["cpr_width"] - X["cpr_width"].rolling(60).mean()) / X["cpr_width"].rolling(60).std()
+    X["ref_vs_cpr"] = np.where(ref > top, 1.0, np.where(ref < bot, -1.0, 0.0))
+    X["ref_vs_pivot_atr"] = (ref - pivot) / atr
+    X["ref_vs_pdh_atr"] = (ref - H) / atr
+    X["ref_vs_pdl_atr"] = (ref - L) / atr
+    X["ref_vs_r1_atr"] = (ref - (2 * pivot - L)) / atr
+    X["ref_vs_s1_atr"] = (ref - (2 * pivot - H)) / atr
+    X["inside_day"] = ((H < H2) & (L > L2)).astype(float)
+    X["outside_day"] = ((H > H2) & (L < L2)).astype(float)
+    X["pdh_sweep"] = ((H > H2) & (C < H2)).astype(float)
+    X["pdl_sweep"] = ((L < L2) & (C > L2)).astype(float)
+    hh = h.shift(lag + 1).rolling(5).max()
+    ll = l.shift(lag + 1).rolling(5).min()
+    X["bos"] = np.where(C > hh, 1.0, np.where(C < ll, -1.0, 0.0))
+    X["fvg"] = np.where(L > h.shift(lag + 2), 1.0, np.where(H < l.shift(lag + 2), -1.0, 0.0))
+    wk = nifty[["high", "low"]].resample("W-FRI").agg({"high": "max", "low": "min"})
+    wk.index = wk.index + pd.Timedelta(days=1)   # weekly bar available from the next Saturday on
+    pwh = _align_backward(F.index, wk["high"], 0)
+    pwl = _align_backward(F.index, wk["low"], 0)
+    X["ref_vs_pwh_atr"] = (ref - pwh) / atr
+    X["ref_vs_pwl_atr"] = (ref - pwl) / atr
+    X["body_lag1"] = ((C - o.shift(lag)) / atr)
+    X["upper_wick_lag1"] = (H - np.maximum(C, o.shift(lag))) / atr
+    X["lower_wick_lag1"] = (np.minimum(C, o.shift(lag)) - L) / atr
+    return F.join(X.replace([np.inf, -np.inf], np.nan))

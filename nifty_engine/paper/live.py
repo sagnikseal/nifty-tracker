@@ -175,7 +175,7 @@ class LivePaperTrader:
 
     def mark_and_manage(self, force_exit: bool = False) -> None:
         import json
-        open_t = self.ledger.open_trades("options")
+        open_t = self.ledger.open_trades()
         if open_t.empty:
             return
         q = self.spot_and_vix()
@@ -195,6 +195,10 @@ class LivePaperTrader:
             reason = None
             if force_exit:
                 reason = "time"
+            elif entry < 0:   # credit structure (iron condor): entry_value = -credit
+                credit = -entry
+                if (val - entry) <= -self.cfg.condor_stop_mult * credit:
+                    reason = "stop"
             elif val <= entry * (1 - self.cfg.option_stop_pct / 100):
                 reason = "stop"
             elif val >= entry * (1 + self.cfg.option_target_pct / 100):
@@ -215,6 +219,73 @@ class LivePaperTrader:
                                  gross_pnl=round(gross, 2), charges=round(charges, 2),
                                  net_pnl=round(gross - charges, 2), exit_reason=reason, status="CLOSED", legs=legs)
         log.info("EXIT #%s %s net=%.0f", t["id"], reason, gross - charges)
+
+    # ------------------------------------------------------------------ iron condor book
+    def range_signal(self) -> Dict:
+        """P(NIFTY stays within condor_k x VIX-implied sigma of the open all day) from the range model."""
+        from ..model import load_champion as _lc
+        from ..pipeline import build_range_frame
+        bundle, meta = _lc("champion_range")
+        if bundle is None:
+            return {"error": "no range model; run `python -m nifty_engine train` with 'condor' in books"}
+        raw = store.load_all()
+        today = pd.Timestamp(now_ist().date())
+        o = self.today_open()
+        nf = raw["nifty"]
+        if o and (len(nf) == 0 or nf.index[-1] < today):
+            nf = pd.concat([nf, pd.DataFrame({"open": [o], "high": [o], "low": [o], "close": [o], "volume": [0]},
+                                             index=pd.DatetimeIndex([today]))])
+            raw = dict(raw, nifty=nf)
+        F = build_range_frame(self.cfg, raw)
+        sig = predict_today(F, bundle, meta)
+        p = sig["p_up"]
+        vprev = F["px_vix_prev"].iloc[-1]
+        out = {"date": sig["date"], "p_inside": p, "vix_prev": float(vprev), "model_version": meta["version"],
+               "action": "SELL_CONDOR" if p >= self.cfg.condor_p_threshold else "NO_CONDOR",
+               "ts": now_ist().isoformat()}
+        self.ledger.log_signal(out["ts"] + "-range", out)
+        return out
+
+    def enter_condor(self, rs: Dict) -> Optional[int]:
+        import math
+        today = now_ist().date().isoformat()
+        if self.ledger.kv_get(f"condor_{today}"):
+            return None
+        self.ledger.kv_set(f"condor_{today}", "done")
+        q = self.spot_and_vix()
+        spot = q["spot"]
+        if not spot:
+            return None
+        vix_now = q["vix"] or rs["vix_prev"]
+        sig = rs["vix_prev"] / 100 / math.sqrt(252)
+        k, w = self.cfg.condor_k, self.cfg.condor_wing
+        sc = math.ceil(spot * (1 + k * sig) / 50) * 50
+        sp = math.floor(spot * (1 - k * sig) / 50) * 50
+        legs = [Leg("CE", sc, -1), Leg("CE", sc + w, +1), Leg("PE", sp, -1), Leg("PE", sp - w, +1)]
+        exp = self.expiry()
+        srcs, net = set(), 0.0
+        for l in legs:
+            l.entry, src = self.leg_price(l, exp, spot, vix_now, buying=l.qty_sign > 0)
+            srcs.add(src)
+            net += l.qty_sign * l.entry
+        credit = -net
+        max_loss = (w - credit) * self.cfg.lot_size
+        if credit <= 1 or max_loss > self.equity("condor") * self.cfg.condor_max_loss_pct / 100:
+            log.info("condor skipped: credit %.2f max_loss %.0f", credit, max_loss)
+            return None
+        rates = rates_from(self.cfg)
+        ch = sum(order_charges("option", "BUY" if l.qty_sign > 0 else "SELL", l.entry * self.cfg.lot_size, rates)["total"]
+                 for l in legs)
+        tid = self.ledger.insert_trade({
+            "book": "condor", "mode": "live", "date": today, "entry_ts": now_ist().isoformat(), "direction": 0,
+            "style": "iron_condor", "lots": 1, "entry_value": round(net, 2),
+            "legs": [{"typ": l.typ, "strike": l.strike, "sign": l.qty_sign, "entry": l.entry,
+                      "key": l.instrument_key, "expiry": exp.isoformat()} for l in legs],
+            "charges": round(ch, 2), "p_up": rs["p_inside"], "model_version": rs.get("model_version"),
+            "status": "OPEN", "price_source": ",".join(sorted(srcs)),
+        })
+        log.info("ENTER condor #%s %s/%s wings %s credit %.2f", tid, sp, sc, w, credit)
+        return tid
 
     def end_of_day(self) -> None:
         d = now_ist().date().isoformat()

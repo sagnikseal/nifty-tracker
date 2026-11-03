@@ -32,6 +32,7 @@ def main(argv=None) -> int:
                                         "fetch-expired-options", "replay-real"])
     ap.add_argument("--max-expiries", type=int)
     ap.add_argument("--since", default="2024-10-01")
+    ap.add_argument("--mode", default="itm", choices=["itm", "wings"])
     ap.add_argument("--capital", type=float)
     ap.add_argument("--books")
     ap.add_argument("--style", choices=["debit_spread", "itm_buy"])
@@ -83,7 +84,7 @@ def main(argv=None) -> int:
             print(name, len(df), "bars")
     if a.command == "fetch-expired-options":
         from .data.expired_options import download
-        print(json.dumps(download(start=a.since, max_expiries=a.max_expiries), indent=1))
+        print(json.dumps(download(start=a.since, max_expiries=a.max_expiries, mode=a.mode), indent=1))
     if a.command == "replay-real":
         from .paper.real_replay import replay_real
         res = replay_real(cfg, start=a.since)

@@ -41,7 +41,7 @@ def _retrain_due(cfg: EngineConfig) -> bool:
     if not champ.exists():
         return True
     v = json.loads(champ.read_text())["version"]
-    age = (dt.datetime.now() - dt.datetime.strptime(v, "%Y%m%d-%H%M%S")).days
+    age = (dt.datetime.now() - dt.datetime.strptime(v[:15], "%Y%m%d-%H%M%S")).days
     return now_ist().weekday() == 4 or age >= cfg.retrain_every_days
 
 
@@ -68,6 +68,11 @@ def run_forever(cfg: EngineConfig, allow_no_edge: bool = False) -> None:
                         log.info("signal: %s", {k: sig.get(k) for k in ("p_up", "stance", "model_version")})
                         if "error" not in sig:
                             trader.enter(sig, allow_no_edge=allow_no_edge or cfg.paper_trade_without_edge)
+                        if "condor" in cfg.book_list:
+                            rs = trader.range_signal()
+                            log.info("range signal: %s", {k: rs.get(k) for k in ("p_inside", "action")})
+                            if rs.get("action") == "SELL_CONDOR":
+                                trader.enter_condor(rs)
                     trader.mark_and_manage()
                 if exit_t <= t < dt.time(15, 35):
                     trader.mark_and_manage(force_exit=True)
