@@ -204,6 +204,68 @@ The default strategy was replayed on **real 5-minute prices of the exact expired
 - **Sample size is small.** 64 trades gives a 95% CI on the win rate of about ±12 points.
 - **Action:** treat modeled results before 2024 as roughly 50% too optimistic. Future model changes will be judged on the real-premium replay (`python -m nifty_engine replay-real`), not the modeled one. Before going live, the edge has to hold up in paper trading and in real-premium replays as more expiries accumulate.
 
+### 4.6 Push for higher accuracy (3 Nov 2026): everything tried, all on real data
+
+Goal from the user: get as close to 80%+ accuracy as possible, and be good enough for real trading. Every test below is walk-forward (unseen data) on real NIFTY data, and every trading result uses real expired-option prices with full charges.
+
+**A. Daily direction (09:20 decision, open→close), 3,094 unseen sessions 2014–2026**
+
+| Variant | All-day acc. | Acc. 2022+ | Acc. on 18% most confident | Real-premium replay Oct 24–Oct 26 |
+|---|---|---|---|---|
+| Base ensemble (current champion) | 53.1% | 51.0% | 58.3% | **+₹50.5k**, 61 trades, 46% wins |
+| + legacy pillar-1 structure (CPR, PDH/PDL, sweeps, BOS, FVG, weekly levels) | 53.3% | 51.2% | 59.7% | not run |
+| + structure, logistic only | 53.4% | 51.8% | 60.9% | +₹9.2k, 42 trades |
+| + structure, slow shallow GBM | 52.9% | 50.7% | 60.9% | not run |
+| + structure, stronger regularisation | 53.5% | 51.2% | 58.2% | **−₹10.1k**, 70 trades |
+
+→ The extra features add at most about 0.4 pts of accuracy, and on real option prices they did *worse*. The champion stays unchanged. `add_price_structure_features()` is in `features.py` for future tests.
+
+**B. Intraday direction (decide at 09:45–13:15, predict to 15:15), 5-min Upstox data 2023–2026, 4,710 predictions**
+
+| Variant | Accuracy |
+|---|---|
+| Intraday features only (first-30-min, ORB, range position, VIX intraday …) | 49.4% |
+| + all daily features | 49.3% |
+| + daily model probability | 50.4% |
+| Baseline: sign of open→T move (momentum) | 51.5% |
+
+→ No edge in rest-of-day direction.
+
+**C. Option-chain features ("pillar 2", built from real OI/volume of ±600-pt strikes), Oct 2024–Oct 2026, 700 predictions**
+
+| Variant | All | Most confident 26% |
+|---|---|---|
+| Intraday features | 51.7% | 44.6% |
+| + PCR, call/put OI change, volume PCR | 52.1% | 46.7% |
+| Option-chain features only | 54.3% | 59.5% (n = 185) |
+| Baseline: momentum | 56.9% | |
+
+→ Within noise. Two years isn't enough data to confirm the option-chain signal, so keep recording it live.
+
+**D. Range questions (high-accuracy targets), 3,079 unseen sessions**
+
+| Question at 09:20 | Base rate | With range model, confident days |
+|---|---|---|
+| Will NIFTY close within ±0.75σ (VIX-implied) of the open? | 74.3% | 82.4% (19% of days) |
+| Will NIFTY never move > 1.0σ from the open all day? | 73.7% | 83.6% (17%) |
+| Will NIFTY never move > 1.25σ from the open all day? | 85.8% | **90.1% (58% of days), 91.1% (27%)** |
+
+→ **These are genuine 80–90% accuracies on unseen data.** The question is whether they make money, because option sellers profit when the market stays in a range.
+
+**E. Monetising the range accuracy: iron condors on real option prices (Oct 2024–Oct 2026, 1 lot, 200-pt wings, full costs)**
+
+| Strategy | Trades | Win rate | Net P&L | Worst trade | Max DD on ₹1L |
+|---|---|---|---|---|---|
+| Intraday condor, shorts at 1.25σ (every day) | 487 | 38.8% | **−₹2,00,267** | −₹4,941 | −200% |
+| Weekly condor, shorts 0.6σ_week, no stop | 101 | 61.4% | −₹35,554 | −₹9,350 | −36.5% |
+| Weekly condor, 0.8σ_week, no stop | 81 | 69.1% | −₹5,784 | −₹9,390 | −18.2% |
+| Weekly condor, 1.0σ_week, no stop | 53 | 69.8% | +₹7,260 | −₹9,069 | −11.1% |
+| Weekly condors with 1× / 2× credit stops (6 variants) | 53–101 | 55–68% | −₹3k to −₹75k | | |
+
+→ Intraday, NIFTY ended inside the short strikes on **95.5% of days**, yet the condor lost money. Intraday time decay on 1–8-day options (~4 pts) is smaller than the cost of 8 fills plus charges (~10 pts). Weekly condors win 60–70% of the time, but the losses are 2–3× the wins, so they come out roughly break-even. The market already prices the "it usually stays in range" edge into option premiums.
+
+**Conclusion.** Across 25+ pre-declared variants on real data, nothing combined accuracy above ~60% with profit, except range questions, and those earned no money after real premiums and costs. **80%+ directional accuracy is not achievable on real data.** The defensible engine is still the base daily model trading ITM options on confident days, at about +₹50k over 2 years on 1 lot. That is thin and regime-dependent, and **not yet good enough for real money**: continue the paper test. The condor book and range model are in the code (`books: "condor"`), but **off by default**.
+
 ---
 
 ## 5. Upgrade roadmap
