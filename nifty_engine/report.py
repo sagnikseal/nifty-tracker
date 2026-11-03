@@ -25,6 +25,8 @@ def write_backtest_markdown(out: Dict, path: Path) -> None:
               f"* AUC: {m['auc']:.3f} | Brier: {m['brier']:.4f} | Log-loss {m['logloss']:.4f} "
               f"vs base-rate {m['logloss_baserate']:.4f} (skill {m['skill_vs_baserate']:+.4f})",
               f"* p-value vs coin-flip: {m['p_value_vs_coinflip']:.4g}; vs always-majority: {m['p_value_vs_majority']:.4g}",
+              f"* Probabilistic skill vs base rate: t = {m.get('skill_t_stat', float('nan')):.2f}, "
+              f"p = {m.get('skill_p_value', float('nan')):.4g} (the engine only trades if p < 0.05)",
               "", "| Baseline | Accuracy |", "|---|---|"]
         L += [f"| {k} | {_pct(v)} |" for k, v in m["baselines"].items()]
         L += ["", "### Accuracy when only trading confident signals", "",

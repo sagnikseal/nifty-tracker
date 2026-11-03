@@ -56,11 +56,12 @@ def refresh_daily(start: str = "2007-01-01", provider: Optional[YahooProvider] =
         new.index = pd.DatetimeIndex(new.index).normalize()
         df = pd.concat([old, new]) if len(old) else new
         df = df[~df.index.duplicated(keep="last")].sort_index()
-        # Drop today's bar while the Indian session is still running (incomplete close).
-        today = pd.Timestamp(dt.date.today())
+        # Drop today's Indian bar until Yahoo has finalised it (it shows close=last trade and
+        # volume=0 for a while after 15:30 IST). The engine never needs today's close intraday.
+        now = dt.datetime.now(dt.timezone(dt.timedelta(hours=5, minutes=30)))
+        today = pd.Timestamp(now.date())
         if name in ("nifty", "indiavix", "banknifty") and len(df) and df.index[-1] == today:
-            now = dt.datetime.now(dt.timezone(dt.timedelta(hours=5, minutes=30)))
-            if now.time() < dt.time(15, 35):
+            if now.time() < dt.time(18, 0):
                 df = df.iloc[:-1]
         save(name, df)
         out[name] = len(df)

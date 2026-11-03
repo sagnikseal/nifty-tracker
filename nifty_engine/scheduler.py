@@ -67,7 +67,7 @@ def run_forever(cfg: EngineConfig, allow_no_edge: bool = False) -> None:
                         sig = trader.morning_signal()
                         log.info("signal: %s", {k: sig.get(k) for k in ("p_up", "stance", "model_version")})
                         if "error" not in sig:
-                            trader.enter(sig, allow_no_edge=allow_no_edge)
+                            trader.enter(sig, allow_no_edge=allow_no_edge or cfg.paper_trade_without_edge)
                     trader.mark_and_manage()
                 if exit_t <= t < dt.time(15, 35):
                     trader.mark_and_manage(force_exit=True)

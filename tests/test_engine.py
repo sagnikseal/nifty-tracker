@@ -121,3 +121,39 @@ class TestReplay(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestLivePaperCycle(unittest.TestCase):
+    def test_signal_enter_mark_exit(self):
+        from nifty_engine.data import store
+        from nifty_engine.model import train_and_register
+        from nifty_engine.paper.ledger import Ledger
+        from nifty_engine.paper.live import LivePaperTrader
+
+        raw = make_market(n=1100, seed=9)
+        for k, v in raw.items():
+            store.save(k, v)
+        cfg = EngineConfig()
+        cfg.min_train_days = 500
+        cfg.prob_threshold = 0.5   # force a trade
+        F = build_daily_features(raw, "oc")
+        train_and_register(F, cfg, [ModelSpec("logit_only", use_gbm=False)])
+        led = Ledger(os.path.join(os.environ["NE_DATA_DIR"], "test_ledger.sqlite"))
+        tr = LivePaperTrader(cfg, led)
+        tr.upstox.token = ""
+        os.environ.pop("UPSTOX_TOTP_SECRET", None)
+        prices = {"spot": 23000.0, "vix": 14.0, "source": "test"}
+        tr.spot_and_vix = lambda: prices
+        tr.today_open = lambda: 23000.0
+        sig = tr.morning_signal()
+        self.assertIn("p_up", sig)
+        tid = tr.enter(sig, allow_no_edge=True)
+        self.assertIsNotNone(tid)
+        self.assertEqual(len(led.open_trades()), 1)
+        prices["spot"] = 23000.0 + 120 * sig["direction"]   # move in our favour
+        tr.mark_and_manage(force_exit=True)
+        t = led.trades().iloc[-1]
+        self.assertEqual(t["status"], "CLOSED")
+        self.assertGreater(t["charges"], 0)
+        self.assertGreater(t["gross_pnl"], 0)
+        self.assertEqual(t["price_source"], "model_vix")

@@ -31,20 +31,21 @@ _load_dotenv()
 @dataclass
 class EngineConfig:
     # ---- account ---------------------------------------------------------
-    capital: float = 50_000.0            # paper capital in INR
+    capital: float = 100_000.0           # paper capital in INR (1 ITM lot = Rs10-16k premium)
     books: str = "options"               # "options", "futures" or "options,futures"
-    option_style: str = "debit_spread"   # "debit_spread" or "itm_buy"
+    option_style: str = "itm_buy"        # "itm_buy" (default, best in replay) or "debit_spread"
     spread_width_pts: int = 150          # short leg distance for debit spreads
     lot_size: int = 65                   # NIFTY lot (65 from Jan-2026 series)
-    max_lots: int = 2
+    max_lots: int = 1
 
     # ---- risk --------------------------------------------------------------
-    risk_per_trade_pct: float = 5.0      # max loss budget per trade (% of equity)
-    max_premium_pct: float = 30.0        # max premium outlay per trade (% of equity)
-    option_stop_pct: float = 45.0        # exit if option/spread value falls this % from entry
+    risk_per_trade_pct: float = 10.0     # loss budget at the disaster stop (% of equity)
+    max_premium_pct: float = 35.0        # max premium outlay per trade (% of equity)
+    option_stop_pct: float = 60.0        # disaster stop only: tight stops lost money in replay (VARIANTS.md)
     option_target_pct: float = 70.0      # take profit if value rises this %
     daily_loss_limit_pct: float = 6.0
-    max_drawdown_kill_pct: float = 25.0  # stop trading (paper) after this drawdown
+    max_drawdown_kill_pct: float = 30.0  # stop trading (paper) after this drawdown
+    paper_trade_without_edge: bool = True  # paper mode may trade an unproven model (flagged)
     max_trades_per_day: int = 1
 
     # ---- signal ------------------------------------------------------------

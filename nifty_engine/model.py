@@ -194,6 +194,12 @@ def evaluate(oos: pd.DataFrame, thresholds=(0.5, 0.53, 0.55, 0.56, 0.58, 0.6)) -
         "up_rate": float(y.mean()),
     }
     res["skill_vs_baserate"] = res["logloss_baserate"] - res["logloss"]
+    # Diebold-Mariano style test on per-day log-loss differences (model vs base-rate forecast)
+    pc, bc = np.clip(p, 1e-6, 1 - 1e-6), np.clip(base, 1e-6, 1 - 1e-6)
+    d = -(y * np.log(bc) + (1 - y) * np.log(1 - bc)) + (y * np.log(pc) + (1 - y) * np.log(1 - pc))
+    t = d.mean() / (d.std(ddof=1) / math.sqrt(len(d))) if d.std() > 0 else 0.0
+    res["skill_t_stat"] = float(t)
+    res["skill_p_value"] = float(0.5 * math.erfc(t / math.sqrt(2)))
     k = int(np.sum(pred == y))
     res["p_value_vs_coinflip"] = _binom_pvalue(k, len(y), 0.5)
     maj = max(res["up_rate"], 1 - res["up_rate"])
@@ -201,6 +207,7 @@ def evaluate(oos: pd.DataFrame, thresholds=(0.5, 0.53, 0.55, 0.56, 0.58, 0.6)) -
 
     base_preds = {
         "always_up": np.ones_like(y),
+        "always_train_majority": (base >= 0.5).astype(int),
         "gap_continuation": (oos["gap"].values > 0).astype(int),
         "gap_fade": (oos["gap"].values < 0).astype(int),
         "yesterday_momentum": (oos["r1"].values > 0).astype(int),
@@ -264,7 +271,8 @@ def train_and_register(F: pd.DataFrame, cfg: EngineConfig, specs: Optional[List[
     model = Ensemble(spec).fit(full[cols], full["y_up"].astype(int))
     oos = r["oos"]
     cal = PlattCalibrator().fit(oos["p_raw"].values, oos["y_up"].values.astype(int))
-    has_edge = bool(r["recent"]["skill_vs_baserate"] > 0 and r["metrics"]["skill_vs_baserate"] > 0)
+    has_edge = bool(r["recent"]["skill_vs_baserate"] > 0 and r["metrics"]["skill_vs_baserate"] > 0
+                    and r["metrics"]["skill_p_value"] < 0.05)
 
     version = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
     vdir = REGISTRY / version

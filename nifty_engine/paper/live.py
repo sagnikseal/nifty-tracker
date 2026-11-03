@@ -124,7 +124,7 @@ class LivePaperTrader:
         sig["direction"] = decide(sig["p_up"], self.cfg)
         sig["stance"] = {1: "BULLISH", -1: "BEARISH", 0: "NO_TRADE"}[sig["direction"]]
         if not meta["has_edge"]:
-            sig["stance"] = "NO_EDGE (model does not beat base rate out-of-sample)"
+            sig["stance"] += " | UNPROVEN EDGE (log-loss skill not significant at 5%)"
         sig["open"] = o
         sig["ts"] = now_ist().isoformat()
         sig["top_features"] = dict(list(meta.get("explain", {}).items())[:8])
@@ -136,7 +136,7 @@ class LivePaperTrader:
         today = now_ist().date().isoformat()
         if self.ledger.kv_get(f"entered_{today}"):
             return None
-        if sig.get("direction", 0) == 0 or ("NO_EDGE" in sig.get("stance", "") and not allow_no_edge):
+        if sig.get("direction", 0) == 0 or ("UNPROVEN EDGE" in sig.get("stance", "") and not allow_no_edge):
             self.ledger.kv_set(f"entered_{today}", "skip")
             return None
         q = self.spot_and_vix()
