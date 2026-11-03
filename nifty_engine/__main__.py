@@ -7,6 +7,9 @@
   run               always-on scheduler: data, paper trading, EOD, self-retraining
   serve             API + dashboard at http://localhost:8010/paper
   all               update-data + train + backtest
+  fetch-expired-options  (Upstox Plus) real 5-min prices of the expired weekly options the
+                    strategy would have traded since --since -> store/options_hist/
+  replay-real       replay the options book on those real prices vs the modeled replay
   variants          run the pre-declared strategy grid (all variants reported) -> VARIANTS.md
   fetch-intraday    (Upstox token) download NIFTY & India VIX 5-minute bars since Jan-2022 for the
                     phase-2 intraday model -> store/intraday/
@@ -25,7 +28,10 @@ from .config import DATA_DIR, EngineConfig
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="nifty_engine")
     ap.add_argument("command", choices=["update-data", "train", "backtest", "signal", "run", "serve", "all",
-                                        "collect-news", "fetch-intraday", "variants"])
+                                        "collect-news", "fetch-intraday", "variants",
+                                        "fetch-expired-options", "replay-real"])
+    ap.add_argument("--max-expiries", type=int)
+    ap.add_argument("--since", default="2024-10-01")
     ap.add_argument("--capital", type=float)
     ap.add_argument("--books")
     ap.add_argument("--style", choices=["debit_spread", "itm_buy"])
@@ -75,6 +81,13 @@ def main(argv=None) -> int:
             df = up.candles(key, "minutes", 5, dt.date(2022, 1, 3), dt.date.today())
             df.to_csv(out / f"{name}.csv")
             print(name, len(df), "bars")
+    if a.command == "fetch-expired-options":
+        from .data.expired_options import download
+        print(json.dumps(download(start=a.since, max_expiries=a.max_expiries), indent=1))
+    if a.command == "replay-real":
+        from .paper.real_replay import replay_real
+        res = replay_real(cfg, start=a.since)
+        print(json.dumps(res["summary"], indent=1, default=str))
     if a.command == "variants":
         from .research import run_grid
         run_grid(cfg)
