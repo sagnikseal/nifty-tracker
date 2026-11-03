@@ -294,11 +294,22 @@ class ZooEnsemble:
         return np.clip(p, 1e-4, 1 - 1e-4)
 
     def explain(self) -> Dict[str, float]:
+        """Logistic coefficients if a logit member exists, else averaged tree importances."""
         for m in self.models:
             if hasattr(m, "named_steps") and "logisticregression" in m.named_steps:
                 coef = m.named_steps["logisticregression"].coef_[0]
                 return dict(sorted(zip(self.cols, map(float, coef)), key=lambda kv: -abs(kv[1])))
-        return {}
+        imps = []
+        for m in self.models:
+            est = m.steps[-1][1] if hasattr(m, "steps") else m
+            fi = getattr(est, "feature_importances_", None)
+            if fi is not None and len(fi) == len(self.cols):
+                fi = np.asarray(fi, dtype=float)
+                imps.append(fi / max(fi.sum(), 1e-12))
+        if not imps:
+            return {}
+        avg = np.mean(imps, axis=0)
+        return dict(sorted(zip(self.cols, map(float, avg)), key=lambda kv: -kv[1]))
 
 
 # ----------------------------------------------------------------------------- research runner

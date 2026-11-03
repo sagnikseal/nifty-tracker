@@ -17,6 +17,18 @@ Or run it anywhere with Docker: `docker compose up -d`. On Windows without Docke
 - **Self-retraining.** Weekly champion/challenger walk-forward. Every model version is kept in `store/models/`.
 - **Tests:** `python -m unittest discover -s tests`. These include tests proving features can't see the future.
 
+### Full model ensemble on your Mac / GPU desktop
+
+```bash
+pip install -r requirements-engine.txt -r requirements-zoo.txt
+# NVIDIA GPU (Windows/Linux): reinstall torch with CUDA, e.g.
+#   pip install torch --index-url https://download.pytorch.org/whl/cu128
+python -m nifty_engine update-data
+python -m nifty_engine zoo --fresh --promote   # 12 models, walk-forward, deploys best-3 if it beats the champion
+```
+
+Apple Silicon (M-series) uses the GPU through MPS automatically, and NVIDIA uses CUDA. The Transformer member is only enabled when a GPU is present (on a laptop CPU it takes 40+ minutes). Trained models live in `store/models/`. Copy that folder to the machine that runs the paper trader.
+
 ---
 
 ## Legacy v3 terminal (kept for reference)

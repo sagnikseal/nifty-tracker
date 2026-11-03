@@ -266,6 +266,34 @@ Goal from the user: get as close to 80%+ accuracy as possible, and be good enoug
 
 **Conclusion.** Across 25+ pre-declared variants on real data, nothing combined accuracy above ~60% with profit, except range questions, and those earned no money after real premiums and costs. **80%+ directional accuracy is not achievable on real data.** The defensible engine is still the base daily model trading ITM options on confident days, at about +₹50k over 2 years on 1 lot. That is thin and regime-dependent, and **not yet good enough for real money**: continue the paper test. The condor book and range model are in the code (`books: "condor"`), but **off by default**.
 
+### 4.7 Model zoo: 12 models and 3 ensembles (3 Nov 2026)
+
+Every model was run through the same walk-forward test (3,094 unseen sessions, 2014–2026, ~150 refits each, same features). XGBoost, LightGBM, CatBoost, LSTM, CNN and the Transformer were trained on the user's Windows laptop (CPU); the rest in the cloud workspace.
+
+| Model | Accuracy | AUC | Log-loss | Skill p | Acc. 2022+ | Acc. confident (p≥.56) | n |
+|---|---|---|---|---|---|---|---|
+| Logistic (L2) | 53.4% | .545 | .6893 | .17 | 51.8% | 57.9% | 1,229 |
+| HistGradientBoosting | 53.0% | .539 | .6898 | .20 | 50.7% | 57.9% | 1,143 |
+| Random Forest | 53.5% | .548 | .6886 | .08 | 50.8% | 58.2% | 1,220 |
+| Extra Trees | 53.3% | .533 | .6896 | .08 | 52.3% | 58.1% | 898 |
+| MLP (sklearn) | 53.1% | .497 | .6969 | .99 | 51.7% | 51.8% | 301 |
+| SVM (RBF) | 53.2% | .540 | .6892 | .12 | 51.9% | 56.3% | 1,120 |
+| XGBoost | 53.4% | .538 | .6898 | .20 | 50.7% | 57.0% | 1,132 |
+| LightGBM | 53.7% | .544 | .6887 | .12 | 51.2% | 57.1% | 1,220 |
+| CatBoost | **54.2%** | .549 | .6888 | .10 | 50.2% | 58.0% | 1,194 |
+| 1-D CNN (20-day window) | 53.3% | .513 | .6916 | .50 | 52.0% | 55.7% | 636 |
+| LSTM (20-day window) | 54.0% | .529 | .6904 | .22 | 52.5% | 56.9% | 661 |
+| Transformer (20-day window) | 53.7% | .513 | .6918 | .56 | 53.1% | 55.2% | 824 |
+| Mean of all 12 | 53.7% | .548 | .6883 | .06 | 51.0% | 57.4% | 1,187 |
+| Stacked (logistic meta-model) | 52.9% | .541 | .6889 | .07 | 50.6% | 57.6% | 1,029 |
+| **Best-3 (trailing log-loss, re-picked monthly)** | **54.4%** | **.555** | **.6871** | **.012** | **52.7%** | **58.4%** | 1,020 |
+
+- **Deep learning didn't help.** LSTM, CNN and Transformer are no better than the tree models. They are worse on log-loss and AUC, which is consistent with the literature for ~4,500 daily samples.
+- **Best-3 is the only model whose skill is statistically significant (p = 0.012).** It beat the old champion on recent unseen log-loss (0.6873 vs 0.6880), so the engine's promotion rule deployed it. It is **RF + CatBoost + Extra Trees**, refitted on all data (`20261103-235830-zoo`, `has_edge = true`).
+- **Real option prices, Oct 2024–Oct 2026 (threshold 0.56, 1 lot):** best-3 made 42 trades, 52% win rate, 69% direction accuracy, **+₹19.7k**. The old champion made +₹50.5k on 61 trades. Single models ranged from −₹27k (stack) to +₹87k (HGB). With 40–130 trades per model the 2-year P&L is mostly noise, so the deployed model was chosen by the pre-declared rule (long-run log-loss and significance), not by the best 2-year P&L, which would be cherry-picking.
+- **Bottom line:** the ensemble adds about +1.3 accuracy points and the first statistically significant skill. It does **not** change the conclusion of §4.6: the ceiling is ~54% on all days and ~58% on confident days.
+- **Weekly self-retraining** (`use_zoo: true`) re-runs the zoo from scratch on fresh data and re-picks the best 3. The Transformer only runs when a GPU (CUDA / Apple MPS) is available.
+
 ---
 
 ## 5. Upgrade roadmap
