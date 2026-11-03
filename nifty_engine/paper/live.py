@@ -220,3 +220,31 @@ class LivePaperTrader:
         d = now_ist().date().isoformat()
         for b in self.cfg.book_list:
             self.ledger.set_equity(d, b, self.equity(b))
+        # Score *every* daily prediction (not only traded ones): a month has ~22 predictions
+        # but only a handful of confident trades, so this is the main accuracy measurement.
+        try:
+            bars = self.yahoo.bars("^NSEI", start=(now_ist().date() - dt.timedelta(days=1)).isoformat(), interval="1m")
+            bars = bars[bars.index.date == now_ist().date()]
+            if len(bars) > 100:
+                o, c = float(bars["open"].iloc[0]), float(bars["close"].iloc[-1])
+                sig = self.ledger.last_signal() or {}
+                if sig.get("date") == d:
+                    self.ledger.kv_set(f"outcome_{d}", {"open": o, "close": c, "up": int(c > o),
+                                                        "p_up": sig.get("p_up"), "direction": sig.get("direction")})
+        except Exception as e:  # noqa: BLE001
+            log.warning("outcome capture failed: %s", e)
+
+    def prediction_scorecard(self) -> Dict:
+        import sqlite3
+        with sqlite3.connect(self.ledger.path) as c:
+            rows = c.execute("SELECT v FROM kv WHERE k LIKE 'outcome_%'").fetchall()
+        import json as _j
+        outs = [_j.loads(r[0]) for r in rows]
+        outs = [o for o in outs if o.get("p_up") is not None]
+        if not outs:
+            return {"days": 0}
+        hits = [int((o["p_up"] >= 0.5) == bool(o["up"])) for o in outs]
+        conf = [o for o in outs if o.get("direction")]
+        return {"days": len(outs), "accuracy_all_days": sum(hits) / len(hits),
+                "confident_days": len(conf),
+                "accuracy_confident": (sum(int((o["direction"] > 0) == bool(o["up"])) for o in conf) / len(conf)) if conf else None}

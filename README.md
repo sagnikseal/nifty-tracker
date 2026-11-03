@@ -1,3 +1,26 @@
+# NIFTY 50 Tracker: v4 prediction engine + auto paper trader
+
+> **Read first:** [`docs/UPGRADE_PLAN_V4.md`](docs/UPGRADE_PLAN_V4.md). The v3 model's 97% accuracy came from label leakage in `scripts/build_real_training_data.py`. v4 replaces it with a leakage-tested, walk-forward engine trained on 19 years of real data. Its honest out-of-sample result is 53% on all days and 57% on confident days (2014–2026).
+
+## v4 quick start
+
+```bash
+pip install -r requirements-engine.txt
+python -m nifty_engine all          # download data (2007-), walk-forward train, backtest report
+python -m nifty_engine run          # auto paper trader + dashboard at http://localhost:8010/paper
+```
+
+Or run it anywhere with Docker: `docker compose up -d`. On Windows without Docker, double-click `run_engine.bat`.
+
+- **Broker independent.** Signals use only free daily data: NIFTY, India VIX, US/Asia indices, FX, crude, yields. Upstox is an optional adapter for live option bid/ask. Put `UPSTOX_ACCESS_TOKEN`, or `UPSTOX_API_KEY` + `UPSTOX_PIN` + `UPSTOX_TOTP_SECRET`, in `.env`.
+- **Paper trading.** ₹1,00,000 by default, 1 lot ITM CE/PE, entry 09:20, exit by 15:15, full NSE charges (2026 STT). Edit `config/engine.json`.
+- **Self-retraining.** Weekly champion/challenger walk-forward. Every model version is kept in `store/models/`.
+- **Tests:** `python -m unittest discover -s tests`. These include tests proving features can't see the future.
+
+---
+
+## Legacy v3 terminal (kept for reference)
+
 # NIFTY 50 Institutional Tracker & 4-Pillar AI Prediction Terminal (Overhaul v2.0)
 
 An institutional-grade intraday prediction engine, options microstructure analyzer, cross-asset macro radar, geopolitical shock scanner, and Smart Money Concepts (SMC) End-of-Day tracker for **NSE NIFTY 50 (`^NSEI`)**.

@@ -157,3 +157,16 @@ class TestLivePaperCycle(unittest.TestCase):
         self.assertGreater(t["charges"], 0)
         self.assertGreater(t["gross_pnl"], 0)
         self.assertEqual(t["price_source"], "model_vix")
+
+
+class TestScorecard(unittest.TestCase):
+    def test_scorecard_counts_all_days(self):
+        from nifty_engine.paper.ledger import Ledger
+        from nifty_engine.paper.live import LivePaperTrader
+        led = Ledger(os.path.join(os.environ["NE_DATA_DIR"], "score.sqlite"))
+        led.kv_set("outcome_2026-11-02", {"up": 1, "p_up": 0.6, "direction": 1})
+        led.kv_set("outcome_2026-11-03", {"up": 0, "p_up": 0.52, "direction": 0})
+        sc = LivePaperTrader(EngineConfig(), led).prediction_scorecard()
+        self.assertEqual(sc["days"], 2)
+        self.assertAlmostEqual(sc["accuracy_all_days"], 0.5)
+        self.assertEqual(sc["accuracy_confident"], 1.0)
