@@ -178,6 +178,11 @@ def generate_realistic_historical_series(days: int = 250) -> pd.DataFrame:
 def compute_smc_and_cpr_dataset(df: pd.DataFrame) -> Dict[str, Any]:
     """Compute complete SMC, CPR, Wick, and Volatility metrics for every daily bar."""
     df = df.sort_values("Date").reset_index(drop=True)
+    # Yahoo returns an in-progress bar with Close=NaN/0 while the session is open
+    # (this produced close=0.0 / change=-100% for 2026-11-02). Drop incomplete bars.
+    for _col in ("Open", "High", "Low", "Close"):
+        df[_col] = pd.to_numeric(df[_col], errors="coerce")
+    df = df[(df["Close"] > 0) & (df["Open"] > 0) & (df["High"] > 0) & (df["Low"] > 0)].reset_index(drop=True)
     entries: List[Dict[str, Any]] = []
 
     for i, row in df.iterrows():
