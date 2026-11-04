@@ -327,6 +327,53 @@ The SMC/ICT, Supertrend and VWAP strategies were skipped. The research found no 
 - First live run (4 Nov, 01:10 IST): 10 of 15 feeds live; crisis level `SEVERE_WAR_ESCALATION` (West Asia); composite +0.15, shock 0.37, so no veto.
 - It is labelled **unvalidated**. Free feeds have no history, so its accuracy can only be measured going forward, or tested now with GDELT history on BigQuery if a Google Cloud account is available.
 
+### 4.9 The friend's SMC/ICT process, coded and tested (4 Nov 2026)
+
+**His rules, as relayed:**
+- **Bias:** daily BOS plus OLCH/OHCL, on both the previous day's candle and today's opening candle.
+- **Liquidity (15-min):** previous day high/low plus 15-min swing highs/lows.
+- **Entry (1-min):** an FVG, or a break out of a small range.
+- **Instrument:** ATM options, including expiry day, up to 10 trades a day.
+- **Exits:** no fixed stop or target ("exit when it feels decent").
+
+**How it was coded (`nifty_engine/smc.py`):**
+- Swing points count only once later bars have confirmed them, so there is no look-ahead.
+- Bias = sign(daily BOS state + previous-day OLCH/OHCL + today's 09:15–09:30 open-at-low/high).
+- Liquidity sweep = a 1-min bar trading through a level and closing back inside it.
+- Entry trigger: price taps a 1-min FVG and then closes beyond it, or breaks out of a tight 5-bar range.
+- Entry time 09:30–14:45; about one position at a time.
+- Data: real 1-min NIFTY bars (448k since Jan 2022) and real 1-min ATM option prices (3,667 contracts, all 109 weekly expiries since Oct 2024, **including expiry day**).
+- Because he exits by feel, **10 different exit styles** were simulated, and all are reported.
+
+**Index-level results, Jan 2022–Nov 2026:** 1,766 setups on 730 days (≈2.4 a day).
+- NIFTY moved in the trade's favour over the next 15 minutes only **48.3%** of the time.
+- With a structure exit (stop beyond the sweep, target at the opposite liquidity): **41% wins, −1.25 pts per trade** (t = −1.5).
+- It was negative in 4 of 5 years; 46% of days were winners.
+
+**Real ATM option prices, Oct 2024–Oct 2026:** 795 trades on 333 days, 1 lot, full charges.
+
+| Exit style | Win rate | Avg win | Avg loss | Net/trade | Net total | Months +ve |
+|---|---|---|---|---|---|---|
+| +20% / −20% of premium | 41% | ₹1,147 | −₹1,364 | −₹332 | −₹2.64 L | 12% |
+| +30% / −20% | 34% | ₹1,584 | −₹1,348 | −₹341 | −₹2.71 L | 16% |
+| +50% / −25% | 30% | ₹2,266 | −₹1,492 | −₹358 | −₹2.84 L | 16% |
+| +30% / −30% | 39% | ₹1,557 | −₹1,683 | −₹424 | −₹3.37 L | 20% |
+| +100% / −40% | 29% | ₹2,598 | −₹1,829 | −₹537 | −₹4.27 L | 20% |
+| Structure (sweep stop, liquidity target) | 29% | ₹996 | −₹830 | −₹304 | −₹2.41 L | 8% |
+| Exit after 15 min | 35% | ₹777 | −₹691 | **−₹179** | −₹1.42 L | 20% |
+| Exit after 30 min | 33% | ₹1,202 | −₹925 | −₹219 | −₹1.74 L | 24% |
+| Exit after 60 min | 31% | ₹1,653 | −₹1,255 | −₹347 | −₹2.76 L | 20% |
+| Hold to 15:20 | 31% | ₹2,950 | −₹2,198 | −₹625 | −₹4.97 L | 20% |
+
+- Charges were about ₹51 per trade, so even before costs the trades lost about ₹130 each. **The mechanical version has no edge**, on expiry days or other days, with either trigger.
+- That leaves three possibilities:
+  - his discretion (which setups he skips, and when he exits) is where any edge lives;
+  - our interpretation differs from what he actually does;
+  - or recent results are a lucky run.
+- **His broker tradebook is the only way to tell these apart.** Next steps: meta-labelling (learn which flagged setups are worth taking), then imitation learning from his tradebook, then 2–4 weeks of live shadowing. See the chat for the method.
+
+**Also this run:** TabM finished on the laptop CPU (53.3% accuracy, 58.3% on confident days). With 13 members, best-3 is 54.3% (skill p = 0.019). The deployed ensemble is unchanged.
+
 ---
 
 ## 5. Upgrade roadmap
