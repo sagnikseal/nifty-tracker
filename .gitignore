@@ -10,3 +10,4 @@ env/
 data/live_recorded_snapshots.jsonl
 .idea/
 .vscode/
+store/

@@ -1,0 +1,12 @@
+services:
+  nifty-engine:
+    build: .
+    container_name: nifty-engine
+    restart: unless-stopped
+    env_file: .env            # UPSTOX_ACCESS_TOKEN or UPSTOX_API_KEY/PIN/TOTP_SECRET (optional)
+    environment:
+      - TZ=Asia/Kolkata
+    ports:
+      - "8010:8010"           # dashboard: http://localhost:8010/paper
+    volumes:
+      - ./store:/data         # data, models, ledger, reports persist here

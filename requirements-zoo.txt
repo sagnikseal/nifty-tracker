@@ -1,0 +1,11 @@
+# Optional extras for `python -m nifty_engine zoo` (full model ensemble).
+# Base requirements first:  pip install -r requirements-engine.txt
+xgboost>=2.0
+lightgbm>=4.0
+catboost>=1.2
+torch>=2.3        # Mac (Apple silicon): this wheel uses the GPU via MPS automatically.
+# NVIDIA GPU on Windows/Linux: install the CUDA build instead, e.g.
+#   pip install torch --index-url https://download.pytorch.org/whl/cu128
+# (pick the cuXXX matching your driver on pytorch.org). AMD GPUs: the CPU build is used.
+tabm>=0.0.3       # TabM tabular deep ensemble (ICLR 2025)
+tabpfn>=2.0       # TabPFN: gated weights, accept licence on huggingface.co/Prior-Labs and set HF_TOKEN

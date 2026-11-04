@@ -1,0 +1,19 @@
+{
+  "capital": 100000,
+  "books": "options",
+  "option_style": "itm_buy",
+  "spread_width_pts": 150,
+  "lot_size": 65,
+  "max_lots": 1,
+  "risk_per_trade_pct": 10.0,
+  "max_premium_pct": 35.0,
+  "option_stop_pct": 60.0,
+  "option_target_pct": 70.0,
+  "max_drawdown_kill_pct": 30.0,
+  "target": "oc",
+  "prob_threshold": 0.56,
+  "retrain_every_days": 21,
+  "entry_time": "09:20",
+  "exit_time": "15:15",
+  "paper_trade_without_edge": true
+}
