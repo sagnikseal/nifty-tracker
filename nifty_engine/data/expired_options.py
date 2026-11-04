@@ -60,11 +60,12 @@ def expired_candles(up: UpstoxProvider, key: str, start: dt.date, end: dt.date, 
     return df.sort_values("ts")
 
 
-def sessions_per_expiry(expiries: List[dt.date], days: List[dt.date]) -> Dict[dt.date, List[dt.date]]:
-    """Map each expiry to the sessions that would trade it (nearest expiry >= 1 day ahead)."""
+def sessions_per_expiry(expiries: List[dt.date], days: List[dt.date], min_days: int = 1) -> Dict[dt.date, List[dt.date]]:
+    """Map each expiry to the sessions that would trade it (nearest expiry >= min_days ahead;
+    min_days=0 includes expiry-day / 0DTE trading)."""
     out: Dict[dt.date, List[dt.date]] = {}
     for d in days:
-        nxt = [e for e in expiries if (e - d).days >= 1]
+        nxt = [e for e in expiries if (e - d).days >= min_days]
         if nxt:
             out.setdefault(nxt[0], []).append(d)
     return out
@@ -73,18 +74,23 @@ def sessions_per_expiry(expiries: List[dt.date], days: List[dt.date]) -> Dict[dt
 def download(start: str = "2024-10-01", neighbours: int = 1, sleep: float = 0.9,
              max_expiries: int | None = None, mode: str = "itm") -> Dict:
     """mode 'itm': ATM +/- (neighbours+1) strikes, both types (directional buying).
-    mode 'wings': OTM calls ATM+100..+600 and OTM puts ATM-100..-600 (option selling / condors)."""
+    mode 'wings': OTM calls ATM+100..+600 and OTM puts ATM-100..-600 (option selling / condors).
+    mode 'atm1m': 1-minute bars, ATM +/- 200 both types, nearest expiry INCLUDING expiry day (0DTE),
+                  stored in store/options_hist_1m/ (for intraday SMC-style strategies)."""
+    out_dir = OUT
+    if mode == "atm1m":
+        out_dir = DATA_DIR / "options_hist_1m"
     up = UpstoxProvider()
     nifty = store.load("nifty")
     days = [d.date() for d in nifty.index if d >= pd.Timestamp(start)]
     exps = expired_expiries(up)
-    plan = sessions_per_expiry(exps, days)
-    OUT.mkdir(parents=True, exist_ok=True)
+    plan = sessions_per_expiry(exps, days, min_days=0 if mode == "atm1m" else 1)
+    out_dir.mkdir(parents=True, exist_ok=True)
     stats = {"expiries": 0, "contracts": 0, "bars": 0, "skipped_existing": 0, "missing": 0}
     for i, (exp, sess) in enumerate(sorted(plan.items())):
         if max_expiries and i >= max_expiries:
             break
-        f = OUT / f"{exp.isoformat()}.csv"
+        f = out_dir / f"{exp.isoformat()}.csv"
         have = pd.read_csv(f) if f.exists() else pd.DataFrame()
         have_keys = set(have["key"]) if len(have) else set()
         try:
@@ -98,7 +104,11 @@ def download(start: str = "2024-10-01", neighbours: int = 1, sleep: float = 0.9,
         for d in sess:
             o = float(nifty.loc[pd.Timestamp(d), "open"])
             atm = round(o / STEP) * STEP
-            if mode == "wings":
+            if mode == "atm1m":
+                for k in range(-4, 5):
+                    need.add((atm + k * STEP, "CE"))
+                    need.add((atm + k * STEP, "PE"))
+            elif mode == "wings":
                 for k in range(2, 13):
                     need.add((atm + k * STEP, "CE"))
                     need.add((atm - k * STEP, "PE"))
@@ -115,7 +125,8 @@ def download(start: str = "2024-10-01", neighbours: int = 1, sleep: float = 0.9,
         frames = [have] if len(have) else []
         for _, c in sel.iterrows():
             try:
-                df = expired_candles(up, c["instrument_key"], min(sess), max(sess))
+                df = expired_candles(up, c["instrument_key"], min(sess), max(sess),
+                                     interval="1minute" if mode == "atm1m" else "5minute")
             except Exception as e:  # noqa: BLE001
                 log.warning("candles %s failed: %s", c["instrument_key"], e)
                 stats["missing"] += 1
@@ -136,8 +147,8 @@ def download(start: str = "2024-10-01", neighbours: int = 1, sleep: float = 0.9,
     return stats
 
 
-def load_expiry(exp: dt.date) -> pd.DataFrame:
-    f = OUT / f"{exp.isoformat()}.csv"
+def load_expiry(exp: dt.date, one_minute: bool = False) -> pd.DataFrame:
+    f = (DATA_DIR / "options_hist_1m" if one_minute else OUT) / f"{exp.isoformat()}.csv"
     if not f.exists():
         return pd.DataFrame()
     df = pd.read_csv(f)

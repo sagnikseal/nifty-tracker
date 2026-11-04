@@ -38,7 +38,7 @@ def main(argv=None) -> int:
     ap.add_argument("--promote", action="store_true", help="zoo: deploy best-3 ensemble if it beats the champion")
     ap.add_argument("--max-expiries", type=int)
     ap.add_argument("--since", default="2024-10-01")
-    ap.add_argument("--mode", default="itm", choices=["itm", "wings"])
+    ap.add_argument("--mode", default="itm", choices=["itm", "wings", "atm1m"])
     ap.add_argument("--capital", type=float)
     ap.add_argument("--books")
     ap.add_argument("--style", choices=["debit_spread", "itm_buy"])
@@ -84,8 +84,8 @@ def main(argv=None) -> int:
             return 1
         out = DATA_DIR / "intraday"
         out.mkdir(parents=True, exist_ok=True)
-        for name, key in (("nifty_5m", up.NIFTY), ("indiavix_5m", up.VIX)):
-            df = up.candles(key, "minutes", 5, dt.date(2022, 1, 3), dt.date.today())
+        for name, key, iv in (("nifty_5m", up.NIFTY, 5), ("indiavix_5m", up.VIX, 5), ("nifty_1m", up.NIFTY, 1)):
+            df = up.candles(key, "minutes", iv, dt.date(2022, 1, 3), dt.date.today())
             df.to_csv(out / f"{name}.csv")
             print(name, len(df), "bars")
     if a.command == "fetch-expired-options":
