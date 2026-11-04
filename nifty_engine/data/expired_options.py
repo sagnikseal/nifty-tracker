@@ -73,7 +73,9 @@ def sessions_per_expiry(expiries: List[dt.date], days: List[dt.date]) -> Dict[dt
 def download(start: str = "2024-10-01", neighbours: int = 1, sleep: float = 0.9,
              max_expiries: int | None = None, mode: str = "itm") -> Dict:
     """mode 'itm': ATM +/- (neighbours+1) strikes, both types (directional buying).
-    mode 'wings': OTM calls ATM+100..+600 and OTM puts ATM-100..-600 (option selling / condors)."""
+    mode 'wings': OTM calls ATM+100..+600 and OTM puts ATM-100..-600 (option selling / condors).
+    mode 'full': every strike within ATM +/- 800 points, both types (all v5 strategy books and the
+    historical option-chain features; ~66 contracts per expiry, takes a few hours the first time)."""
     up = UpstoxProvider()
     nifty = store.load("nifty")
     days = [d.date() for d in nifty.index if d >= pd.Timestamp(start)]
@@ -102,6 +104,10 @@ def download(start: str = "2024-10-01", neighbours: int = 1, sleep: float = 0.9,
                 for k in range(2, 13):
                     need.add((atm + k * STEP, "CE"))
                     need.add((atm - k * STEP, "PE"))
+            elif mode == "full":
+                for k in range(-16, 17):
+                    need.add((atm + k * STEP, "CE"))
+                    need.add((atm + k * STEP, "PE"))
             else:
                 for k in range(-neighbours - 1, neighbours + 2):   # ITM strikes are atm -/+ 50
                     need.add((atm + k * STEP, "CE"))
@@ -115,7 +121,10 @@ def download(start: str = "2024-10-01", neighbours: int = 1, sleep: float = 0.9,
         frames = [have] if len(have) else []
         for _, c in sel.iterrows():
             try:
-                df = expired_candles(up, c["instrument_key"], min(sess), max(sess))
+                # from a few days before the first session: the previous session's closing chain is
+                # a feature for the first day of each weekly cycle
+                # ...and through expiry day itself (0DTE book), if Upstox serves those bars
+                df = expired_candles(up, c["instrument_key"], min(sess) - dt.timedelta(days=4), exp)
             except Exception as e:  # noqa: BLE001
                 log.warning("candles %s failed: %s", c["instrument_key"], e)
                 stats["missing"] += 1

@@ -75,6 +75,18 @@ class EngineConfig:
     broker: str = "auto"                 # auto | upstox | yahoo  (signals never depend on a broker)
     poll_seconds: int = 30
 
+    # ---- v5: features, strategy books, local LLM ------------------------------------
+    feature_groups: str = "base"         # daily-model feature groups (features.FEATURE_GROUPS); add a group
+                                         # only after `python -m nifty_engine research` shows it helps
+    strategy_books: str = ("debit_spread,credit_spread,iron_condor,iron_fly_0dte,event_straddle,"
+                           "turn_of_month,smc_intraday,llm_analyst")   # v5 paper books (strategies/books.py)
+    book_capital: float = 100_000.0      # paper equity per v5 book
+    llm_model: str = "llama3.1:8b"       # local Ollama model: free, runs on the Mac (`ollama pull llama3.1:8b`)
+    llm_url: str = "http://localhost:11434"
+    llm_knowledge_cutoff: str = "2023-12-31"   # news on/before this date may be "remembered" by the model:
+                                               # it is scored but excluded from accuracy tests
+    record_live: bool = True             # record option chain / depth during market hours (needs token)
+
     extra: Dict[str, Any] = field(default_factory=dict)
 
     @classmethod
@@ -98,3 +110,11 @@ class EngineConfig:
     @property
     def book_list(self):
         return [b.strip() for b in self.books.split(",") if b.strip()]
+
+    @property
+    def group_list(self):
+        return [g.strip() for g in self.feature_groups.split(",") if g.strip()] or ["base"]
+
+    @property
+    def strategy_list(self):
+        return [b.strip() for b in self.strategy_books.split(",") if b.strip()]

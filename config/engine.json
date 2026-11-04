@@ -15,5 +15,20 @@
   "retrain_every_days": 21,
   "entry_time": "09:20",
   "exit_time": "15:15",
-  "paper_trade_without_edge": true
+  "paper_trade_without_edge": true,
+  "feature_groups": "base",
+  "strategy_books": "debit_spread,credit_spread,iron_condor,iron_fly_0dte,event_straddle,turn_of_month,smc_intraday,llm_analyst",
+  "book_capital": 100000,
+  "llm_model": "llama3.1:8b",
+  "llm_url": "http://localhost:11434",
+  "llm_knowledge_cutoff": "2023-12-31",
+  "record_live": true,
+  "extra": {
+    "upstox_plus": true,
+    "record_expiries": 2,
+    "chain_poll_seconds": 30,
+    "record_depth": true,
+    "depth_snapshot_seconds": 5,
+    "depth_strikes_each_side": 10
+  }
 }

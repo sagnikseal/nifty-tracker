@@ -30,6 +30,46 @@ def bs_price(S: float, K: float, T: float, iv: float, typ: str, r: float = RISK_
     return K * math.exp(-r * T) * _ncdf(-d2) - S * _ncdf(-d1)
 
 
+def _npdf(x: float) -> float:
+    return math.exp(-0.5 * x * x) / math.sqrt(2 * math.pi)
+
+
+def bs_greeks(S: float, K: float, T: float, iv: float, typ: str, r: float = RISK_FREE) -> dict:
+    """Delta, gamma (per point), vega (per 1 vol point), theta (per calendar day)."""
+    T = max(T, 1e-6)
+    iv = max(iv, 0.01)
+    sq = iv * math.sqrt(T)
+    d1 = (math.log(S / K) + (r + 0.5 * iv * iv) * T) / sq
+    d2 = d1 - sq
+    gamma = _npdf(d1) / (S * sq)
+    vega = S * _npdf(d1) * math.sqrt(T) / 100
+    if typ == "CE":
+        delta = _ncdf(d1)
+        theta = (-S * _npdf(d1) * iv / (2 * math.sqrt(T)) - r * K * math.exp(-r * T) * _ncdf(d2)) / 365
+    else:
+        delta = _ncdf(d1) - 1
+        theta = (-S * _npdf(d1) * iv / (2 * math.sqrt(T)) + r * K * math.exp(-r * T) * _ncdf(-d2)) / 365
+    return {"delta": delta, "gamma": gamma, "vega": vega, "theta": theta}
+
+
+def implied_vol(price: float, S: float, K: float, T: float, typ: str, r: float = RISK_FREE,
+                lo: float = 0.01, hi: float = 3.0) -> float:
+    """Bisection IV. NaN when the price is outside no-arbitrage bounds (stale/illiquid quotes)."""
+    if not (price and price > 0 and S > 0 and K > 0):
+        return float("nan")
+    T = max(T, 1e-6)
+    intrinsic = max(0.0, S - K * math.exp(-r * T)) if typ == "CE" else max(0.0, K * math.exp(-r * T) - S)
+    if price < intrinsic - 0.05 or price >= (S if typ == "CE" else K):
+        return float("nan")
+    for _ in range(80):
+        mid = 0.5 * (lo + hi)
+        if bs_price(S, K, T, mid, typ, r) > price:
+            hi = mid
+        else:
+            lo = mid
+    return 0.5 * (lo + hi)
+
+
 def smile_iv(vix: float, S: float, K: float) -> float:
     """India VIX (30d, %) -> strike IV with a mild put skew. m = ln(K/S)."""
     base = max(vix, 8.0) / 100.0

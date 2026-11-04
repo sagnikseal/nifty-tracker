@@ -119,7 +119,10 @@ class LivePaperTrader:
             nf = pd.concat([nf, pd.DataFrame({"open": [o], "high": [o], "low": [o], "close": [o], "volume": [0]},
                                              index=pd.DatetimeIndex([today]))])
             raw = dict(raw, nifty=nf)
-        F = build_daily_features(raw, meta["target"], extras())
+        from ..pipeline import sameday_extras
+        groups = (meta.get("feature_groups") or "base").split(",")   # exactly what the model was trained on
+        F = build_daily_features(raw, meta["target"], extras(), groups=groups,
+                                 extra_sameday=sameday_extras(self.cfg, groups))
         sig = predict_today(F, bundle, meta)
         sig["direction"] = decide(sig["p_up"], self.cfg)
         sig["stance"] = {1: "BULLISH", -1: "BEARISH", 0: "NO_TRADE"}[sig["direction"]]
@@ -186,6 +189,8 @@ class LivePaperTrader:
     def mark_and_manage(self, force_exit: bool = False) -> None:
         import json
         open_t = self.ledger.open_trades()
+        if "rules" in open_t:
+            open_t = open_t[open_t["rules"].isna()]   # v5 book trades are managed by BookRunner
         if open_t.empty:
             return
         q = self.spot_and_vix()
@@ -246,7 +251,7 @@ class LivePaperTrader:
             nf = pd.concat([nf, pd.DataFrame({"open": [o], "high": [o], "low": [o], "close": [o], "volume": [0]},
                                              index=pd.DatetimeIndex([today]))])
             raw = dict(raw, nifty=nf)
-        F = build_range_frame(self.cfg, raw)
+        F = build_range_frame(self.cfg, raw, groups=(meta.get("feature_groups") or "base").split(","))
         sig = predict_today(F, bundle, meta)
         p = sig["p_up"]
         vprev = F["px_vix_prev"].iloc[-1]

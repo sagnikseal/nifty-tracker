@@ -23,6 +23,13 @@ from .calendar import days_to_expiry, is_expiry_day
 
 LAGGED_GLOBAL = ["spx", "ndx", "usvix", "dxy", "us10y", "brent", "gold", "usdinr"]
 SAME_DAY_OPEN = ["n225", "hsi"]
+ASIA_EXTRA = ["kospi", "twii", "shanghai"]      # open 05:30 / 06:30 / 07:00 IST
+
+# Optional feature groups (v5). The base model stays exactly as before so every group can be
+# tested against it on identical days (research/experiments.py) before it is switched on in
+# config/engine.json "feature_groups".
+FEATURE_GROUPS = ("base", "asia_extra", "adr", "overnight_futures", "smc", "structure", "regime",
+                  "events", "news", "options_hist")
 
 
 def _gk_vol(df: pd.DataFrame) -> pd.Series:
@@ -55,9 +62,15 @@ def _align_backward(target_index: pd.DatetimeIndex, s: pd.Series, avail_lag_days
 
 
 def build_daily_features(raw: Dict[str, pd.DataFrame], target: str = "oc",
-                         extra: Optional[Dict[str, pd.Series]] = None, range_k: float = 1.25) -> pd.DataFrame:
+                         extra: Optional[Dict[str, pd.Series]] = None, range_k: float = 1.25,
+                         groups=None, extra_sameday: Optional[pd.DataFrame] = None) -> pd.DataFrame:
     """Return a frame indexed by NIFTY trading date with features, label columns and the
-    day's OHLC (for the paper-trading replay). Labels: `y_ret`, `y_up`."""
+    day's OHLC (for the paper-trading replay). Labels: `y_ret`, `y_up`.
+
+    `groups`: feature groups to include (default: "base" only). `extra_sameday`: a frame keyed by
+    session date whose values are already known before the decision on that date (pre-open news
+    aggregates, previous-close option-chain features); aligned without a lag."""
+    groups = set(groups or ("base",))
     nf = raw["nifty"].copy().sort_index()
     nf = nf[~nf.index.duplicated(keep="last")]
     idx = nf.index
@@ -137,9 +150,45 @@ def build_daily_features(raw: Dict[str, pd.DataFrame], target: str = "oc",
     for name, s in (extra or {}).items():
         F[name] = _align_backward(idx, s, 1)
 
+    # ---- v5 optional groups -------------------------------------------------------------
+    if "asia_extra" in groups:
+        for name in ASIA_EXTRA:
+            df = raw.get(name)
+            if df is None or df.empty:
+                continue
+            F[f"{name}_gap"] = _align_backward(idx, np.log(df["open"] / df["close"].shift(1)), 0)
+            F[f"{name}_r1"] = _align_backward(idx, np.log(df["close"]).diff(), 1)
+    if "adr" in groups:
+        from .data.global_markets import adr_features
+        F = F.join(adr_features(raw, idx, _align_backward))
+    if "overnight_futures" in groups:
+        from .data.global_markets import overnight_features
+        F = F.join(overnight_features(idx))
+    if "smc" in groups:
+        from .analytics.smc import distance_features, smc_features
+        S = smc_features(nf, k=2).shift(lag)
+        ref = o if target != "cc" else c
+        D = distance_features(S, ref, "smcd_")
+        for col in ("ms_trend", "bos", "choch", "sweep", "fvg_new", "pd_pos", "in_bull_fvg", "in_bear_fvg",
+                    "n_bull_fvg", "n_bear_fvg", "bars_since_bull_sweep", "bars_since_bear_sweep"):
+            D[f"smc_{col}"] = S[col]
+        F = F.join(D)
+    if "regime" in groups:
+        from .analytics.regime import regime_features
+        vix = raw["indiavix"]["close"] if "indiavix" in raw and len(raw["indiavix"]) else None
+        F = F.join(regime_features(nf, vix, lag=lag))
+    if "events" in groups:
+        from .data.events import event_features
+        F = F.join(event_features(idx))
+    if extra_sameday is not None and len(extra_sameday):
+        es = extra_sameday.copy()
+        es.index = pd.DatetimeIndex(es.index).normalize()
+        es = es[~es.index.duplicated(keep="last")]
+        F = F.join(es.reindex(idx))
+
     # ---- calendar
     dates = idx.date
-    F["dow"] = idx.dayofweek
+    F["dow"] = idx.day_of_week
     F["is_expiry"] = [int(is_expiry_day(d)) for d in dates]
     F["dte"] = [days_to_expiry(d) for d in dates]
     F["month_turn"] = ((idx.day >= 27) | (idx.day <= 3)).astype(int)
@@ -163,6 +212,8 @@ def build_daily_features(raw: Dict[str, pd.DataFrame], target: str = "oc",
     F["px_prev_close"] = c.shift(1)
     if "indiavix" in raw and len(raw["indiavix"]):
         F["px_vix_prev"] = raw["indiavix"]["close"].reindex(idx).ffill(limit=3).shift(1)
+    if "structure" in groups:
+        F = add_price_structure_features(F, nf, target)
     return F.replace([np.inf, -np.inf], np.nan)
 
 

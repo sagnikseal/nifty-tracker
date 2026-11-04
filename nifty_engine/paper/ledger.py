@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import sqlite3
 import threading
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -35,14 +36,24 @@ class Ledger:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self._conn() as c:
             c.executescript(SCHEMA)
+            cols = {r[1] for r in c.execute("PRAGMA table_info(trades)")}
+            if "rules" not in cols:        # v5: per-trade exit rules for the strategy books
+                c.execute("ALTER TABLE trades ADD COLUMN rules TEXT")
 
+    @contextmanager
     def _conn(self):
-        return sqlite3.connect(self.path, timeout=10)
+        c = sqlite3.connect(self.path, timeout=10)
+        try:
+            with c:            # commit / rollback
+                yield c
+        finally:
+            c.close()          # sqlite3's own context manager does not close the connection
 
     def insert_trade(self, row: Dict[str, Any]) -> int:
         row = dict(row)
-        if isinstance(row.get("legs"), (list, dict)):
-            row["legs"] = json.dumps(row["legs"])
+        for k in ("legs", "rules"):
+            if isinstance(row.get(k), (list, dict)):
+                row[k] = json.dumps(row[k], default=str)
         cols = ",".join(row)
         q = ",".join("?" * len(row))
         with _LOCK, self._conn() as c:

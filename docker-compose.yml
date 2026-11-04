@@ -3,10 +3,13 @@ services:
     build: .
     container_name: nifty-engine
     restart: unless-stopped
-    env_file: .env            # UPSTOX_ACCESS_TOKEN or UPSTOX_API_KEY/PIN/TOTP_SECRET (optional)
+    env_file: .env            # UPSTOX_ANALYTICS_TOKEN (optional but recommended)
     environment:
       - TZ=Asia/Kolkata
+      - NE_LLM_URL=http://host.docker.internal:11434   # Ollama running on the host (Mac/Windows)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"             # same name on Linux hosts
     ports:
       - "8010:8010"           # dashboard: http://localhost:8010/paper
     volumes:
-      - ./store:/data         # data, models, ledger, reports persist here
+      - ./store:/data         # data, recordings, news, models, ledger, reports persist here

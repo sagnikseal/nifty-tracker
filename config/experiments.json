@@ -1,0 +1,36 @@
+{
+  "_note": "Pre-registered experiments. Thresholds are fixed here BEFORE running, and every experiment is reported, including failures. Edit only with a dated note explaining why; changing a rule after seeing results invalidates it.",
+  "registered": "2026-11-04",
+  "rules": {
+    "feature_group": {"min_days": 250, "max_p": 0.10, "text": "PASS if the group lowers out-of-sample log-loss vs the base model on the same days (Diebold-Mariano one-sided p < 0.10, at least 250 days)."},
+    "short_history_group": {"min_days": 120, "max_p": 0.10, "text": "Groups with < 3 years of history: stacked on top of the base model's probability, walk-forward; PASS if p < 0.10 on at least 120 out-of-sample days."},
+    "strategy": {"min_trades": 40, "min_t": 2.0, "min_dsr": 0.95, "min_real_share": 0.5, "text": "PASS if net P&L per trade > 0 with t >= 2, deflated Sharpe >= 0.95 across all strategy trials, and at least half the trades priced on real option data. PROMISING if net > 0 and t >= 1. FAIL otherwise."},
+    "meta": {"min_trades": 100, "min_kept": 0.7, "text": "PASS if net per trade on kept trades beats all trades while keeping >= 70% of them."},
+    "forward": {"min_days": 60, "text": "Forward-only data (live recordings, LLM briefs): INSUFFICIENT_DATA until 60 sessions exist."}
+  },
+  "experiments": [
+    {"id": "P0", "kind": "benchmark", "name": "Base daily model (v4 features)"},
+    {"id": "P1", "kind": "feature_group", "group": "asia_extra", "name": "+ KOSPI / Taiwan / Shanghai opening gaps"},
+    {"id": "P2", "kind": "feature_group", "group": "adr", "name": "+ ADR and INDA premium vs NSE close"},
+    {"id": "P3", "kind": "feature_group", "group": "smc", "name": "+ daily SMC structure (BOS/CHoCH, OB, FVG, sweeps)"},
+    {"id": "P4", "kind": "feature_group", "group": "structure", "name": "+ CPR / PDH / PDL / weekly levels"},
+    {"id": "P5", "kind": "feature_group", "group": "regime", "name": "+ HAR volatility forecast, VRP, efficiency ratio"},
+    {"id": "P6", "kind": "feature_group", "group": "events", "name": "+ scheduled-event flags (RBI, FOMC, Budget, NFP)"},
+    {"id": "P7", "kind": "short_history_group", "group": "overnight_futures", "name": "+ ES/NQ/crude/BTC/USDINR move from 15:30 to 09:00 IST"},
+    {"id": "P8", "kind": "short_history_group", "group": "options_hist", "name": "+ previous-close option chain (PCR, walls, IV, skew, GEX)"},
+    {"id": "P9", "kind": "short_history_group", "group": "news", "name": "+ pre-open news (local LLM after its cutoff, lexicon before)"},
+    {"id": "S1", "kind": "strategy", "book": "directional_itm", "name": "ITM option buy on confident days"},
+    {"id": "S2", "kind": "strategy", "book": "debit_spread", "name": "Debit spread when IV is high"},
+    {"id": "S3", "kind": "strategy", "book": "credit_spread", "name": "Credit spread when VRP > 0"},
+    {"id": "S4", "kind": "strategy", "book": "iron_condor", "name": "Intraday iron condor (k = 1.0 / 1.25 / 1.5, PBO reported)"},
+    {"id": "S5", "kind": "strategy", "book": "iron_fly_0dte", "name": "Expiry-day (0DTE) iron fly, real prices only"},
+    {"id": "S6", "kind": "strategy", "book": "event_straddle", "name": "Long straddle into RBI / FOMC / Budget"},
+    {"id": "S7", "kind": "strategy", "book": "turn_of_month", "name": "Turn-of-month ITM call (TD-2 -> TD+3)"},
+    {"id": "S7b", "kind": "benchmark", "name": "Turn-of-month on NIFTY futures, 2007-2026, with costs"},
+    {"id": "S8", "kind": "strategy", "book": "smc_intraday", "name": "SMC sweep -> BOS -> FVG/OB retrace, ITM option"},
+    {"id": "S8b", "kind": "benchmark", "name": "Same SMC setups measured on the index in R-multiples (no option costs)"},
+    {"id": "M1", "kind": "meta", "name": "Meta-labelling filter across all books"},
+    {"id": "F1", "kind": "forward", "name": "Local-LLM pre-open brief vs the base model (same days)"},
+    {"id": "F2", "kind": "forward", "name": "Live option-chain / depth recordings at 09:20"}
+  ]
+}

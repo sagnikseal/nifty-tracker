@@ -29,22 +29,36 @@ def extras() -> Dict[str, pd.Series]:
     return ex
 
 
-def build_frame(cfg: EngineConfig, raw: Optional[dict] = None) -> pd.DataFrame:
+def sameday_extras(cfg: EngineConfig, groups) -> Optional[pd.DataFrame]:
+    """Features keyed by session date that are known before that session's decision."""
+    frames = []
+    if "news" in groups:
+        from .semantic.news_llm import daily_news_frame
+        frames.append(daily_news_frame(cfg))
+    if "options_hist" in groups:
+        from .data import options_hist
+        frames.append(options_hist.load())
+    frames = [f for f in frames if f is not None and len(f)]
+    return pd.concat(frames, axis=1) if frames else None
+
+
+def build_frame(cfg: EngineConfig, raw: Optional[dict] = None, groups=None, target: Optional[str] = None) -> pd.DataFrame:
     raw = raw or store.load_all()
     if raw.get("nifty") is None or raw["nifty"].empty:
         raise RuntimeError("No NIFTY data in store. Run: python -m nifty_engine update-data")
-    return build_daily_features(raw, cfg.target, extras())
+    groups = list(groups or cfg.group_list)
+    return build_daily_features(raw, target or cfg.target, extras(), groups=groups,
+                                extra_sameday=sameday_extras(cfg, groups), range_k=cfg.condor_k)
 
 
-def build_range_frame(cfg: EngineConfig, raw: Optional[dict] = None) -> pd.DataFrame:
-    raw = raw or store.load_all()
-    return build_daily_features(raw, "range", extras(), range_k=cfg.condor_k)
+def build_range_frame(cfg: EngineConfig, raw: Optional[dict] = None, groups=None) -> pd.DataFrame:
+    return build_frame(cfg, raw, groups, target="range")
 
 
 def retrain(cfg: EngineConfig) -> Dict:
     F = build_frame(cfg)
     meta = train_and_register(F, cfg)
-    if "condor" in cfg.book_list:
+    if "condor" in cfg.book_list or "iron_condor" in cfg.strategy_list:
         import copy
         c2 = copy.deepcopy(cfg)
         c2.target = "range"

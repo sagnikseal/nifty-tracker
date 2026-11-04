@@ -38,6 +38,23 @@ YAHOO_SYMBOLS: Dict[str, str] = {
     "brent": "BZ=F",
     "us10y": "^TNX",
     "gold": "GC=F",
+    # ---- v5 related markets (feature groups "asia_extra" and "adr"; off in the base model) ----
+    "kospi": "^KS11",          # Seoul opens 05:30 IST -> same-day opening gap
+    "twii": "^TWII",           # Taipei opens 06:30 IST
+    "shanghai": "000001.SS",   # Shanghai opens 07:00 IST
+    "inda": "INDA",            # US-listed India ETF: how US investors repriced India overnight
+    "hdb": "HDB", "ibn": "IBN", "infy_adr": "INFY", "wit": "WIT", "rdy": "RDY",   # NIFTY-heavyweight ADRs
+    "hdfcbank": "HDFCBANK.NS", "icicibank": "ICICIBANK.NS", "infy_ns": "INFY.NS",
+    "wipro_ns": "WIPRO.NS", "drreddy_ns": "DRREDDY.NS",
+    "copper": "HG=F",
+}
+
+# Hourly series used for the "overnight_futures" group: their move between NIFTY's close (15:30 IST)
+# and 09:00 IST the next morning is known before the open. Yahoo keeps ~730 days of hourly bars,
+# so the engine stores them and the history grows over time. ES/NQ futures trade through the Asian
+# night, which makes them the best free stand-in for GIFT Nifty.
+YAHOO_HOURLY: Dict[str, str] = {
+    "es": "ES=F", "nq": "NQ=F", "crude": "CL=F", "gold_f": "GC=F", "btc": "BTC-USD", "usdinr": "INR=X",
 }
 
 
@@ -110,23 +127,34 @@ def totp_now(base32_secret: str, step: int = 30, digits: int = 6) -> str:
 
 
 class UpstoxProvider:
-    """Upstox v2/v3 REST adapter (analytics + live option prices for paper fills).
+    """Upstox v2/v3 REST adapter (market data, option chains, news; never orders).
 
-    Token: UPSTOX_ACCESS_TOKEN (valid until ~03:30 IST next day). Get it via the OAuth
-    login flow or Upstox's "access token request" approval flow; no order APIs are used.
+    Token, in order of preference:
+      * UPSTOX_ANALYTICS_TOKEN: the read-only Analytics Token (valid 1 year, GET endpoints only:
+        quotes, candles, option chain, expired instruments with Upstox Plus, news, WebSocket feed).
+        No daily login needed. Generate it in the Upstox developer console.
+      * UPSTOX_ACCESS_TOKEN: a daily OAuth token (valid until ~03:30 IST next day), or the
+        UPSTOX_API_KEY + UPSTOX_PIN + UPSTOX_TOTP_SECRET trio for automatic daily refresh.
     """
 
     BASE = "https://api.upstox.com"
     NIFTY = "NSE_INDEX|Nifty 50"
     VIX = "NSE_INDEX|India VIX"
+    BANKNIFTY = "NSE_INDEX|Nifty Bank"
 
     def __init__(self, token: Optional[str] = None):
-        self.token = (token or os.environ.get("UPSTOX_ACCESS_TOKEN", "")).strip()
+        self.token = (token or os.environ.get("UPSTOX_ANALYTICS_TOKEN", "")
+                      or os.environ.get("UPSTOX_ACCESS_TOKEN", "")).strip()
         self.s = requests.Session()
 
     @property
     def available(self) -> bool:
         return bool(self.token) or bool(os.environ.get("UPSTOX_TOTP_SECRET"))
+
+    @property
+    def is_analytics_token(self) -> bool:
+        return bool(os.environ.get("UPSTOX_ANALYTICS_TOKEN", "").strip()) and \
+            self.token == os.environ.get("UPSTOX_ANALYTICS_TOKEN", "").strip()
 
     def _get(self, path: str, params: Optional[dict] = None, _retry: bool = True) -> dict:
         if not self.token and _retry and self.refresh_via_totp():
@@ -134,9 +162,10 @@ class UpstoxProvider:
         r = self.s.get(self.BASE + path, params=params, timeout=10, headers={
             "Accept": "application/json", "Authorization": f"Bearer {self.token}"})
         if r.status_code == 401:
-            if _retry and self.refresh_via_totp():
+            if _retry and not self.is_analytics_token and self.refresh_via_totp():
                 return self._get(path, params, _retry=False)
-            raise PermissionError("Upstox token expired/invalid (401). Refresh UPSTOX_ACCESS_TOKEN.")
+            raise PermissionError("Upstox token expired/invalid (401). Refresh UPSTOX_ANALYTICS_TOKEN "
+                                  "or UPSTOX_ACCESS_TOKEN.")
         r.raise_for_status()
         return r.json()
 
@@ -168,6 +197,33 @@ class UpstoxProvider:
             out[k] = float(v.get("last_price"))
         return out
 
+    def quotes(self, keys: List[str]) -> Dict[str, dict]:
+        """Full market quotes (OHLC, depth, OI, volume) keyed by instrument key. Max ~500 keys."""
+        data = self._get("/v2/market-quote/quotes", {"instrument_key": ",".join(keys)}).get("data", {})
+        return {(v.get("instrument_token") or v.get("instrument_key") or k): v for k, v in data.items()}
+
+    def news(self, keys: List[str]) -> List[Dict]:
+        """GET /v2/news (launched Apr-2026): articles for up to 30 instrument keys per call."""
+        out = []
+        for i in range(0, len(keys), 30):
+            js = self._get("/v2/news", {"category": "instrument_keys", "instrument_keys": ",".join(keys[i:i + 30])})
+            data = js.get("data") or []
+            groups = data if isinstance(data, list) else [data]
+            for g in groups:
+                items = g.get("news") or g.get("articles") or g.get("items") or ([g] if g.get("headline") else [])
+                for it in items:
+                    ts = it.get("published_at") or it.get("publishedAt") or it.get("published_time")
+                    try:
+                        tsd = dt.datetime.fromtimestamp(int(ts) / 1000, IST) if ts and str(ts).isdigit() else (
+                            pd.Timestamp(ts).tz_convert(IST).to_pydatetime() if ts else None)
+                    except Exception:  # noqa: BLE001
+                        tsd = None
+                    out.append({"source": "upstox_news", "title": (it.get("headline") or it.get("title") or "").strip(),
+                                "summary": (it.get("summary") or "").strip(), "url": it.get("link") or it.get("url"),
+                                "ts": tsd, "instrument_key": g.get("instrument_key") or it.get("instrument_key")})
+            time.sleep(0.2)
+        return [o for o in out if o["title"]]
+
     def option_expiries(self) -> List[dt.date]:
         rows = self._get("/v2/option/contract", {"instrument_key": self.NIFTY}).get("data", [])
         return sorted({dt.date.fromisoformat(r["expiry"][:10]) for r in rows if r.get("expiry")})
@@ -184,10 +240,24 @@ class UpstoxProvider:
                     "strike": float(r["strike_price"]), "type": side,
                     "instrument_key": o.get("instrument_key"),
                     "ltp": md.get("ltp"), "bid": md.get("bid_price"), "ask": md.get("ask_price"),
-                    "oi": md.get("oi"), "iv": gk.get("iv"), "delta": gk.get("delta"),
-                    "spot": r.get("underlying_spot_price"),
+                    "bid_qty": md.get("bid_qty"), "ask_qty": md.get("ask_qty"),
+                    "oi": md.get("oi"), "prev_oi": md.get("prev_oi"), "volume": md.get("volume"),
+                    "close_price": md.get("close_price"),
+                    "iv": gk.get("iv"), "delta": gk.get("delta"), "gamma": gk.get("gamma"),
+                    "theta": gk.get("theta"), "vega": gk.get("vega"), "pop": gk.get("pop"),
+                    "spot": r.get("underlying_spot_price"), "pcr": r.get("pcr"),
                 })
         return pd.DataFrame(recs)
+
+    def intraday_today(self, key: str, unit: str = "minutes", interval: int = 5) -> pd.DataFrame:
+        """Today's candles so far (v3 intraday endpoint; the historical endpoint ends yesterday)."""
+        path = f"/v3/historical-candle/intraday/{urllib.parse.quote(key, safe='')}/{unit}/{interval}"
+        c = self._get(path).get("data", {}).get("candles", [])
+        if not c:
+            return pd.DataFrame()
+        df = pd.DataFrame(c, columns=["ts", "open", "high", "low", "close", "volume", "oi"][: len(c[0])])
+        df["ts"] = pd.to_datetime(df["ts"]).dt.tz_convert(IST)
+        return df.drop_duplicates("ts").set_index("ts").sort_index()
 
     def candles(self, key: str, unit: str, interval: int, start: dt.date, end: dt.date) -> pd.DataFrame:
         """v3 historical candles. unit: minutes|hours|days. Minute data is chunked monthly."""
@@ -259,3 +329,26 @@ class GdeltProvider:
         s = pd.Series({pd.to_datetime(p["date"], format="%Y%m%dT%H%M%SZ", utc=True).tz_convert(IST).date():
                        float(p["value"]) for p in pts})
         return s.groupby(level=0).mean().sort_index()
+
+    def articles(self, query: str, start: dt.datetime, end: dt.datetime, maxrecords: int = 250) -> List[Dict]:
+        """Headlines with the time GDELT first saw them (`seendate`, UTC). Only the last ~3 months
+        are searchable, which is enough to backfill news history after a local LLM's training cutoff."""
+        fmt = "%Y%m%d%H%M%S"
+        r = requests.get(self.URL, timeout=40, headers=UA, params={
+            "query": query, "mode": "artlist", "format": "json", "maxrecords": maxrecords, "sort": "datedesc",
+            "startdatetime": start.astimezone(dt.timezone.utc).strftime(fmt),
+            "enddatetime": end.astimezone(dt.timezone.utc).strftime(fmt)})
+        r.raise_for_status()
+        try:
+            arts = r.json().get("articles", [])
+        except ValueError:     # GDELT answers plain text on bad queries / throttling
+            return []
+        out = []
+        for a in arts:
+            try:
+                ts = pd.to_datetime(a["seendate"], format="%Y%m%dT%H%M%SZ", utc=True).tz_convert(IST).to_pydatetime()
+            except Exception:  # noqa: BLE001
+                continue
+            out.append({"source": "gdelt:" + str(a.get("domain", "")), "title": (a.get("title") or "").strip(),
+                        "url": a.get("url"), "ts": ts, "first_seen": ts})
+        return [o for o in out if o["title"]]

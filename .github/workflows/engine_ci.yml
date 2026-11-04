@@ -1,17 +1,16 @@
-name: v4 engine - tests & walk-forward backtest
+name: Engine tests
 
+# Fast checks on every push / pull request. The daily data + research job lives in update_nifty.yml.
 on:
   push:
-    paths: ['nifty_engine/**', 'tests/**', 'requirements-engine.txt', '.github/workflows/engine_ci.yml']
+    paths: ['nifty_engine/**', 'tests/**', 'config/**', 'requirements-engine.txt', '.github/workflows/engine_ci.yml']
+  pull_request:
   workflow_dispatch:
-  schedule:
-    - cron: '30 11 * * 1-5'   # 17:00 IST: refresh data, retrain, re-run backtest
 
 jobs:
-  test-and-backtest:
+  tests:
     runs-on: ubuntu-latest
-    env:
-      NE_DATA_DIR: ${{ github.workspace }}/store
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,11 +18,3 @@ jobs:
       - run: pip install -r requirements-engine.txt
       - name: Unit + leakage tests
         run: python -m unittest discover -s tests -v
-      - name: Download data, train, backtest (real data)
-        run: python -m nifty_engine all
-      - uses: actions/upload-artifact@v4
-        with:
-          name: backtest-report
-          path: |
-            store/reports/
-            store/models/champion.json

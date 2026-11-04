@@ -1,4 +1,4 @@
-# NIFTY v4 engine (python -m nifty_engine). Python 3.10+
+# NIFTY v5 engine (python -m nifty_engine). Python 3.10+. Everything here is free.
 numpy>=1.26
 pandas>=2.1
 scikit-learn>=1.4
@@ -7,3 +7,5 @@ requests>=2.31
 fastapi>=0.110
 uvicorn>=0.29
 truststore>=0.9   # use the OS certificate store (fixes corporate TLS inspection)
+upstox-python-sdk>=2.17   # official Upstox SDK: WebSocket v3 feed (order-book depth recorder)
+# Local LLM: install Ollama separately (https://ollama.com, `brew install ollama`); no Python package needed.

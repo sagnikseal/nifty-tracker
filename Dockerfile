@@ -1,4 +1,5 @@
-# NIFTY v4 engine: runs anywhere Docker runs (Windows/macOS/Linux/cloud VM).
+# NIFTY v5 engine: runs anywhere Docker runs (Windows/macOS/Linux/cloud VM).
+# The local LLM (Ollama) runs on the host; docker-compose points NE_LLM_URL at it.
 FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 TZ=Asia/Kolkata NE_DATA_DIR=/data
 WORKDIR /app
@@ -7,6 +8,7 @@ RUN pip install --no-cache-dir -r requirements-engine.txt
 COPY nifty_engine ./nifty_engine
 COPY config ./config
 COPY tests ./tests
+COPY scripts ./scripts
 VOLUME ["/data"]
 EXPOSE 8010
 HEALTHCHECK --interval=5m --timeout=10s CMD python -c "import urllib.request;urllib.request.urlopen('http://localhost:8010/api/v4/health')"

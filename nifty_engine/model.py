@@ -294,6 +294,7 @@ def train_and_register(F: pd.DataFrame, cfg: EngineConfig, specs: Optional[List[
     oos.to_csv(vdir / "oos_predictions.csv")
     meta = {
         "version": version, "spec_name": best, "target": cfg.target, "has_edge": has_edge,
+        "feature_groups": cfg.feature_groups,
         "trained_on": [str(full.index.min().date()), str(full.index.max().date())],
         "n_train": int(len(full)), "features": model.cols, "explain": model.explain(),
         "metrics": r["metrics"], "recent_metrics": r["recent"],

@@ -532,7 +532,7 @@ def promote_best3(F: pd.DataFrame, cfg, zoo_result: Dict, recent_days: int = 500
     joblib.dump({"model": model, "calibrator": cal, "target": cfg.target}, vdir / "model.joblib")
     b3.to_csv(vdir / "oos_predictions.csv")
     meta = {"version": version, "spec_name": "zoo_best3", "members": top3, "target": cfg.target,
-            "has_edge": has_edge, "trained_on": [str(full.index.min().date()), str(full.index.max().date())],
+            "has_edge": has_edge, "feature_groups": getattr(cfg, "feature_groups", "base"), "trained_on": [str(full.index.min().date()), str(full.index.max().date())],
             "n_train": int(len(full)), "features": model.cols, "explain": model.explain(),
             "metrics": met, "recent_metrics": rec_met, "zoo_decision": decision, "promoted": True}
     (vdir / "meta.json").write_text(json.dumps(meta, indent=2, default=str))

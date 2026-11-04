@@ -1,6 +1,19 @@
-# NIFTY 50 Tracker: v4 prediction engine + auto paper trader
+# NIFTY 50 Tracker: v5 engine (analytics, local-LLM news, multi-strategy paper trading, research harness)
 
-> **Read first:** [`docs/UPGRADE_PLAN_V4.md`](docs/UPGRADE_PLAN_V4.md). The v3 model's 97% accuracy came from label leakage in `scripts/build_real_training_data.py`. v4 replaces it with a leakage-tested, walk-forward engine trained on 19 years of real data. Its honest out-of-sample result is 53% on all days and 57% on confident days (2014–2026).
+> **New in v5:** see [`docs/V5_ENGINE.md`](docs/V5_ENGINE.md). It covers SMC / technical / option-chain analytics, related global markets, news read by a free local LLM (Ollama), nine options strategy books paper-traded side by side, and a pre-registered research harness that tests every idea on real expired-option prices. Everything runs free on your Mac.
+>
+> **Background:** [`docs/UPGRADE_PLAN_V4.md`](docs/UPGRADE_PLAN_V4.md). The v3 model's 97% accuracy came from label leakage in `scripts/build_real_training_data.py`. v4 replaced it with a leakage-tested, walk-forward engine.
+
+## v5 quick start (Mac)
+
+```bash
+pip install -r requirements-engine.txt
+brew install ollama && ollama pull llama3.1:8b      # free local LLM for news (optional; lexicon fallback)
+cp .env.example .env                                # set UPSTOX_ANALYTICS_TOKEN
+python -m nifty_engine update-data && python -m nifty_engine fetch-intraday && python -m nifty_engine train
+python -m nifty_engine research                     # every experiment -> store/reports/RESEARCH_REPORT.md
+python -m nifty_engine run                          # recorder + paper books + dashboard at http://localhost:8010/paper
+```
 
 ## v4 quick start
 

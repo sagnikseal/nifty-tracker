@@ -15,6 +15,18 @@
   variants          run the pre-declared strategy grid (all variants reported) -> VARIANTS.md
   fetch-intraday    (Upstox token) download NIFTY & India VIX 5-minute bars since Jan-2022 for the
                     phase-2 intraday model -> store/intraday/
+
+v5 (all free: Upstox Analytics Token + Yahoo/GDELT/RSS + a local Ollama model)
+  research          run every pre-registered experiment (feature groups, strategy books, meta-labelling,
+                    forward tests) -> store/reports/RESEARCH_REPORT.md   [--only P1,S4] [--quick]
+  record            record today's option chain + order-book depth until 15:31 (Analytics Token)
+  news-capture      collect headlines now (RSS, Upstox News API, GDELT)
+  news-score        score unscored headlines with the local LLM (lexicon if Ollama is off)
+  news-backfill     fill the last ~3 months of headlines from GDELT (run once)
+  brief             write today's pre-open brief with the local LLM
+  build-option-features  rebuild historical option-chain features from expired-option candles
+  books             status of the v5 paper books
+  llm-check         check the local Ollama model
 """
 
 from __future__ import annotations
@@ -31,14 +43,18 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="nifty_engine")
     ap.add_argument("command", choices=["update-data", "train", "backtest", "signal", "run", "serve", "all",
                                         "collect-news", "fetch-intraday", "variants",
-                                        "fetch-expired-options", "replay-real", "zoo"])
+                                        "fetch-expired-options", "replay-real", "zoo",
+                                        "research", "record", "news-capture", "news-score", "news-backfill",
+                                        "brief", "build-option-features", "books", "llm-check"])
+    ap.add_argument("--only", help="research: comma list of experiment ids (e.g. P1,S4)")
+    ap.add_argument("--quick", action="store_true", help="research: logistic model only (fast)")
     ap.add_argument("--members", help="comma list for `zoo` (default: every installed model)")
     ap.add_argument("--no-deep", action="store_true", help="zoo without PyTorch models")
     ap.add_argument("--fresh", action="store_true", help="zoo: discard cached member predictions (use after new data)")
     ap.add_argument("--promote", action="store_true", help="zoo: deploy best-3 ensemble if it beats the champion")
     ap.add_argument("--max-expiries", type=int)
     ap.add_argument("--since", default="2024-10-01")
-    ap.add_argument("--mode", default="itm", choices=["itm", "wings"])
+    ap.add_argument("--mode", default="itm", choices=["itm", "wings", "full"])
     ap.add_argument("--capital", type=float)
     ap.add_argument("--books")
     ap.add_argument("--style", choices=["debit_spread", "itm_buy"])
@@ -62,8 +78,10 @@ def main(argv=None) -> int:
         cfg.target = a.target
 
     if a.command in ("update-data", "all"):
+        from .data.global_markets import refresh_hourly
         from .data.store import refresh_daily
         print(json.dumps(refresh_daily(cfg.extra.get("download_start", "2007-01-01")), indent=1))
+        print(json.dumps({"hourly": refresh_hourly()}, indent=1))
     if a.command in ("train", "all"):
         from .pipeline import retrain
         meta = retrain(cfg)
@@ -133,6 +151,51 @@ def main(argv=None) -> int:
         import uvicorn
         from .api import app
         uvicorn.run(app, host="0.0.0.0", port=a.port)
+    # ------------------------------------------------------------------ v5
+    if a.command == "research":
+        from .research.experiments import REPORTS, run_all
+        out = run_all(cfg, only=a.only.split(",") if a.only else None, quick=a.quick)
+        print((REPORTS / "RESEARCH_REPORT.md").read_text(encoding="utf-8"))
+        print(f"\nFull results: {REPORTS / 'research.json'}  ({len(out['results'])} experiments)")
+    if a.command == "record":
+        from .data.recorder import run_session
+        print(json.dumps(run_session(cfg), indent=1, default=str))
+    if a.command == "news-capture":
+        from .semantic.news_llm import capture
+        print(json.dumps(capture(cfg), indent=1))
+    if a.command == "news-score":
+        from .semantic.news_llm import score_pending
+        print(json.dumps(score_pending(cfg, max_items=5000), indent=1))
+    if a.command == "news-backfill":
+        from .semantic.news_llm import backfill_gdelt, score_pending
+        print(json.dumps(backfill_gdelt(), indent=1))
+        print(json.dumps(score_pending(cfg, max_items=20000), indent=1))
+    if a.command == "brief":
+        from .semantic.market_brief import build_state, write_brief
+        from .paper.ledger import Ledger
+        sig = Ledger().last_signal()
+        out = write_brief(cfg, build_state(cfg, sig))
+        print(json.dumps({k: v for k, v in out.items() if k != "state"}, indent=1, default=str))
+    if a.command == "build-option-features":
+        from .data import options_hist
+        from .intraday import load_5m
+        from .research.experiments import Lab
+        X = options_hist.build(load_5m("nifty_5m"), Lab(cfg).real_expiries(), cfg.lot_size)
+        print(f"{len(X)} sessions -> {options_hist.FEATURES_FILE}")
+    if a.command == "books":
+        from .paper.books_live import BookRunner
+        from .paper.live import LivePaperTrader
+        print(json.dumps(BookRunner(cfg, LivePaperTrader(cfg)).scorecard(), indent=1))
+    if a.command == "llm-check":
+        from .semantic.llm import LocalLLM
+        llm = LocalLLM(cfg.llm_model, cfg.llm_url)
+        ok = llm.available()
+        print(json.dumps({"url": llm.url, "model": llm.model, "available": ok,
+                          "hint": None if ok else f"install Ollama, run `ollama serve`, then `ollama pull {llm.model}`"}, indent=1))
+        if ok:
+            from .semantic.news_llm import BATCH_SCHEMA, SYSTEM
+            print(json.dumps(llm.json_chat(SYSTEM.replace("{heavy}", "HDFCBANK, RELIANCE"),
+                                           "id=t1: RBI unexpectedly cuts repo rate by 50 bps", BATCH_SCHEMA), indent=1))
     return 0
 
 
