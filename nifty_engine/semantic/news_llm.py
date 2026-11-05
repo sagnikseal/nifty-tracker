@@ -172,24 +172,29 @@ def capture(cfg: EngineConfig) -> Dict[str, int]:
     try:
         from ..data.providers import GdeltProvider
         end = now_ist()
+        gp = GdeltProvider()                       # one throttled client for all queries
         for q in _gdelt_queries():
-            g = GdeltProvider().articles(q, end - dt.timedelta(hours=3), end)
+            g = gp.articles(q, end - dt.timedelta(hours=3), end)
             items += g
             stats["gdelt"] = stats.get("gdelt", 0) + len(g)
     except Exception as e:  # noqa: BLE001
-        log.warning("gdelt failed: %s", str(e)[:150])
+        log.warning("gdelt skipped: %s", str(e)[:150])
     stats["new"] = store_items([i for i in items if i.get("title")])
     return stats
 
 
 def _gdelt_queries() -> List[str]:
-    return ['(Nifty OR Sensex OR "Indian stocks" OR "Indian markets" OR RBI OR rupee OR "Dalal Street") sourcelang:english',
-            '("Federal Reserve" OR "crude oil" OR "Treasury yields" OR tariffs OR geopolitical OR "Wall Street") sourcelang:english']
+    # One combined query = one request per capture (GDELT allows 1 request / 5 s per IP).
+    return ['(Nifty OR Sensex OR "Indian stocks" OR "Indian markets" OR RBI OR rupee OR "Dalal Street" OR '
+            '"Federal Reserve" OR "crude oil" OR "Treasury yields" OR tariffs OR geopolitical OR "Wall Street") '
+            'sourcelang:english']
 
 
-def backfill_gdelt(days: int = 85, sleep: float = 6.0) -> Dict[str, int]:
-    """Fill the last ~3 months of pre-open news from GDELT (first_seen = GDELT's seendate)."""
-    from ..data.providers import GdeltProvider
+def backfill_gdelt(days: int = 85, sleep: float = 0.0) -> Dict[str, int]:
+    """Fill the last ~3 months of pre-open news from GDELT (first_seen = GDELT's seendate).
+    Pacing, retries and caching are handled by GdeltProvider; finished windows are cached,
+    so an interrupted backfill resumes without re-downloading."""
+    from ..data.providers import GdeltError, GdeltProvider
     g, n = GdeltProvider(), 0
     today = now_ist().date()
     for k in range(days, -1, -1):
@@ -201,9 +206,14 @@ def backfill_gdelt(days: int = 85, sleep: float = 6.0) -> Dict[str, int]:
         for q in _gdelt_queries():
             try:
                 n += store_items(g.articles(q, start, end))
+            except GdeltError as e:
+                log.warning("gdelt %s: %s", d, str(e)[:160])
+                if "cooling down" in str(e) or "pausing" in str(e):
+                    return {"stored": n, "stopped_early": d.isoformat(), "reason": str(e)}
             except Exception as e:  # noqa: BLE001
                 log.warning("gdelt %s: %s", d, str(e)[:120])
-            time.sleep(sleep)
+            if sleep:
+                time.sleep(sleep)
     return {"stored": n}
 
 

@@ -13,6 +13,7 @@ import json
 import os
 import time
 import urllib.parse
+from pathlib import Path
 from typing import Dict, List, Optional
 
 import pandas as pd
@@ -311,18 +312,107 @@ def load_participant_oi(folder: str) -> pd.DataFrame:
 
 
 # --------------------------------------------------------------------------- news
+class GdeltError(RuntimeError):
+    pass
+
+
 class GdeltProvider:
-    """GDELT DOC 2.0 API: free global news tone. The API only covers a rolling ~3 month
-    window, so news features are *collected forward* and enter the model once enough
-    history exists (see model.py feature gating)."""
+    """GDELT DOC 2.0 API: free global news tone and headlines (rolling ~3 month window).
+
+    GDELT allows ONE request every 5 seconds per IP and answers HTTP 429 (or a plain-text
+    "Please limit requests" page) when that is exceeded. Several engine jobs call it within
+    seconds of each other (08:40 lexicon tone + news capture), so every request goes through
+    `_request`, which:
+      * throttles to >= MIN_INTERVAL seconds between calls, shared across threads AND processes
+        (the timestamp lives in store/cache/gdelt/_last_call),
+      * retries 429 / throttle pages with backoff (Retry-After honoured, else 8s, 16s, 32s),
+      * after repeated throttling, pauses all GDELT calls for COOLDOWN seconds (circuit breaker),
+      * caches responses on disk (TTL: 20 min for live windows, forever for past windows),
+        so re-running a command does not re-hit the API.
+    """
 
     URL = "https://api.gdeltproject.org/api/v2/doc/doc"
+    MIN_INTERVAL = 6.0
+    MAX_RETRIES = 3
+    COOLDOWN = 15 * 60
+    LIVE_TTL = 20 * 60
+    _lock = __import__("threading").Lock()
 
+    def __init__(self, session: Optional[requests.Session] = None, cache_dir=None, sleep=time.sleep):
+        from ..config import DATA_DIR
+        self.s = session or requests.Session()
+        self.s.headers.update({"User-Agent": "nifty-engine/5 (research; +https://github.com/sagnikseal/nifty-tracker)"})
+        self.dir = Path(cache_dir or (DATA_DIR / "cache" / "gdelt"))
+        self.dir.mkdir(parents=True, exist_ok=True)
+        self._sleep = sleep
+
+    # ---- shared state (works across processes) --------------------------------------
+    def _read_float(self, name: str) -> float:
+        try:
+            return float((self.dir / name).read_text().strip() or 0)
+        except (OSError, ValueError):
+            return 0.0
+
+    def _write_float(self, name: str, v: float) -> None:
+        try:
+            (self.dir / name).write_text(repr(v))
+        except OSError:
+            pass
+
+    def _cache_path(self, params: Dict) -> Path:
+        import hashlib
+        key = json.dumps(params, sort_keys=True)
+        return self.dir / (hashlib.sha1(key.encode()).hexdigest()[:20] + ".json")
+
+    @staticmethod
+    def _throttled(r: requests.Response) -> bool:
+        if r.status_code == 429:
+            return True
+        ctype = r.headers.get("Content-Type", "")
+        return r.status_code == 200 and "json" not in ctype and "limit requests" in r.text[:300].lower()
+
+    def _request(self, params: Dict, ttl: Optional[float]) -> Dict:
+        cp = self._cache_path(params)
+        if cp.exists() and (ttl is None or time.time() - cp.stat().st_mtime < ttl):
+            try:
+                return json.loads(cp.read_text(encoding="utf-8"))
+            except ValueError:
+                pass
+        if time.time() < self._read_float("_cooldown_until"):
+            raise GdeltError("GDELT cooling down after repeated rate limiting; skipped")
+        delay = 8.0
+        for attempt in range(self.MAX_RETRIES + 1):
+            with self._lock:
+                wait = self.MIN_INTERVAL - (time.time() - self._read_float("_last_call"))
+                if wait > 0:
+                    self._sleep(wait)
+                self._write_float("_last_call", time.time())
+                r = self.s.get(self.URL, params=params, timeout=40)
+            if self._throttled(r):
+                if attempt == self.MAX_RETRIES:
+                    self._write_float("_cooldown_until", time.time() + self.COOLDOWN)
+                    raise GdeltError(f"GDELT rate limit persisted after {self.MAX_RETRIES} retries; "
+                                     f"pausing GDELT for {self.COOLDOWN // 60} min")
+                ra = r.headers.get("Retry-After")
+                self._sleep(float(ra) if ra and ra.replace(".", "", 1).isdigit() else delay)
+                delay *= 2
+                continue
+            r.raise_for_status()
+            try:
+                js = r.json()
+            except ValueError:            # plain-text error page for a bad query
+                raise GdeltError("GDELT returned non-JSON: " + r.text[:120].strip())
+            try:
+                cp.write_text(json.dumps(js), encoding="utf-8")
+            except OSError:
+                pass
+            return js
+        raise GdeltError("unreachable")
+
+    # ---- endpoints ----------------------------------------------------------------------
     def daily_tone(self, query: str, timespan: str = "3months") -> pd.Series:
-        r = requests.get(self.URL, params={"query": query, "mode": "timelinetone", "format": "json",
-                                           "timespan": timespan}, headers=UA, timeout=30)
-        r.raise_for_status()
-        js = r.json()
+        js = self._request({"query": query, "mode": "timelinetone", "format": "json", "timespan": timespan},
+                           ttl=self.LIVE_TTL)
         pts = (js.get("timeline") or [{}])[0].get("data", [])
         if not pts:
             return pd.Series(dtype=float)
@@ -334,17 +424,13 @@ class GdeltProvider:
         """Headlines with the time GDELT first saw them (`seendate`, UTC). Only the last ~3 months
         are searchable, which is enough to backfill news history after a local LLM's training cutoff."""
         fmt = "%Y%m%d%H%M%S"
-        r = requests.get(self.URL, timeout=40, headers=UA, params={
+        live = (dt.datetime.now(dt.timezone.utc) - end.astimezone(dt.timezone.utc)).total_seconds() < 6 * 3600
+        js = self._request({
             "query": query, "mode": "artlist", "format": "json", "maxrecords": maxrecords, "sort": "datedesc",
             "startdatetime": start.astimezone(dt.timezone.utc).strftime(fmt),
-            "enddatetime": end.astimezone(dt.timezone.utc).strftime(fmt)})
-        r.raise_for_status()
-        try:
-            arts = r.json().get("articles", [])
-        except ValueError:     # GDELT answers plain text on bad queries / throttling
-            return []
+            "enddatetime": end.astimezone(dt.timezone.utc).strftime(fmt)}, ttl=self.LIVE_TTL if live else None)
         out = []
-        for a in arts:
+        for a in js.get("articles", []):
             try:
                 ts = pd.to_datetime(a["seendate"], format="%Y%m%dT%H%M%SZ", utc=True).tz_convert(IST).to_pydatetime()
             except Exception:  # noqa: BLE001
