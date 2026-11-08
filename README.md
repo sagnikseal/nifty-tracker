@@ -41,4 +41,4 @@ A local, free, paper-trading engine for NIFTY 50 options. It has:
 python -m unittest discover -s tests
 ```
 
-There are 99 tests. They cover look-ahead protection for every feature, the exact behaviour of the ATM rules, conservative replay fills, news parsing and polling, the news-impact study, agent guardrails, the model zoo, the GitHub collector, and the runtime and API end to end.
+There are 84 tests. They cover look-ahead protection for every feature, the exact behaviour of the ATM rules, conservative replay fills, news parsing and polling, the news-impact study, agent guardrails, the model zoo, the GitHub collector, and the runtime and API end to end.

@@ -29,6 +29,8 @@ Data
   fetch-expired-options  (Upstox Plus) real prices of expired weekly options [--since] [--mode]
   news-capture / news-score / news-backfill   headlines now / score with the LLM / ~3 months of GDELT
   record            record today's option chain + depth (Upstox)
+  chain-poll        one option-chain snapshot and exit (Upstox); skips cleanly if the market is closed or
+                    no token is set -- for a short scheduled job (e.g. a GitHub Actions cron), not daily use
   llm-check         is the local LLM reachable?
 """
 
@@ -44,7 +46,8 @@ from .config import DATA_DIR, EngineConfig
 COMMANDS = ["app", "run", "serve", "intraday-train", "intraday-zoo", "intraday-ablation", "fetch-history", "atm-replay", "news-impact", "llm-bench", "sources-check",
             "data-report", "refresh-intraday", "update-data", "train", "backtest", "signal", "all", "collect-news",
             "fetch-intraday", "variants", "fetch-expired-options", "replay-real", "zoo", "research", "record",
-            "news-capture", "news-score", "news-backfill", "brief", "build-option-features", "books", "llm-check"]
+            "chain-poll", "news-capture", "news-score", "news-backfill", "brief", "build-option-features", "books",
+            "llm-check"]
 
 
 def main(argv=None) -> int:
@@ -209,6 +212,17 @@ def main(argv=None) -> int:
     if c == "record":
         from .data.recorder import run_session
         print(json.dumps(run_session(cfg), indent=1, default=str))
+    if c == "chain-poll":
+        from .calendar import is_market_open
+        from .data.providers import UpstoxProvider
+        from .data.recorder import ChainPoller
+        up = UpstoxProvider()
+        if not up.available:
+            print(json.dumps({"skipped": "no Upstox token set"}, indent=1))
+        elif not is_market_open():
+            print(json.dumps({"skipped": "market is closed"}, indent=1))
+        else:
+            print(json.dumps(ChainPoller(cfg, up).poll_once(), indent=1, default=str))
     if c == "news-capture":
         from .semantic.news_llm import capture
         print(json.dumps(capture(cfg), indent=1))

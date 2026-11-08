@@ -266,11 +266,13 @@ The sequence networks and foundation models still have to be run in full on the 
 
 ### GitHub Actions collector (`docs/DATA_COLLECTION.md`)
 
-- **What it collects:** option-chain snapshots and quotes with depth every 15 minutes in market hours; end-of-day 1/5-minute candles for NIFTY, VIX, Bank Nifty, futures and heavyweights; expired options after each expiry; news every 15 minutes, around the clock.
-- **Where it goes:** a `data` branch; `python -m nifty_engine.collect sync` pulls it to the Mac.
+One small workflow (`.github/workflows/collect.yml`), one job, every 15 minutes on market days. It reuses the engine's own one-shot commands rather than a separate code path, so the data it writes is identical to what the engine writes locally:
+
+- **What it runs, each tick:** `chain-poll` (one option-chain snapshot), `refresh-intraday` (recent 1-/5-minute candles), `fetch-history` (Bank Nifty, heavyweights, NIFTY futures), `news-capture` (headlines). Each command is already incremental, so a run just picks up from wherever the last one left off.
+- **Where it goes:** a `data` branch. The job checks that branch out first, so each run only ever appends after what's already there; there's no separate merge step. Pulling it onto the Mac isn't wired up yet — for now, `git fetch` the `data` branch and copy the files you want into `store/`.
 - **Off by default:**
   - set the repository variable `COLLECT_ENABLED=true` to turn it on;
-  - your repository is public, so first point `DATA_REPO` at a **private** repository;
+  - your repository is public, so first point `DATA_REPO` at a **private** repository, with `DATA_REPO_TOKEN` set to a token that can write to it;
   - exchange and broker data may not be redistributed publicly.
 
 ## 10. Moving to real money later
