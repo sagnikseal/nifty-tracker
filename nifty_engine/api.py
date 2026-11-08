@@ -1,116 +1,167 @@
-"""FastAPI service: signal, paper-trading status and reports. `python -m nifty_engine serve`."""
+"""FastAPI service for the dashboard (contract: docs/API.md). Paper trading only.
+
+`create_app(runtime)` serves the dashboard at `/`, static files at `/static`, the JSON API at
+`/api/*`, and a Server-Sent Events stream of the live snapshot at `/api/stream`.
+Without a runtime (e.g. `serve` for reports only) the state endpoints say the engine is not running.
+"""
 
 from __future__ import annotations
 
+import asyncio
 import json
+import math
+from typing import Any, Optional
 
-from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, PlainTextResponse
+from fastapi import Body, FastAPI
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Response, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 
-from .config import EngineConfig
-from .model import load_champion
+from .config import DATA_DIR, ROOT
 from .paper.ledger import Ledger
-from .pipeline import REPORTS
-from .report import live_month_report
 
-app = FastAPI(title="NIFTY v5 engine", version="5.0.0")
-cfg = EngineConfig.load()
-ledger = Ledger()
-
-
-@app.get("/api/v4/health")
-def health():
-    _, meta = load_champion()
-    return {"ok": True, "model": meta and {k: meta[k] for k in ("version", "spec_name", "has_edge", "trained_on")},
-            "capital": cfg.capital, "books": cfg.books}
+WEB = ROOT / "nifty_engine" / "web"
+REPORTS = DATA_DIR / "reports"
+REPORT_FILES = {"intraday": "INTRADAY_REPORT.md", "atm_replay": "ATM_REPLAY_REPORT.md",
+                "news_impact": "NEWS_IMPACT_REPORT.md", "research": "RESEARCH_REPORT.md", "data": "DATA_REPORT.md",
+                "llm_bench": "LLM_BENCH_REPORT.md", "sources": "SOURCES_REPORT.md", "backtest": "BACKTEST_REPORT.md"}
+HINTS = {"intraday": "python -m nifty_engine intraday-train", "atm_replay": "python -m nifty_engine atm-replay",
+         "news_impact": "python -m nifty_engine news-impact", "research": "python -m nifty_engine research",
+         "data": "python -m nifty_engine data-report", "llm_bench": "python -m nifty_engine llm-bench",
+         "sources": "python -m nifty_engine sources-check", "backtest": "python -m nifty_engine backtest"}
 
 
-@app.get("/api/v4/signal")
-def signal():
-    return ledger.last_signal() or {"stance": "no signal yet today"}
+def clean(o: Any) -> Any:
+    """JSON-safe: NaN/inf -> None, timestamps -> ISO strings, numpy scalars -> Python."""
+    if isinstance(o, dict):
+        return {str(k): clean(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [clean(v) for v in o]
+    if isinstance(o, float):
+        return None if math.isnan(o) or math.isinf(o) else o
+    if hasattr(o, "isoformat"):
+        return o.isoformat()
+    if hasattr(o, "item"):
+        try:
+            return clean(o.item())
+        except Exception:  # noqa: BLE001
+            return str(o)
+    return o
 
 
-@app.get("/api/v4/paper/status")
-def status():
-    tr = ledger.trades("live")
-    closed = tr[tr["status"] == "CLOSED"] if len(tr) else tr
-    return {"capital": cfg.capital, "equity": cfg.capital + (float(closed["net_pnl"].sum()) if len(closed) else 0.0),
-            "trades_closed": int(len(closed)), "open": json.loads(ledger.open_trades().to_json(orient="records")),
-            "win_rate": float((closed["net_pnl"] > 0).mean()) if len(closed) else None}
+def _json(o: Any, status: int = 200) -> JSONResponse:
+    return JSONResponse(clean(o), status_code=status)
 
 
-@app.get("/api/v4/paper/scorecard")
-def scorecard():
-    from .paper.live import LivePaperTrader
-    return LivePaperTrader(cfg, ledger).prediction_scorecard()
+def create_app(runtime=None) -> FastAPI:
+    app = FastAPI(title="NIFTY engine")
+    ledger = runtime.ledger if runtime is not None else Ledger()
+    if WEB.exists():
+        app.mount("/static", StaticFiles(directory=str(WEB)), name="static")
+
+    @app.get("/")
+    def index():
+        f = WEB / "index.html"
+        return FileResponse(str(f)) if f.exists() else PlainTextResponse("dashboard files missing (nifty_engine/web)")
+
+    @app.get("/api/state")
+    def state():
+        if runtime is None:
+            return _json({"error": "engine not running: start it with `python -m nifty_engine app`"}, 503)
+        return _json(runtime.snapshot())
+
+    @app.get("/api/stream")
+    async def stream():
+        if runtime is None:
+            return _json({"error": "engine not running"}, 503)
+
+        async def gen():
+            last = 0.0
+            loop = asyncio.get_running_loop()
+            while True:
+                changed = await loop.run_in_executor(None, runtime.changed.wait, 2.0)
+                runtime.changed.clear()
+                now = loop.time()
+                if not changed and now - last < 2.0:
+                    continue
+                last = now
+                yield f"event: state\ndata: {json.dumps(clean(runtime.snapshot()), allow_nan=False)}\n\n"
+
+        return StreamingResponse(gen(), media_type="text/event-stream",
+                                 headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+    @app.get("/api/trades")
+    def trades(limit: int = 200):
+        t = ledger.trades()
+        if len(t):
+            t = t.sort_values("id", ascending=False).head(limit)
+            for c in ("legs", "rules"):
+                if c in t:
+                    t[c] = [json.loads(x) if isinstance(x, str) and x else None for x in t[c]]
+        return _json(json.loads(t.to_json(orient="records")) if len(t) else [])
+
+    @app.get("/api/equity")
+    def equity():
+        t = ledger.trades("live")
+        out = {}
+        cap = runtime.cfg.book_capital if runtime is not None else 100_000.0
+        if len(t):
+            c = t[t["status"] == "CLOSED"].copy()
+            c["d"] = c["exit_ts"].fillna(c["date"]).astype(str).str[:10]
+            for b, g in c.groupby("book"):
+                s = g.groupby("d")["net_pnl"].sum().sort_index().cumsum() + cap
+                out[b] = [{"date": d, "equity": round(float(v), 2)} for d, v in s.items()]
+        return _json(out)
+
+    @app.get("/api/news")
+    def news(limit: int = 100):
+        if runtime is None:
+            return _json([])
+        if not runtime.news:
+            runtime.refresh_news_view()
+        return _json(runtime.news[:limit])
+
+    @app.get("/api/report/{name}")
+    def report(name: str):
+        f = REPORT_FILES.get(name)
+        if not f:
+            return PlainTextResponse(f"unknown report {name}", status_code=404)
+        p = REPORTS / f
+        if not p.exists():
+            return PlainTextResponse(f"# Not generated yet\n\nRun `{HINTS[name]}` in the engine's terminal.")
+        return PlainTextResponse(p.read_text(encoding="utf-8"))
+
+    @app.get("/api/glossary")
+    def glossary():
+        f = WEB / "glossary.json"
+        return Response(f.read_bytes(), media_type="application/json") if f.exists() else _json({})
+
+    @app.post("/api/paper/order")
+    def order(body: dict = Body(...)):
+        if runtime is None:
+            return _json({"ok": False, "error": "engine not running"}, 503)
+        return _json(runtime.manual_order(str(body.get("action", "")), str(body.get("book", "manual"))))
+
+    @app.post("/api/auto")
+    def auto(body: dict = Body(...)):
+        if runtime is None:
+            return _json({"ok": False, "error": "engine not running"}, 503)
+        return _json(runtime.set_auto(str(body.get("book", "")), bool(body.get("enabled"))))
+
+    @app.get("/api/health")
+    def health():
+        return _json({"ok": True, "runtime": runtime is not None})
+
+    return app
 
 
-@app.get("/api/v4/paper/trades")
-def trades():
-    return json.loads(ledger.trades().to_json(orient="records"))
+def serve(runtime=None, host: str = "127.0.0.1", port: int = 8010, open_browser: bool = False) -> None:
+    import threading
+    import webbrowser
+
+    import uvicorn
+    if open_browser:
+        threading.Timer(1.5, lambda: webbrowser.open(f"http://localhost:{port}/")).start()
+    uvicorn.run(create_app(runtime), host=host, port=port, log_level="warning")
 
 
-@app.get("/api/v4/model")
-def model():
-    _, meta = load_champion()
-    return meta or {}
-
-
-@app.get("/api/v4/report/live", response_class=PlainTextResponse)
-def live_report():
-    return live_month_report(ledger.trades("live"), ledger.equity_curve(), cfg.capital)
-
-
-@app.get("/api/v4/report/backtest", response_class=PlainTextResponse)
-def bt_report():
-    p = REPORTS / "BACKTEST_REPORT.md"
-    return p.read_text(encoding="utf-8") if p.exists() else "Run `python -m nifty_engine backtest` first."
-
-
-@app.get("/api/v5/books")
-def v5_books():
-    from .paper.books_live import BookRunner
-    from .paper.live import LivePaperTrader
-    return BookRunner(cfg, LivePaperTrader(cfg, ledger)).scorecard()
-
-
-@app.get("/api/v5/brief")
-def v5_brief():
-    from .calendar import now_ist
-    from .semantic.market_brief import BRIEFS
-    f = BRIEFS / f"{now_ist().date().isoformat()}.json"
-    if not f.exists():
-        return {"note": "no brief today yet (needs Ollama; written at 09:20)"}
-    js = json.loads(f.read_text(encoding="utf-8"))
-    return {k: v for k, v in js.items() if k != "state"} | {"inputs": js.get("state")}
-
-
-@app.get("/api/v5/chain")
-def v5_chain():
-    from .data.recorder import latest_chain_metrics
-    return latest_chain_metrics() or {"note": "nothing recorded today (needs UPSTOX_ANALYTICS_TOKEN)"}
-
-
-@app.get("/api/v5/research", response_class=PlainTextResponse)
-def v5_research():
-    p = REPORTS / "RESEARCH_REPORT.md"
-    return p.read_text(encoding="utf-8") if p.exists() else "Run `python -m nifty_engine research` first."
-
-
-@app.get("/paper", response_class=HTMLResponse)
-def dashboard():
-    return """<!doctype html><html><head><meta charset=utf-8><title>NIFTY v4 paper trader</title>
-<style>body{font:14px system-ui;margin:24px;background:#0f1115;color:#e6e6e6}table{border-collapse:collapse}
-td,th{border:1px solid #333;padding:4px 8px}h2{margin-top:24px}.k{color:#9aa}</style></head><body>
-<h1>NIFTY v5 &mdash; auto paper trader</h1><div id=s></div><h2>Prediction scorecard (every day, traded or not)</h2><pre id=c></pre><h2>Today's signal</h2><pre id=g></pre>
-<h2>v5 strategy books (paper)</h2><pre id=b></pre><h2>Local-LLM pre-open brief</h2><pre id=r></pre><h2>Live option chain (latest)</h2><pre id=o></pre>
-<h2>Trades</h2><table id=t></table><p class=k>Research report: <a href="/api/v5/research" style="color:#9cf">/api/v5/research</a></p><script>
-async function load(){const s=await (await fetch('/api/v4/paper/status')).json();
-for (const [id,u] of [['b','/api/v5/books'],['r','/api/v5/brief'],['o','/api/v5/chain']]){try{document.getElementById(id).textContent=JSON.stringify(await (await fetch(u)).json(),null,2)}catch(e){}}
-document.getElementById('s').innerHTML=`<b>Equity</b> Rs ${s.equity.toFixed(0)} <span class=k>(capital ${s.capital}, closed ${s.trades_closed}, win rate ${s.win_rate==null?'-':(s.win_rate*100).toFixed(1)+'%'})</span>`;
-document.getElementById('c').textContent=JSON.stringify(await (await fetch('/api/v4/paper/scorecard')).json(),null,2);
-document.getElementById('g').textContent=JSON.stringify(await (await fetch('/api/v4/signal')).json(),null,2);
-const t=await (await fetch('/api/v4/paper/trades')).json();
-document.getElementById('t').innerHTML='<tr><th>Date</th><th>Dir</th><th>Style</th><th>Lots</th><th>Entry</th><th>Exit</th><th>Net</th><th>Reason</th><th>Status</th><th>Prices</th></tr>'+
-t.reverse().map(r=>`<tr><td>${r.date}</td><td>${r.direction>0?'LONG':(r.direction<0?'SHORT':'NEUTRAL')}</td><td>${r.book}:${r.style}</td><td>${r.lots}</td><td>${r.entry_value}</td><td>${r.exit_value??''}</td><td>${r.net_pnl??''}</td><td>${r.exit_reason??''}</td><td>${r.status}</td><td>${r.price_source}</td></tr>`).join('');}
-load();setInterval(load,30000);</script></body></html>"""
+app: Optional[FastAPI] = None   # created by the CLI (`python -m nifty_engine app`)

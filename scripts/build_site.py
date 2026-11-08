@@ -84,11 +84,11 @@ def main(src: str, dst: str) -> None:
         (d / name).write_text(page(title, "<p><a href='index.html'>&larr; index</a></p>" + md_to_html(f.read_text(encoding="utf-8"))),
                               encoding="utf-8")
         links.append(f"<li><a href='{name}'>{html.escape(title)}</a></li>")
-    body = ("<h1>NIFTY engine v5 &mdash; daily reports</h1>"
+    body = ("<h1>NIFTY engine &mdash; daily reports</h1>"
             f"<p class=muted>Updated {dt.datetime.now(dt.timezone.utc):%Y-%m-%d %H:%M} UTC by GitHub Actions. Paper trading and research "
             "only; nothing here is investment advice. Experiments that need Upstox data or the local LLM run on the "
             "owner's machine and show as INSUFFICIENT_DATA here.</p><ul>" + "".join(links) + "</ul>")
-    (d / "index.html").write_text(page("NIFTY engine v5", body), encoding="utf-8")
+    (d / "index.html").write_text(page("NIFTY engine", body), encoding="utf-8")
 
 
 if __name__ == "__main__":

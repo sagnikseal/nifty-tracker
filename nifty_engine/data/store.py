@@ -70,14 +70,3 @@ def refresh_daily(start: str = "2007-01-01", provider: Optional[YahooProvider] =
 
 def load_all() -> Dict[str, pd.DataFrame]:
     return {n: load(n) for n in YAHOO_SYMBOLS}
-
-
-def import_legacy_repo_json(path: Path) -> pd.DataFrame:
-    """Seed NIFTY daily bars from the legacy data/nifty_data.json (offline bootstrap)."""
-    import json
-    js = json.loads(Path(path).read_text(encoding="utf-8"))
-    rows = [{"date": e["date"], "open": e["open"], "high": e["high"], "low": e["low"],
-             "close": e["close"], "volume": e.get("volume", 0)} for e in js["data"] if e.get("close", 0) > 0]
-    df = pd.DataFrame(rows).set_index("date")
-    df.index = pd.DatetimeIndex(df.index)
-    return df.sort_index()

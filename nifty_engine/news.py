@@ -117,51 +117,45 @@ def load_news_series() -> Dict[str, pd.Series]:
 def premarket_overlay(direction: int = 0) -> Dict:
     """Pre-open news overlay used at 09:20 (UNVALIDATED until enough history exists to test it).
 
-    Combines the legacy v3 MultiEndpointMediaEngine (15 feeds, 8 transmission channels,
-    war / central-bank / crude shock scanner) with the v4 lexicon collector. Returns a
-    composite score in [-1, 1], a shock intensity in [0, 1], top headlines, and a risk-gate
-    decision: if a strong shock points AGAINST the model's direction, the trade is vetoed.
+    Combines the LLM-scored pre-open headlines (previous close to 09:10, when the local LLM has
+    scored them) with the lexicon on the live RSS headlines. Returns a composite score in [-1, 1],
+    a shock intensity in [0, 1], top headlines, and a risk-gate decision: if a strong shock points
+    AGAINST the model's direction, the trade is vetoed. 
     """
     out: Dict = {"validated": False, "sources": []}
-    composite, shock = 0.0, 0.0
+    parts, shock = [], 0.0
     try:
-        import importlib.util
-        from .config import ROOT
-        spec = importlib.util.spec_from_file_location("media_news_engine", ROOT / "scripts" / "media_news_engine.py")
-        import sys
-        mod = importlib.util.module_from_spec(spec)
-        sys.modules[spec.name] = mod          # dataclasses need the module registered
-        spec.loader.exec_module(mod)  # type: ignore[union-attr]
-        res = mod.MultiEndpointMediaEngine().analyze_media_ecosystem(force_refresh=True)
-        f = res.get("features", {})
-        gates = res.get("non_linear_gates", {})
-        shock = float(gates.get("news_shock_intensity", 0.0))
-        v3 = float(np.clip(0.5 * f.get("news_finbert_sentiment", 0.0) + 0.3 * f.get("geopolitical_war_shock", 0.0)
-                           + 0.2 * f.get("central_bank_event_shock", 0.0), -2, 2)) / 2
-        composite += v3
-        out.update({"v3_features": f, "crisis_level": res.get("crisis_level"),
-                    "geopolitical_alert": res.get("geopolitical_alert"),
-                    "channels": {k: v.get("stance") for k, v in res.get("channel_transmission", {}).items()},
-                    "headlines": [h.get("title") for h in res.get("scored_headlines", [])[:6]],
-                    "endpoints_live": res.get("endpoints_live")})
-        out["sources"].append("v3_media_engine")
+        from .calendar import now_ist
+        from .config import EngineConfig
+        from .semantic.news_llm import preopen_window, scored_frame, window_features
+        today = now_ist().date()
+        prev = today - dt.timedelta(days=3 if today.weekday() == 0 else 1)
+        S = scored_frame(EngineConfig.load(), prev, today)
+        if S is not None and len(S):
+            w = window_features(S, *preopen_window(today, prev))
+            if w.get("nw_n", 0) > 0:
+                parts.append(float(w.get("nw_dir", 0.0)))
+                shock = max(shock, float(w.get("nw_shock", 0.0)) * (1 if w.get("nw_shock_dir", 0) != 0 else 0))
+                out["llm_window"] = {k: round(v, 3) for k, v in w.items()}
+                out["sources"].append("llm_preopen")
     except Exception as e:  # noqa: BLE001
-        out["v3_error"] = str(e)[:200]
+        out["llm_error"] = str(e)[:200]
     try:
         heads = fetch_headlines()
         sc = [score_headline(h["title"]) for h in heads]
         nz = [x for x in sc if x != 0]
         lex = sum(nz) / len(nz) if nz else 0.0
-        composite = composite + lex if out["sources"] else lex
-        if out["sources"]:
-            composite /= 2
+        parts.append(lex)
+        neg_strong = sum(1 for x in nz if x <= -0.5) / len(nz) if nz else 0.0
+        shock = max(shock, neg_strong if lex < 0 else 0.0)
         out["lexicon_score"] = round(lex, 3)
-        out["sources"].append("v4_lexicon")
-        out.setdefault("headlines", [h["title"] for h in heads[:6]])
+        out["sources"].append("lexicon")
+        out["headlines"] = [h["title"] for h in heads[:6]]
     except Exception as e:  # noqa: BLE001
         out["lexicon_error"] = str(e)[:200]
+    composite = float(np.mean(parts)) if parts else 0.0
     out["composite"] = round(float(np.clip(composite, -1, 1)), 3)
-    out["shock_intensity"] = round(shock, 3)
+    out["shock_intensity"] = round(float(np.clip(shock, 0, 1)), 3)
     veto = bool(direction != 0 and shock >= 0.6 and np.sign(out["composite"]) == -direction
                 and abs(out["composite"]) >= 0.25)
     out["veto"] = veto

@@ -1,12 +1,10 @@
-"""NIFTY v5 engine: broker-agnostic data layer, leakage-free walk-forward models,
-SMC / technical / option-chain analytics, a free local-LLM news layer, multi-strategy
-options paper trading with realistic Indian F&O charges, a pre-registered research
-harness, and scheduled self-retraining.
+"""NIFTY engine: live dashboard and paper trading for NIFTY options (ATM rules, model and local-LLM
+agent books), leakage-tested walk-forward models (daily and 5-minute), news read by a local LLM,
+option-chain / futures / cross-asset analytics, a pre-registered research harness, and a GitHub
+Actions data collector. Paper trading only.
 
 Run `python -m nifty_engine --help` for the command list.
 """
-
-__version__ = "5.0.0"
 
 # Corporate networks often intercept TLS with their own root CA (installed in the OS store
 # but unknown to certifi). truststore makes Python use the OS trust store, like browsers do.

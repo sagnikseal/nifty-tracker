@@ -34,14 +34,9 @@ BRIEF_SCHEMA = {
     "required": ["stance", "p_up", "confidence", "expected_range_pct", "drivers", "risks", "narrative"],
 }
 
-SYSTEM = """You are an experienced NIFTY 50 index-options trader writing the 09:10 IST pre-open brief for today's session (09:15-15:30 IST). You are given numbers and headlines. Decide whether NIFTY is more likely to close above or below its opening price today.
+from ..agent.prompts import brief_system  # noqa: E402
 
-Rules:
-- Weigh the evidence like a professional: overnight US futures and Asian opens, the ADR premium, the volatility regime, the option chain, scheduled events, and news. Say which items matter most.
-- The quantitative model's historical out-of-sample accuracy is given; treat it as one input, not the truth.
-- Be calibrated. Daily index direction is hard to predict: keep p_up between 0.40 and 0.60 unless the evidence is unusually strong. Use "neutral" when it is mixed.
-- expected_range_pct: your estimate of today's high-low range in percent of the open.
-- drivers and risks: at most 4 short items each. narrative: at most 120 words."""
+SYSTEM = brief_system()
 
 
 def _fmt(v, nd=3):

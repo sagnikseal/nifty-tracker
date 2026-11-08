@@ -1,4 +1,4 @@
-"""Live paper trading for the v5 strategy books (never sends orders).
+"""Live paper trading for the research strategy books (never sends orders).
 
 Each book gets its own paper equity (`book_capital`). Fills use real Upstox bid/ask when the
 option chain is available and the VIX model otherwise (recorded per trade as `price_source`).
@@ -203,7 +203,7 @@ class BookRunner:
             "direction": plan.direction, "style": plan.style, "lots": 1, "entry_value": round(net, 2),
             "legs": [{"typ": l.typ, "strike": l.strike, "sign": l.qty_sign, "entry": l.entry, "key": l.instrument_key,
                       "expiry": plan.expiry.isoformat()} for l in plan.legs],
-            "charges": round(ch, 2), "p_up": ctx.p_up, "model_version": "v5:" + plan.book, "status": "OPEN",
+            "charges": round(ch, 2), "p_up": ctx.p_up, "model_version": "book:" + plan.book, "status": "OPEN",
             "price_source": ",".join(sorted(srcs)), "rules": {**plan.rules(), "meta": plan.meta}})
         log.info("BOOK %s ENTER #%s %s net=%.2f", plan.book, tid, plan.style, net)
         return tid
@@ -213,7 +213,7 @@ class BookRunner:
         open_t = self.ledger.open_trades()
         if open_t.empty or "rules" not in open_t:
             return
-        open_t = open_t[open_t["rules"].notna()]
+        open_t = open_t[open_t["rules"].notna() & open_t["book"].isin([b.name for b in self.books])]   # never the main books
         if open_t.empty:
             return
         q = self.trader.spot_and_vix()

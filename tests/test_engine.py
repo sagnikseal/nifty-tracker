@@ -1,6 +1,6 @@
 """Core tests (stdlib unittest; run: python -m unittest discover -s tests -v).
 
-The most important ones guard against the failure mode that broke the legacy v3 model:
+The most important ones guard against the failure mode that broke the original model:
 information from the future leaking into features or training."""
 
 from __future__ import annotations

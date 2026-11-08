@@ -3,7 +3,7 @@ name: Engine tests
 # Fast checks on every push / pull request. The daily data + research job lives in update_nifty.yml.
 on:
   push:
-    paths: ['nifty_engine/**', 'tests/**', 'config/**', 'requirements-engine.txt', '.github/workflows/engine_ci.yml']
+    paths: ['nifty_engine/**', 'tests/**', 'config/**', 'requirements.txt', '.github/workflows/engine_ci.yml']
   pull_request:
   workflow_dispatch:
 
@@ -15,6 +15,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.12', cache: 'pip' }
-      - run: pip install -r requirements-engine.txt
+      - run: pip install -r requirements.txt
       - name: Unit + leakage tests
         run: python -m unittest discover -s tests -v

@@ -75,17 +75,42 @@ class EngineConfig:
     broker: str = "auto"                 # auto | upstox | yahoo  (signals never depend on a broker)
     poll_seconds: int = 30
 
-    # ---- v5: features, strategy books, local LLM ------------------------------------
+    # ---- feature groups, research strategy books, local LLM ----------------------------
     feature_groups: str = "base"         # daily-model feature groups (features.FEATURE_GROUPS); add a group
                                          # only after `python -m nifty_engine research` shows it helps
     strategy_books: str = ("debit_spread,credit_spread,iron_condor,iron_fly_0dte,event_straddle,"
-                           "turn_of_month,smc_intraday,llm_analyst")   # v5 paper books (strategies/books.py)
-    book_capital: float = 100_000.0      # paper equity per v5 book
-    llm_model: str = "llama3.1:8b"       # local Ollama model: free, runs on the Mac (`ollama pull llama3.1:8b`)
+                           "turn_of_month,smc_intraday,llm_analyst")   # research paper books (strategies/books.py), off by default
+    book_capital: float = 100_000.0      # paper equity per book
+    llm_model: str = "qwen3.5:9b"        # local Ollama model (free, ~6.6 GB, fits a 16 GB Mac next to the engine).
+                                         # Compare candidates with `python -m nifty_engine llm-bench`.
     llm_url: str = "http://localhost:11434"
-    llm_knowledge_cutoff: str = "2023-12-31"   # news on/before this date may be "remembered" by the model:
-                                               # it is scored but excluded from accuracy tests
+    llm_knowledge_cutoff: str = "2026-03-10"   # news on/before this date may be "remembered" by the model:
+                                               # it is scored but excluded from accuracy tests. Unknown cutoffs
+                                               # use the model's release date (a safe upper bound).
     record_live: bool = True             # record option chain / depth during market hours (needs token)
+
+    # ---- the user's ATM rules (strategies/atm_rules.py), all amounts in Rs for the position --------
+    atm_target_inr: float = 5000.0       # take profit at +Rs 5,000 ...
+    atm_extend_prob: float = 0.80        # ... unless P(move continues 30 more min) > 80%: then hold 30 min, repeat
+    atm_extend_minutes: int = 30
+    atm_stop_inr: float = 2000.0         # exit immediately at -Rs 2,000
+    atm_against_bars: int = 2            # exit after 2 consecutive 5-min closes against the trade ...
+    atm_against_scope: str = "in_profit"  # ... while in profit ("always" / "after_target" are the alternatives)
+    atm_entry_threshold: float = 0.60    # enter when P(up by 15:15) >= 0.60 (call) or <= 0.40 (put)
+    atm_entry_start: str = "09:20"
+    atm_entry_end: str = "13:30"
+    atm_exit_time: str = "15:15"
+    atm_lots: int = 1
+    atm_max_trades_per_day: int = 1
+    atm_news_exit_bps: float = 8.0       # exit on a headline with learned impact >= 8 bps against the trade
+                                         # (only active once the news-impact model passes its test)
+
+    # ---- runtime -------------------------------------------------------------------------------------
+    price_poll_seconds: float = 5.0      # option/spot price checks for open positions (stop is checked on each)
+    news_poll_seconds: int = 60          # fast news sources (conditional GET, per-source backoff)
+    agent_enabled: bool = True           # local-LLM trading agent (paper), decides every 5 minutes
+    agent_auto: bool = True              # agent book trades automatically (paper) when enabled
+    model_rules_auto: bool = True        # model + ATM rules book trades automatically (paper)
 
     extra: Dict[str, Any] = field(default_factory=dict)
 

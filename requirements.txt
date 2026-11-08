@@ -1,9 +1,25 @@
-fastapi>=0.92.0
-uvicorn>=0.17.6
-pydantic>=1.10.4
-numpy>=1.24.0
-pandas>=2.0.0
-scipy>=1.10.0
-yfinance>=0.2.40
-requests>=2.31.0
-python-dotenv>=1.0.0
+# NIFTY engine: everything it needs. Python 3.10+. All free. The launchers (start.command / start.bat)
+# install this automatically.
+numpy>=1.26
+pandas>=2.1
+scikit-learn>=1.4
+joblib>=1.3
+requests>=2.31
+truststore>=0.9            # use the OS certificate store (fixes corporate TLS inspection)
+fastapi>=0.110             # dashboard + API
+uvicorn>=0.29
+upstox-python-sdk>=2.17    # Upstox WebSocket feed (order-book depth recorder)
+
+# Models: gradient-boosted trees and neural networks (Apple-silicon Macs use the GPU via MPS automatically)
+lightgbm>=4.0
+xgboost>=2.0
+catboost>=1.2
+torch>=2.3
+
+# Optional extras (not installed by default):
+#   time-series foundation models as features for `python -m nifty_engine intraday-zoo --tsfm ...`
+#     pip install chronos-forecasting                                                  # Chronos-Bolt, Chronos-2
+#     pip install "timesfm[torch] @ git+https://github.com/google-research/timesfm.git"   # TimesFM 2.5
+#     git clone https://github.com/shiyu-coder/Kronos ~/Kronos && pip install -r ~/Kronos/requirements.txt
+#   extra daily-zoo members: pip install tabm tabpfn   (TabPFN needs a Hugging Face token: accept its licence first)
+# The local LLM runs in Ollama (https://ollama.com), not in Python.

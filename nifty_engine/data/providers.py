@@ -21,7 +21,7 @@ import requests
 
 from ..calendar import IST
 
-UA = {"User-Agent": "Mozilla/5.0 (nifty-engine/4.0)", "Accept": "application/json"}
+UA = {"User-Agent": "Mozilla/5.0 (nifty-engine)", "Accept": "application/json"}
 
 # Daily series used by the model. Timing rule (enforced in features.py): anything that
 # trades after 09:15 IST on day t is only used with a one-session lag.
@@ -39,7 +39,7 @@ YAHOO_SYMBOLS: Dict[str, str] = {
     "brent": "BZ=F",
     "us10y": "^TNX",
     "gold": "GC=F",
-    # ---- v5 related markets (feature groups "asia_extra" and "adr"; off in the base model) ----
+    # ---- related markets (feature groups "asia_extra" and "adr"; off in the base model) ----
     "kospi": "^KS11",          # Seoul opens 05:30 IST -> same-day opening gap
     "twii": "^TWII",           # Taipei opens 06:30 IST
     "shanghai": "000001.SS",   # Shanghai opens 07:00 IST
@@ -338,10 +338,16 @@ class GdeltProvider:
     LIVE_TTL = 20 * 60
     _lock = __import__("threading").Lock()
 
-    def __init__(self, session: Optional[requests.Session] = None, cache_dir=None, sleep=time.sleep):
+    def __init__(self, session: Optional[requests.Session] = None, cache_dir=None, sleep=time.sleep,
+                 max_retries: Optional[int] = None, timeout: float = 40.0):
+        """Live captures should fail fast (max_retries=1, timeout=15): RSS and Upstox cover live news,
+        and a slow GDELT must never hold up anything else. Backfills keep the patient defaults."""
         from ..config import DATA_DIR
+        if max_retries is not None:
+            self.MAX_RETRIES = max_retries
+        self.timeout = timeout
         self.s = session or requests.Session()
-        self.s.headers.update({"User-Agent": "nifty-engine/5 (research; +https://github.com/sagnikseal/nifty-tracker)"})
+        self.s.headers.update({"User-Agent": "nifty-engine (research; +https://github.com/sagnikseal/nifty-tracker)"})
         self.dir = Path(cache_dir or (DATA_DIR / "cache" / "gdelt"))
         self.dir.mkdir(parents=True, exist_ok=True)
         self._sleep = sleep
@@ -387,7 +393,7 @@ class GdeltProvider:
                 if wait > 0:
                     self._sleep(wait)
                 self._write_float("_last_call", time.time())
-                r = self.s.get(self.URL, params=params, timeout=40)
+                r = self.s.get(self.URL, params=params, timeout=self.timeout)
             if self._throttled(r):
                 if attempt == self.MAX_RETRIES:
                     self._write_float("_cooldown_until", time.time() + self.COOLDOWN)

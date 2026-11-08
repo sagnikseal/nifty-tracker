@@ -15,7 +15,7 @@ def _pct(x):
 
 def write_backtest_markdown(out: Dict, path: Path) -> None:
     m = out["prediction_metrics"]
-    L = [f"# NIFTY v4 engine: walk-forward backtest report",
+    L = [f"# Daily model: walk-forward backtest report",
          f"_Generated {dt.datetime.now():%Y-%m-%d %H:%M}. Target: `{out['config']['target']}` "
          f"(oc = today's open->close). Model: `{out['model_spec']['name']}`._", ""]
     if m.get("n_days"):

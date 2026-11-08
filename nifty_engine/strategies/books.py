@@ -1,9 +1,9 @@
-"""The v5 strategy books. Rules and parameters are fixed here *before* testing (pre-registered);
+"""The research strategy books. Rules and parameters are fixed here *before* testing (pre-registered);
 the research harness reports every book, including the ones that lose.
 
 | book            | when                         | idea                                                     |
 |-----------------|------------------------------|----------------------------------------------------------|
-| directional_itm | 09:20                        | v4 champion: buy 1 ITM option on confident days          |
+| directional_itm | 09:20                        | daily model: buy 1 ITM option on confident days          |
 | debit_spread    | 09:20, options rich          | same signal, ATM/OTM debit spread when IV is high        |
 | credit_spread   | 09:20, VRP > 0               | sell the OTM spread on the side the model fades          |
 | iron_condor     | 09:20, VRP > 0, range model  | intraday short condor at k x sigma                       |

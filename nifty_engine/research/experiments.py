@@ -208,7 +208,7 @@ def exp_feature_group(lab: Lab, e: Dict, reg: Dict) -> Dict:
     g = e["group"]
     cols = _group_cols(lab, g)
     if not cols:
-        return {"status": "INSUFFICIENT_DATA", "note": f"no '{g}' columns: run `update-data` (needs the v5 series)"}
+        return {"status": "INSUFFICIENT_DATA", "note": f"no '{g}' columns: run `update-data` (needs the related-market series)"}
     a, b = lab.oos(("base",)), lab.oos(("base", g))
     F = lab.frame(("base", g))
     avail = F[cols].notna().any(axis=1)
@@ -529,7 +529,7 @@ def _fmt_metrics(r: Dict) -> str:
 
 
 def render_markdown(out: Dict, reg: Dict) -> str:
-    L = ["# NIFTY v5 research report", "",
+    L = ["# Research report", "",
          f"_Generated {out['generated'][:16]} IST{' (quick mode: logistic model only)' if out.get('quick') else ''}. "
          f"Rules were fixed in `config/experiments.json` on {reg.get('registered')} before any test ran._", "",
          f"Strategy trials counted for the deflated Sharpe: **{out['n_strategy_trials']}**.", "",

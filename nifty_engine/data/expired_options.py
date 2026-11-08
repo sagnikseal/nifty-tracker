@@ -74,7 +74,7 @@ def download(start: str = "2024-10-01", neighbours: int = 1, sleep: float = 0.9,
              max_expiries: int | None = None, mode: str = "itm") -> Dict:
     """mode 'itm': ATM +/- (neighbours+1) strikes, both types (directional buying).
     mode 'wings': OTM calls ATM+100..+600 and OTM puts ATM-100..-600 (option selling / condors).
-    mode 'full': every strike within ATM +/- 800 points, both types (all v5 strategy books and the
+    mode 'full': every strike within ATM +/- 800 points, both types (all research strategy books and the
     historical option-chain features; ~66 contracts per expiry, takes a few hours the first time)."""
     up = UpstoxProvider()
     nifty = store.load("nifty")

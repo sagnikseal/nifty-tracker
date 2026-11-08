@@ -25,7 +25,7 @@ LAGGED_GLOBAL = ["spx", "ndx", "usvix", "dxy", "us10y", "brent", "gold", "usdinr
 SAME_DAY_OPEN = ["n225", "hsi"]
 ASIA_EXTRA = ["kospi", "twii", "shanghai"]      # open 05:30 / 06:30 / 07:00 IST
 
-# Optional feature groups (v5). The base model stays exactly as before so every group can be
+# Optional feature groups. The base model stays exactly as before so every group can be
 # tested against it on identical days (research/experiments.py) before it is switched on in
 # config/engine.json "feature_groups".
 FEATURE_GROUPS = ("base", "asia_extra", "adr", "overnight_futures", "smc", "structure", "regime",
@@ -150,7 +150,7 @@ def build_daily_features(raw: Dict[str, pd.DataFrame], target: str = "oc",
     for name, s in (extra or {}).items():
         F[name] = _align_backward(idx, s, 1)
 
-    # ---- v5 optional groups -------------------------------------------------------------
+    # ---- optional groups ----------------------------------------------------------------
     if "asia_extra" in groups:
         for name in ASIA_EXTRA:
             df = raw.get(name)

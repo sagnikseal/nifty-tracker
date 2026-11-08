@@ -40,6 +40,13 @@ def snapshot(opt: pd.DataFrame, day: dt.date, upto: dt.time) -> pd.DataFrame:
         columns={"volume_day": "volume"})
 
 
+def _window(snap: pd.DataFrame, spot_0920: Optional[float], pts: int = 100) -> pd.DataFrame:
+    if snap.empty or not spot_0920:
+        return pd.DataFrame()
+    k0 = round(spot_0920 / 50) * 50
+    return snap[(snap["strike"] >= k0 - pts) & (snap["strike"] <= k0 + pts)]
+
+
 def _spot_at(n5: pd.DataFrame, day: dt.date, upto: dt.time) -> Optional[float]:
     d = n5[n5.index.date == day]
     cut = (dt.datetime.combine(day, upto) - dt.timedelta(minutes=5)).time()
@@ -62,8 +69,12 @@ def build(n5: pd.DataFrame, expiries: List[dt.date], lot_size: int = 65, save: b
             cache = {e: load_expiry(e)}
         opt = cache[e]
         s_prev, s_open = _spot_at(n5, p, dt.time(15, 30)), _spot_at(n5, d, dt.time(9, 20))
-        c_prev, c_open = snapshot(opt, p, dt.time(15, 30)), snapshot(opt, d, dt.time(9, 20))
-        c_prev2 = snapshot(opt, prev_day.get(p, p), dt.time(15, 30)) if prev_day.get(p) else pd.DataFrame()
+        # Look-ahead guard: a weekly file holds the strikes needed on every day of that week (chosen from each
+        # day's open), so the strike SET leaks later prices. Use only a window fixed by each day's own 09:20 spot.
+        c_prev = _window(snapshot(opt, p, dt.time(15, 30)), _spot_at(n5, p, dt.time(9, 20)))
+        c_open = _window(snapshot(opt, d, dt.time(9, 20)), s_open)
+        p2 = prev_day.get(p)
+        c_prev2 = _window(snapshot(opt, p2, dt.time(15, 30)), _spot_at(n5, p2, dt.time(9, 20))) if p2 else pd.DataFrame()
         if c_prev.empty or not s_prev or len(c_prev) < 10:
             continue
         T_prev = year_fraction(dt.datetime.combine(p, dt.time(15, 30), tzinfo=IST), dt.datetime.combine(e, dt.time(15, 30), tzinfo=IST))

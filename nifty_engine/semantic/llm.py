@@ -40,19 +40,39 @@ class LocalLLM:
     def json_chat(self, system: str, user: str, schema: Dict[str, Any], temperature: float = 0.0,
                   num_ctx: int = 8192) -> Optional[Dict[str, Any]]:
         """One chat turn constrained to `schema`. Returns the parsed object, or None on failure."""
-        body = {"model": self.model, "stream": False, "format": schema,
+        obj, _ = self.json_chat_timed(system, user, schema, temperature, num_ctx)
+        return obj
+
+    def json_chat_timed(self, system: str, user: str, schema: Dict[str, Any], temperature: float = 0.0,
+                        num_ctx: int = 8192):
+        """Like json_chat, plus timing: {seconds, eval_tokens, tokens_per_s, prompt_tokens}.
+        Thinking is off by default (decisions must be fast); set NE_LLM_THINK=1 to allow it.
+        keep_alive keeps the model in memory between the engine's calls."""
+        import time as _t
+        body = {"model": self.model, "stream": False, "format": schema, "keep_alive": "30m",
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
                 "options": {"temperature": temperature, "num_ctx": num_ctx}}
-        if os.environ.get("NE_LLM_THINK", "").lower() in ("0", "false", "no"):
-            body["think"] = False      # for thinking models (e.g. qwen3) when speed matters
+        if os.environ.get("NE_LLM_THINK", "").lower() not in ("1", "true", "yes"):
+            body["think"] = False
+        t0 = _t.time()
+        meta: Dict[str, Any] = {}
         try:
             r = requests.post(self.url + "/api/chat", json=body, timeout=self.timeout)
+            if r.status_code == 400 and "think" in body:      # model without a thinking switch
+                body.pop("think")
+                r = requests.post(self.url + "/api/chat", json=body, timeout=self.timeout)
             r.raise_for_status()
-            content = r.json().get("message", {}).get("content", "")
-            return json.loads(content)
+            js = r.json()
+            ev, dur = js.get("eval_count") or 0, (js.get("eval_duration") or 0) / 1e9
+            meta = {"seconds": round(_t.time() - t0, 2), "eval_tokens": ev, "prompt_tokens": js.get("prompt_eval_count"),
+                    "tokens_per_s": round(ev / dur, 1) if dur else None}
+            content = js.get("message", {}).get("content", "")
+            return json.loads(content), meta
         except Exception as e:  # noqa: BLE001
             log.warning("local LLM call failed: %s", str(e)[:200])
-            return None
+            meta["seconds"] = round(_t.time() - t0, 2)
+            meta["error"] = str(e)[:200]
+            return None, meta
 
 
 def clamp(v, lo: float, hi: float, default: float = 0.0) -> float:

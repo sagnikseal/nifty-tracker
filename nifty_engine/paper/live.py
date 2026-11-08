@@ -190,7 +190,7 @@ class LivePaperTrader:
         import json
         open_t = self.ledger.open_trades()
         if "rules" in open_t:
-            open_t = open_t[open_t["rules"].isna()]   # v5 book trades are managed by BookRunner
+            open_t = open_t[open_t["rules"].isna()]   # strategy-book trades are managed elsewhere
         if open_t.empty:
             return
         q = self.spot_and_vix()

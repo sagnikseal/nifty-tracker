@@ -1,9 +1,9 @@
 """Model zoo + ensembles.
 
 Members (any that can be imported are used):
-  sklearn : logit, hgb, rf, et, mlp, svm
+  sklearn : logit, hgb, rf, et, svm
   boosters: xgb, lgbm, cat               (pip install xgboost lightgbm catboost)
-  deep    : lstm, cnn, transformer         (pip install torch; uses CUDA, Apple MPS or CPU)
+  deep    : lstm                           (pip install torch; uses CUDA, Apple MPS or CPU)
 
 Sequence models look at the last `SEQ_LEN` sessions of features. They get those rows from a
 *context* frame of features only (no labels). A feature row dated d is known by 09:20 on d, so a
@@ -11,7 +11,6 @@ window ending at d uses no future information.
 
 Ensembles (built in `run_zoo`, all walk-forward / leak-free):
   mean_all  : average of every member's probability
-  stack     : logistic meta-model on members' logits, fitted only on earlier OOS predictions
   best3     : average of the 3 members with the best trailing OOS log-loss (re-selected each block)
 """
 
@@ -28,7 +27,6 @@ import pandas as pd
 from sklearn.ensemble import ExtraTreesClassifier, HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
-from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
@@ -61,9 +59,6 @@ def _sk_members() -> Dict[str, Callable]:
             n_estimators=400, max_depth=6, min_samples_leaf=40, max_features=0.3, n_jobs=-1, random_state=7)),
         "et": lambda: make_pipeline(SimpleImputer(strategy="median"), ExtraTreesClassifier(
             n_estimators=400, max_depth=6, min_samples_leaf=40, max_features=0.3, n_jobs=-1, random_state=7)),
-        "mlp": lambda: _imp_scale(MLPClassifier(hidden_layer_sizes=(32, 16), alpha=0.05, learning_rate_init=1e-3,
-                                                max_iter=400, early_stopping=True, validation_fraction=0.15,
-                                                random_state=7)),
         "svm": lambda: _imp_scale(SVC(C=0.3, kernel="rbf", gamma="scale", probability=True, random_state=7)),
     }
 
@@ -104,7 +99,7 @@ def torch_device():
 
 
 class TorchSeqClassifier:
-    """LSTM / 1-D CNN / small Transformer over the last SEQ_LEN sessions of features."""
+    """LSTM over the last SEQ_LEN sessions of features."""
 
     def __init__(self, kind: str = "lstm", hidden: int = 32, epochs: int = 40, lr: float = 1e-3,
                  weight_decay: float = 1e-3, dropout: float = 0.2, seed: int = 7):
@@ -146,31 +141,7 @@ class TorchSeqClassifier:
                 o, _ = s.rnn(x)
                 return s.head(o[:, -1]).squeeze(-1)
 
-        class CNNNet(nn.Module):
-            def __init__(s):
-                super().__init__()
-                s.c = nn.Sequential(nn.Conv1d(k, h, 3, padding=1), nn.ReLU(), nn.Dropout(dp),
-                                    nn.Conv1d(h, h, 3, padding=2, dilation=2), nn.ReLU())
-                s.head = nn.Linear(h, 1)
-
-            def forward(s, x):
-                z = s.c(x.transpose(1, 2))
-                return s.head(z[:, :, -5:].mean(-1)).squeeze(-1)
-
-        class TfNet(nn.Module):
-            def __init__(s):
-                super().__init__()
-                s.inp = nn.Linear(k, h)
-                s.pos = nn.Parameter(np.float32(0.02) * __import__("torch").randn(1, SEQ_LEN, h))
-                layer = nn.TransformerEncoderLayer(h, 4, 2 * h, dp, batch_first=True)
-                s.enc = nn.TransformerEncoder(layer, 2)
-                s.head = nn.Linear(h, 1)
-
-            def forward(s, x):
-                z = s.enc(s.inp(x) + s.pos)
-                return s.head(z[:, -1]).squeeze(-1)
-
-        return {"lstm": LSTMNet, "cnn": CNNNet, "transformer": TfNet}[self.kind]()
+        return LSTMNet()
 
     def fit(self, X: pd.DataFrame, y) -> "TorchSeqClassifier":
         import torch
@@ -315,11 +286,10 @@ def _deep_members() -> Dict[str, Callable]:
         import torch  # noqa: F401
     except Exception:  # noqa: BLE001
         return {}
-    kinds = ["lstm", "cnn"]
+    # MLP, CNN and Transformer members were removed: out of sample (2014-2026, 3,094 days) they had zero or
+    # negative log-loss skill vs the base rate (MLP t = -2.33, CNN t = 0.01, Transformer t = -0.14).
     gpu = str(torch_device()) != "cpu"
-    if gpu:                                # transformer is ~40+ min per walk-forward on a laptop CPU
-        kinds.append("transformer")
-    out = {k: (lambda k=k: TorchSeqClassifier(k)) for k in kinds}
+    out = {"lstm": lambda: TorchSeqClassifier("lstm")}
     try:
         import tabm  # noqa: F401
         out["tabm"] = lambda: TabMClassifier()
@@ -354,8 +324,8 @@ def _ll(p, y):
 
 
 class ZooEnsemble:
-    """Deployable ensemble: fits the chosen members on all rows; combine='mean' averages them,
-    combine='stack' fits a logistic meta-model on an inner time-ordered hold-out (last 30%)."""
+    """Deployable ensemble: fits the chosen members on all rows and averages their probabilities (a soft
+    majority vote). A learned stacker was removed: out of sample it did worse than the plain average."""
 
     def __init__(self, members: List[str], combine: str = "mean", max_missing: float = 0.2):
         self.members, self.combine, self.max_missing = list(members), combine, max_missing
@@ -367,25 +337,13 @@ class ZooEnsemble:
         Xc, yv = X[self.cols], np.asarray(y).astype(int)
         reg = available_members(include_deep=True)
         self.members = [m for m in self.members if m in reg]
-        self.meta = None
-        if self.combine == "stack" and len(Xc) > 600:
-            cut = int(len(Xc) * 0.7)
-            Z = []
-            for m in self.members:
-                mdl = reg[m]().fit(Xc.iloc[:cut], yv[:cut])
-                Z.append(_logit(mdl.predict_proba(Xc.iloc[cut:])[:, 1]))
-            self.meta = LogisticRegression(C=1.0).fit(np.vstack(Z).T, yv[cut:])
         self.models = [reg[m]().fit(Xc, yv) for m in self.members]
         return self
 
     def predict_proba(self, X: pd.DataFrame) -> np.ndarray:
         Xc = X.reindex(columns=self.cols)
         ps = [m.predict_proba(Xc)[:, 1] for m in self.models]
-        if self.meta is not None:
-            p = self.meta.predict_proba(np.vstack([_logit(q) for q in ps]).T)[:, 1]
-        else:
-            p = np.mean(ps, axis=0)
-        return np.clip(p, 1e-4, 1 - 1e-4)
+        return np.clip(np.mean(ps, axis=0), 1e-4, 1 - 1e-4)
 
     def explain(self) -> Dict[str, float]:
         """Logistic coefficients if a logit member exists, else averaged tree importances."""
@@ -410,7 +368,7 @@ class ZooEnsemble:
 def run_zoo(F: pd.DataFrame, cfg, members: Optional[List[str]] = None, include_deep: bool = True,
             out_dir=None) -> Dict:
     """Walk-forward every member (cached per member so long runs can resume), then build
-    mean / stacked / trailing-best ensembles from the members' OOS predictions only."""
+    mean and trailing-best-3 ensembles from the members' OOS predictions only."""
     from .features import feature_columns
     from .model import PlattCalibrator, evaluate, walk_forward, ModelSpec
 
@@ -437,21 +395,17 @@ def run_zoo(F: pd.DataFrame, cfg, members: Optional[List[str]] = None, include_d
     P = pd.DataFrame({m: oos[m]["p_raw"] for m in members}).dropna()
     y = base.loc[P.index, "y_up"].astype(int)
     blocks = np.array_split(np.arange(len(P)), max(1, len(P) // 21))
-    ens = {"mean_all": [], "stack": [], "best3": []}
+    ens = {"mean_all": [], "best3": []}
     for b in blocks:
         hist = P.index[: b[0]]
         Pb = P.iloc[b]
         ens["mean_all"].append(Pb.mean(axis=1))
         if len(hist) >= 250:
-            Z = np.vstack([_logit(P.loc[hist, m].values) for m in members]).T
-            meta = LogisticRegression(C=0.5).fit(Z, y.loc[hist].values)
-            ens["stack"].append(pd.Series(meta.predict_proba(np.vstack([_logit(Pb[m].values) for m in members]).T)[:, 1], index=Pb.index))
             recent = hist[-500:]
             scores = {m: _ll(P.loc[recent, m].values, y.loc[recent].values) for m in members}
             top = sorted(scores, key=scores.get)[:3]
             ens["best3"].append(Pb[top].mean(axis=1))
         else:
-            ens["stack"].append(Pb.mean(axis=1))
             ens["best3"].append(Pb.mean(axis=1))
     results = {}
     for name, parts in ens.items():

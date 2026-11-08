@@ -37,7 +37,7 @@ class Ledger:
         with self._conn() as c:
             c.executescript(SCHEMA)
             cols = {r[1] for r in c.execute("PRAGMA table_info(trades)")}
-            if "rules" not in cols:        # v5: per-trade exit rules for the strategy books
+            if "rules" not in cols:        # per-trade exit rules for the strategy books
                 c.execute("ALTER TABLE trades ADD COLUMN rules TEXT")
 
     @contextmanager

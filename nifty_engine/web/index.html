@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NIFTY engine · paper trading terminal</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar" role="banner">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">N</span>
+    <div class="brand-text">
+      <strong>NIFTY engine</strong>
+      <span class="paper-pill" data-term="paper trading">PAPER ONLY</span>
+    </div>
+  </div>
+
+  <div class="quote" aria-live="polite">
+    <div class="quote-main">
+      <span class="quote-label" data-term="nifty 50">NIFTY 50</span>
+      <span class="hero" id="q-spot">—</span>
+    </div>
+    <div class="quote-sub">
+      <span id="q-change" class="delta">—</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span class="muted">O <b id="q-open">—</b> H <b id="q-high">—</b> L <b id="q-low">—</b> PC <b id="q-prev">—</b></span>
+    </div>
+  </div>
+
+  <div class="stat-mini">
+    <span class="stat-label" data-term="india vix">India VIX</span>
+    <span class="stat-val" id="q-vix">—</span>
+    <span class="delta small" id="q-vixchg">—</span>
+  </div>
+
+  <div class="stat-mini">
+    <span class="stat-label">Market</span>
+    <span class="pill" id="mkt-status">—</span>
+    <span class="muted small" id="mkt-note"></span>
+  </div>
+
+  <div class="stat-mini">
+    <span class="stat-label">IST</span>
+    <span class="stat-val mono" id="clock">--:--:--</span>
+    <span class="muted small" id="q-source" data-term="price source">source —</span>
+  </div>
+
+  <div class="health" aria-label="System health">
+    <span class="hdot" id="h-engine"><i></i>Engine</span>
+    <span class="hdot" id="h-llm"><i></i><span data-term="llm">LLM</span></span>
+    <span class="hdot" id="h-upstox"><i></i>Upstox</span>
+    <span class="hdot" id="h-news"><i></i>News</span>
+  </div>
+
+  <div class="top-actions">
+    <span class="conn" id="conn" role="status">CONNECTING</span>
+    <button class="btn ghost icon" id="theme-toggle" type="button" aria-label="Toggle light or dark theme" title="Toggle theme">◐</button>
+  </div>
+</header>
+
+<div class="offline-banner" id="offline-banner" hidden>
+  <strong>Engine offline.</strong> Start the engine: double-click <code>start.command</code> (Mac) / <code>start.bat</code> (Windows) or run <code>python -m nifty_engine app</code> in a terminal. This page reconnects automatically.
+</div>
+
+<nav class="tabs" role="tablist" aria-label="Sections">
+  <button role="tab" class="tab" id="tab-live" aria-controls="panel-live" aria-selected="true">Live</button>
+  <button role="tab" class="tab" id="tab-books" aria-controls="panel-books" aria-selected="false">Books &amp; trades</button>
+  <button role="tab" class="tab" id="tab-reports" aria-controls="panel-reports" aria-selected="false">Reports</button>
+  <button role="tab" class="tab" id="tab-system" aria-controls="panel-system" aria-selected="false">Sources &amp; alerts <span class="count" id="alert-count" hidden></span></button>
+  <button role="tab" class="tab" id="tab-glossary" aria-controls="panel-glossary" aria-selected="false">Glossary</button>
+</nav>
+
+<main id="main">
+
+<!-- ============================== LIVE ============================== -->
+<section id="panel-live" role="tabpanel" aria-labelledby="tab-live" class="panel">
+  <div class="grid-live">
+
+    <div class="col-main">
+      <article class="card" id="card-chart">
+        <header class="card-h">
+          <h2>NIFTY intraday <span class="muted small">1-minute bars</span></h2>
+          <div class="seg" role="group" aria-label="Chart style">
+            <button class="seg-b on" id="mode-line" type="button" aria-pressed="true">Line</button>
+            <button class="seg-b" id="mode-candle" type="button" aria-pressed="false">Candles</button>
+          </div>
+        </header>
+        <div class="chart-wrap tall" id="price-wrap">
+          <canvas id="price-chart" role="img" aria-label="NIFTY intraday price chart"></canvas>
+          <div class="chart-empty" id="price-empty">No intraday bars yet: the market is closed or no data source is connected.</div>
+        </div>
+        <div class="legend small" id="price-legend">
+          <span class="lg"><i class="mk entry-l"></i>Entry (long)</span>
+          <span class="lg"><i class="mk entry-s"></i>Entry (short)</span>
+          <span class="lg"><i class="mk exit"></i>Exit</span>
+          <span class="lg"><i class="ln strike"></i><span data-term="strike">Strike</span> of open position</span>
+        </div>
+      </article>
+
+      <article class="card" id="card-predhist">
+        <header class="card-h">
+          <h2>Prediction history <span class="muted small">today, one point per 5-min bar</span></h2>
+          <div class="legend small">
+            <span class="lg"><i class="ln s1"></i>P(up 30 min)</span>
+            <span class="lg"><i class="ln s2"></i>P(up by 15:15)</span>
+            <span class="lg"><i class="ln ref"></i>Rule thresholds</span>
+          </div>
+        </header>
+        <div class="chart-wrap" id="pred-wrap">
+          <canvas id="pred-chart" role="img" aria-label="Prediction probabilities through the day"></canvas>
+          <div class="chart-empty" id="pred-empty">No predictions yet today. The model scores each closed 5-minute bar from 09:20.</div>
+        </div>
+      </article>
+
+      <article class="card" id="card-news">
+        <header class="card-h">
+          <h2>Live news <span class="muted small">with the <span data-term="llm">LLM</span>'s reading</span></h2>
+          <div class="news-filters" id="news-filters" role="group" aria-label="News filters">
+            <button class="chip on" data-cat="__all" type="button">All</button>
+            <label class="chk"><input type="checkbox" id="news-india"> <span data-term="india-relevant">India-relevant only</span></label>
+          </div>
+        </header>
+        <ol class="news" id="news-list" aria-live="polite"></ol>
+        <p class="empty" id="news-empty">No headlines yet. The news thread polls each source about every minute.</p>
+      </article>
+    </div>
+
+    <div class="col-side">
+      <article class="card" id="card-pred">
+        <header class="card-h">
+          <h2>Model prediction</h2>
+          <span class="badge" id="edge-badge" data-term="has edge">—</span>
+        </header>
+        <div class="gauges">
+          <div class="gauge" id="g-30">
+            <div class="g-top"><span class="g-label">P(up in 30 min)</span><span class="g-val" id="g30-val">—</span><span class="g-word" id="g30-word"></span></div>
+            <div class="meter" aria-hidden="true"><div class="m-track"></div><div class="m-mid"></div><div class="m-fill" id="g30-fill"></div><div class="m-tick" id="g30-t1"></div><div class="m-tick" id="g30-t2"></div><div class="m-tick ext" id="g30-t3"></div><div class="m-tick ext" id="g30-t4"></div></div>
+          </div>
+          <div class="gauge" id="g-close">
+            <div class="g-top"><span class="g-label">P(up by 15:15)</span><span class="g-val" id="gc-val">—</span><span class="g-word" id="gc-word"></span></div>
+            <div class="meter" aria-hidden="true"><div class="m-track"></div><div class="m-mid"></div><div class="m-fill" id="gc-fill"></div><div class="m-tick" id="gc-t1"></div><div class="m-tick" id="gc-t2"></div></div>
+          </div>
+          <div class="gauge" id="g-daily">
+            <div class="g-top"><span class="g-label">Daily model P(close &gt; open)</span><span class="g-val" id="gd-val">—</span><span class="g-word" id="gd-word"></span></div>
+            <div class="meter" aria-hidden="true"><div class="m-track"></div><div class="m-mid"></div><div class="m-fill" id="gd-fill"></div></div>
+          </div>
+        </div>
+        <div class="rule-armed" id="rule-armed" role="status">—</div>
+        <div class="kv small">
+          <span>Model</span><b id="p-version">—</b>
+          <span>Updated</span><b id="p-updated">—</b>
+        </div>
+        <h3 class="sub">Top drivers <span class="muted small">signed contribution to log-odds</span></h3>
+        <ul class="drivers" id="drivers"></ul>
+        <p class="empty small" id="drivers-empty">No driver breakdown yet.</p>
+      </article>
+
+      <article class="card" id="card-pos">
+        <header class="card-h">
+          <h2>Positions <span class="muted small">paper</span></h2>
+          <span class="muted small" id="pos-count"></span>
+        </header>
+        <div id="positions"></div>
+        <p class="empty" id="pos-empty">No open position.</p>
+        <div class="paper-controls">
+          <div class="pc-title"><span class="paper-pill" data-term="paper trading">PAPER</span> Manual book <span class="muted small">no real orders</span></div>
+          <div class="pc-btns">
+            <button class="btn up" id="btn-buy-ce" type="button"><span aria-hidden="true">▲</span> Buy <span data-term="atm">ATM</span> <span data-term="ce">CE</span></button>
+            <button class="btn down" id="btn-buy-pe" type="button"><span aria-hidden="true">▼</span> Buy <span data-term="atm">ATM</span> <span data-term="pe">PE</span></button>
+          </div>
+          <div class="rules small" id="rules-summary"></div>
+        </div>
+      </article>
+
+      <article class="card" id="card-agent">
+        <header class="card-h">
+          <h2><span data-term="agent">LLM agent</span></h2>
+          <span class="hdot" id="agent-avail"><i></i><span id="agent-model">—</span></span>
+        </header>
+        <div class="agent-dec">
+          <div class="ad-row">
+            <span class="action-pill" id="ag-action">—</span>
+            <span class="muted small">confidence <b id="ag-conf">—</b> · P(up 30m) <b id="ag-p">—</b> · <span id="ag-ts">—</span></span>
+          </div>
+          <div class="guardrail" id="ag-guard" hidden></div>
+          <p class="reason gl-auto" id="ag-reason"></p>
+          <div class="two">
+            <div><h4>Key factors</h4><ul class="bul gl-auto" id="ag-factors"></ul></div>
+            <div><h4>Risks</h4><ul class="bul gl-auto" id="ag-risks"></ul></div>
+          </div>
+          <p class="muted small">Decisions today: <b id="ag-count">—</b></p>
+        </div>
+        <details class="brief" id="ag-brief">
+          <summary>Pre-open brief <span class="pill small" id="brief-stance">—</span> <span class="muted small" id="brief-p"></span></summary>
+          <p class="gl-auto" id="brief-narr"></p>
+          <div class="two">
+            <div><h4>Drivers</h4><ul class="bul gl-auto" id="brief-drivers"></ul></div>
+            <div><h4>Risks</h4><ul class="bul gl-auto" id="brief-risks"></ul></div>
+          </div>
+        </details>
+      </article>
+
+      <article class="card" id="card-chain">
+        <header class="card-h">
+          <h2><span data-term="option chain">Option chain</span></h2>
+          <span class="muted small" id="chain-meta"></span>
+        </header>
+        <div class="tiles" id="chain-tiles">
+          <div class="tile"><span class="t-l" data-term="pcr">PCR</span><span class="t-v" id="c-pcr">—</span></div>
+          <div class="tile"><span class="t-l" data-term="max pain">Max pain</span><span class="t-v" id="c-maxpain">—</span></div>
+          <div class="tile"><span class="t-l" data-term="call wall">Call wall</span><span class="t-v" id="c-cwall">—</span></div>
+          <div class="tile"><span class="t-l" data-term="put wall">Put wall</span><span class="t-v" id="c-pwall">—</span></div>
+          <div class="tile"><span class="t-l" data-term="atm iv">ATM IV</span><span class="t-v" id="c-iv">—</span></div>
+          <div class="tile"><span class="t-l" data-term="implied move">Implied move</span><span class="t-v" id="c-move">—</span></div>
+          <div class="tile"><span class="t-l" data-term="gex">GEX</span><span class="t-v" id="c-gex">—</span></div>
+          <div class="tile"><span class="t-l" data-term="zero gamma">Zero gamma</span><span class="t-v" id="c-zg">—</span></div>
+          <div class="tile"><span class="t-l" data-term="rr25">RR25</span><span class="t-v" id="c-rr">—</span></div>
+        </div>
+        <p class="empty" id="chain-empty" hidden>No option chain recorded today. It is recorded every 30 s during market hours and needs an Upstox token (<code>UPSTOX_ANALYTICS_TOKEN</code> in <code>.env</code>).</p>
+      </article>
+
+      <article class="card" id="card-quality">
+        <header class="card-h">
+          <h2>Model quality <span class="muted small"><span data-term="out-of-sample">out-of-sample</span>, <span data-term="walk-forward">walk-forward</span></span></h2>
+        </header>
+        <div class="table-wrap">
+          <table class="tbl num" id="q-table">
+            <thead><tr>
+              <th scope="col">Horizon</th>
+              <th scope="col" class="r"><span data-term="accuracy">Acc.</span></th>
+              <th scope="col" class="r"><span data-term="base rate">Base</span></th>
+              <th scope="col" class="r"><span data-term="auc">AUC</span></th>
+              <th scope="col" class="r"><span data-term="log-loss skill">Skill</span></th>
+              <th scope="col" class="r"><span data-term="p-value">p</span></th>
+              <th scope="col" class="r">n</th>
+            </tr></thead>
+            <tbody id="q-body"></tbody>
+          </table>
+        </div>
+        <h3 class="sub"><span data-term="hit rate">Hit rate</span> when confident <span class="muted small">(30-min horizon)</span></h3>
+        <div class="table-wrap">
+          <table class="tbl num"><thead><tr><th scope="col">Threshold</th><th scope="col" class="r"><span data-term="coverage">Coverage</span></th><th scope="col" class="r">Hit rate</th></tr></thead>
+          <tbody id="q-hits"></tbody></table>
+        </div>
+        <p class="note small" id="q-note"></p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== BOOKS ============================== -->
+<section id="panel-books" role="tabpanel" aria-labelledby="tab-books" class="panel" hidden>
+  <div class="grid-2">
+    <article class="card">
+      <header class="card-h"><h2><span data-term="books">Paper books</span></h2></header>
+      <div class="table-wrap">
+        <table class="tbl num" id="books-table">
+          <thead><tr><th scope="col">Book</th><th scope="col">Auto</th><th scope="col" class="r"><span data-term="equity">Equity</span></th><th scope="col" class="r">Realised</th><th scope="col" class="r">Today</th><th scope="col" class="r">Trades</th><th scope="col" class="r"><span data-term="hit rate">Win rate</span></th><th scope="col" class="r">Open</th></tr></thead>
+          <tbody id="books-body"></tbody>
+        </table>
+      </div>
+      <p class="empty" id="books-empty">No books reported yet.</p>
+    </article>
+    <article class="card">
+      <header class="card-h">
+        <h2><span data-term="equity">Equity</span> curves</h2>
+        <div class="legend small" id="eq-legend"></div>
+      </header>
+      <div class="chart-wrap" id="eq-wrap">
+        <canvas id="eq-chart" role="img" aria-label="Equity curve per book"></canvas>
+        <div class="chart-empty" id="eq-empty">No equity history yet: it is recorded at the end of each trading day.</div>
+      </div>
+    </article>
+  </div>
+  <article class="card">
+    <header class="card-h">
+      <h2>Trades</h2>
+      <div class="seg" role="group" aria-label="Trades range">
+        <button class="seg-b on" id="tr-today" type="button" aria-pressed="true">Today</button>
+        <button class="seg-b" id="tr-all" type="button" aria-pressed="false">All</button>
+      </div>
+    </header>
+    <div class="table-wrap">
+      <table class="tbl num" id="trades-table">
+        <thead><tr>
+          <th scope="col">#</th><th scope="col">Book</th><th scope="col">Date</th><th scope="col">Entry</th><th scope="col">Exit</th>
+          <th scope="col">Side</th><th scope="col" class="r"><span data-term="strike">Strike</span></th><th scope="col" class="r"><span data-term="premium">Entry px</span></th><th scope="col" class="r">Exit px</th>
+          <th scope="col" class="r">Net <span data-term="pnl">P&amp;L</span></th><th scope="col" class="r"><span data-term="charges">Charges</span></th><th scope="col">Reason</th><th scope="col">Status</th><th scope="col"><span data-term="price source">Prices</span></th>
+        </tr></thead>
+        <tbody id="trades-body"></tbody>
+      </table>
+    </div>
+    <p class="empty" id="trades-empty">No trades.</p>
+  </article>
+</section>
+
+<!-- ============================== REPORTS ============================== -->
+<section id="panel-reports" role="tabpanel" aria-labelledby="tab-reports" class="panel" hidden>
+  <article class="card">
+    <header class="card-h">
+      <h2>Reports</h2>
+      <div class="seg" role="group" aria-label="Report" id="report-btns">
+        <button class="seg-b" data-report="intraday" type="button">Intraday model</button>
+        <button class="seg-b" data-report="atm_replay" type="button">ATM rules replay</button>
+        <button class="seg-b" data-report="news_impact" type="button">News impact</button>
+        <button class="seg-b" data-report="research" type="button">Research</button>
+        <button class="seg-b" data-report="data" type="button">Data</button>
+        <button class="seg-b" data-report="llm_bench" type="button">LLM bench</button>
+      </div>
+    </header>
+    <div class="md gl-auto" id="report-body"><p class="empty">Pick a report above.</p></div>
+  </article>
+</section>
+
+<!-- ============================== SYSTEM ============================== -->
+<section id="panel-system" role="tabpanel" aria-labelledby="tab-system" class="panel" hidden>
+  <div class="grid-2">
+    <article class="card">
+      <header class="card-h"><h2>News sources</h2><span class="muted small" id="src-summary"></span></header>
+      <div class="table-wrap">
+        <table class="tbl num" id="src-table">
+          <thead><tr><th scope="col">Source</th><th scope="col">Category</th><th scope="col">Status</th><th scope="col">Last OK</th><th scope="col" class="r">Latency</th><th scope="col" class="r">New today</th><th scope="col" class="r">Poll</th><th scope="col">Error</th></tr></thead>
+          <tbody id="src-body"></tbody>
+        </table>
+      </div>
+      <p class="empty" id="src-empty">No source health reported yet.</p>
+    </article>
+    <article class="card">
+      <header class="card-h"><h2>Alerts</h2></header>
+      <ul class="alerts" id="alerts"></ul>
+      <p class="empty" id="alerts-empty">No alerts.</p>
+      <h3 class="sub">Engine health</h3>
+      <div class="kv small" id="health-kv">
+        <span>Engine</span><b id="hk-engine">—</b>
+        <span>Loop lag</span><b id="hk-lag">—</b>
+        <span>Last bar</span><b id="hk-bar">—</b>
+        <span>Uptime</span><b id="hk-up">—</b>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============================== GLOSSARY ============================== -->
+<section id="panel-glossary" role="tabpanel" aria-labelledby="tab-glossary" class="panel" hidden>
+  <article class="card">
+    <header class="card-h">
+      <h2>Glossary</h2>
+      <input type="search" id="gl-search" class="search" placeholder="Search terms…" aria-label="Search glossary">
+    </header>
+    <dl class="glossary" id="gl-list"></dl>
+  </article>
+</section>
+
+</main>
+
+<div class="tooltip" id="tip" role="tooltip" hidden></div>
+<div class="chart-tip" id="chart-tip" hidden></div>
+<div class="toasts" id="toasts" aria-live="assertive"></div>
+
+<script src="/static/app.js" defer></script>
+</body>
+</html>

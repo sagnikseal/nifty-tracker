@@ -9,7 +9,7 @@
     "forward": {"min_days": 60, "text": "Forward-only data (live recordings, LLM briefs): INSUFFICIENT_DATA until 60 sessions exist."}
   },
   "experiments": [
-    {"id": "P0", "kind": "benchmark", "name": "Base daily model (v4 features)"},
+    {"id": "P0", "kind": "benchmark", "name": "Base daily model (base features)"},
     {"id": "P1", "kind": "feature_group", "group": "asia_extra", "name": "+ KOSPI / Taiwan / Shanghai opening gaps"},
     {"id": "P2", "kind": "feature_group", "group": "adr", "name": "+ ADR and INDA premium vs NSE close"},
     {"id": "P3", "kind": "feature_group", "group": "smc", "name": "+ daily SMC structure (BOS/CHoCH, OB, FVG, sweeps)"},

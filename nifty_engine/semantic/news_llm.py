@@ -63,19 +63,10 @@ ITEM_SCHEMA = {
 BATCH_SCHEMA = {"type": "object", "properties": {"items": {"type": "array", "items": ITEM_SCHEMA}},
                 "required": ["items"]}
 
-SYSTEM = """You are a senior India equity strategist on an index-derivatives desk. For each news headline, judge how it is likely to move the NIFTY 50 index, using only the headline text. Think about the transmission channel (interest rates, inflation, the rupee, crude oil, geopolitics, foreign/domestic fund flows, company earnings, policy and regulation, global equities, commodities, domestic macro data).
+from ..agent.prompts import headline_system  # noqa: E402
 
-Return one item per headline, with the same id:
-- india_relevance: 0 (irrelevant to Indian markets) to 1 (directly about NIFTY, RBI, Indian macro or index heavyweights)
-- nifty_direction: -1 (clearly negative for NIFTY) to +1 (clearly positive); 0 if neutral or unclear
-- magnitude: 0.1 routine news, 0.5 notable, 1.0 crisis or regime-changing
-- surprise: 0 (expected, scheduled or old news) to 1 (completely unexpected)
-- horizon: intraday, days, weeks or long_term
-- channel: the main transmission channel
-- heavyweights: NSE symbols of NIFTY heavyweights directly affected, from this list only: {heavy}
-- confidence: 0 to 1, how sure you are of the direction
-- reason: at most 20 words
-Be conservative: most headlines are noise with small magnitude. Do not guess facts that are not in the headline."""
+# The market-expert primer comes first (see agent/prompts.py), then the scoring task with examples.
+SYSTEM = headline_system("{heavy}")
 
 
 def _norm(title: str) -> str:
@@ -172,7 +163,7 @@ def capture(cfg: EngineConfig) -> Dict[str, int]:
     try:
         from ..data.providers import GdeltProvider
         end = now_ist()
-        gp = GdeltProvider()                       # one throttled client for all queries
+        gp = GdeltProvider(max_retries=1, timeout=15)   # live: fail fast, RSS/Upstox cover live news
         for q in _gdelt_queries():
             g = gp.articles(q, end - dt.timedelta(hours=3), end)
             items += g

@@ -2,7 +2,7 @@
 
 Design choices (and the research behind them):
   * Expanding-window walk-forward with periodic refits; purge + embargo where labels overlap
-    (Lopez de Prado 2018). No shuffling: the legacy v3 trainer shuffled rows, which mixes the
+    (Lopez de Prado 2018). No shuffling: the original trainer shuffled rows, which mixes the
     future into training.
   * Small, regularised ensemble (L2 logistic + shallow gradient boosting). Daily index direction
     has a very low signal-to-noise ratio (Gu-Kelly-Xiu 2020: monthly R^2 ~0.4%); big models
@@ -52,7 +52,7 @@ class ModelSpec:
     logit_C: float = 0.05
     max_missing: float = 0.2
     members: tuple = ()          # non-empty -> zoo ensemble of these members (see zoo.py)
-    combine: str = "mean"        # zoo combine: "mean" or "stack"
+    combine: str = "mean"        # zoo combine: average of members (soft majority vote)
 
 
 def make_model(spec: "ModelSpec"):

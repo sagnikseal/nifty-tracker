@@ -1,0 +1,78 @@
+name: Collect end-of-day data
+
+# After the close: today's 1- and 5-minute candles (NIFTY, India VIX, Bank Nifty, near-month NIFTY
+# future with volume/OI, heavyweight stocks), 1-minute candles of the options of a weekly expiry
+# that ended in the last few days (ATM +/- 800, CE+PE; Upstox Plus, skipped if the plan lacks it),
+# and a final news poll. Stored on the `data` branch. See docs/DATA_COLLECTION.md.
+#
+# The second run is a safety net (GitHub occasionally drops scheduled runs); every write is
+# idempotent, so running twice adds nothing twice.
+on:
+  schedule:
+    - cron: '40 10 * * 1-5'    # 16:10 IST
+    - cron: '40 13 * * 1-5'    # 19:10 IST (retry / catch-up)
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Run even before 15:35 IST'
+        type: boolean
+        default: false
+      no_expired:
+        description: 'Skip expired-option candles'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-branch-writer
+  cancel-in-progress: false
+
+jobs:
+  eod:
+    # Off until you opt in (repo Settings > Variables: COLLECT_ENABLED=true). If this repository is public,
+    # also set DATA_REPO to a PRIVATE repo: Upstox/NSE data may not be redistributed publicly.
+    if: ${{ vars.COLLECT_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      TZ: Asia/Kolkata
+      PYTHONUNBUFFERED: '1'
+      NE_DATA_DIR: ${{ github.workspace }}/.store
+      DATA_REPO: ${{ vars.DATA_REPO || github.repository }}
+      DATA_DIR_PATH: databranch
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
+
+      - name: Install collector dependencies (numpy, pandas, requests only)
+        run: pip install --disable-pip-version-check -q "numpy>=1.26" "pandas>=2.1" "requests>=2.31"
+
+      - name: Check out the data branch (sparse, last 6 days)
+        env:
+          DATA_TOKEN: ${{ secrets.DATA_REPO_TOKEN || github.token }}
+        run: bash nifty_engine/collect/gha.sh checkout
+
+      - name: Collect end-of-day data
+        env:
+          UPSTOX_ANALYTICS_TOKEN: ${{ secrets.UPSTOX_ANALYTICS_TOKEN }}
+          FORCE: ${{ inputs.force && '--force' || '' }}
+          NO_EXPIRED: ${{ inputs.no_expired && '--no-expired' || '' }}
+        run: >-
+          python -m nifty_engine.collect eod
+          --out "$RUNNER_TEMP/staging" --data-branch-dir "$DATA_DIR_PATH" $FORCE $NO_EXPIRED
+
+      - name: Commit and push to the data branch
+        if: ${{ !cancelled() }}
+        env:
+          DATA_TOKEN: ${{ secrets.DATA_REPO_TOKEN || github.token }}
+          MODE: eod
+        run: STAGING="$RUNNER_TEMP/staging" bash nifty_engine/collect/gha.sh push
