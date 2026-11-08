@@ -9,9 +9,9 @@ A local, free, paper-trading engine for NIFTY 50 options. It has:
 - a local-LLM trading agent;
 - tests that report losses as readily as wins.
 
-**Start:** double-click `start.command` (Mac) or `start.bat` (Windows). The dashboard opens at http://localhost:8010.
+**Start:** double-click `start.command` (Mac) or `start.bat` (Windows). The dashboard opens at http://localhost:8010. Each launch gives you a few seconds to type `c` and choose the LLM model, training features, auto-trade settings and port; otherwise it starts with your last choices.
 
-**Guide:** [`docs/GUIDE.md`](docs/GUIDE.md), covering setup, rules, model and LLM options, what the tests found, and news sources.
+**Guide:** [`docs/GUIDE.md`](docs/GUIDE.md), covering setup, rules, model and LLM options, what the tests found, and news sources. **Every option, setting and command:** [`docs/FEATURES.md`](docs/FEATURES.md).
 
 **Paper only:** nothing in this repository can place a real order.
 
@@ -32,6 +32,7 @@ A local, free, paper-trading engine for NIFTY 50 options. It has:
 | `nifty_engine/model.py`, `features.py`, `zoo.py` | daily (09:20) model and model zoo |
 | `nifty_engine/research/` | pre-registered experiments, deflated Sharpe, PBO |
 | `config/engine.json` | all settings (rules under `atm_*`) |
+| `docs/FEATURES.md` | every CLI command, setting, feature group, model and book, in one page |
 | `docs/API.md` | dashboard ↔ engine API |
 | `docs/RESEARCH.md` | research harness: pre-registered experiments and strategy books |
 

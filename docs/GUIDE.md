@@ -29,6 +29,20 @@ The first run does the setup and takes 10-20 minutes:
 
 After that, start-up takes a few seconds and the dashboard opens at **http://localhost:8010**. Keep the window open while you want it running. It is safe to leave it running all week.
 
+### 1.1 Choosing settings at launch
+
+Each launch gives you a few seconds to type `c` and customise; otherwise it starts with your last choices (or the defaults, on a first run):
+
+| Prompt | Choices |
+|---|---|
+| Local LLM model | `qwen3.5:9b` (default) / `llama3.1:8b` / `gemma4:12b` / `qwen3:8b` / type your own / `none` (disables the agent) |
+| Intraday training features | `base` (37 features, a few minutes, default) / `all` (189 features, slower) / custom comma list |
+| Auto-trade "Model + your rules"? | Y/n |
+| Auto-trade "LLM agent + your rules"? | Y/n (only asked if the LLM is enabled) |
+| Dashboard port | default `8010` |
+
+Picking `all` or a custom feature list retrains the intraday model that run, even if one already exists. The full list of what every option and setting does is [`FEATURES.md`](FEATURES.md).
+
 **Recommended:** put your Upstox **Analytics Token** in `.env` as `UPSTOX_ANALYTICS_TOKEN=`. It gives real-time NIFTY and VIX, real option bid/ask prices for paper fills, and option-chain recording. Without it, prices come from Yahoo (about 1 minute delayed) and option prices are modelled from India VIX. The dashboard says which source each number came from.
 
 **Local LLM:** install Ollama from https://ollama.com. The launcher starts it and pulls the configured model.
@@ -181,7 +195,7 @@ Live check from this machine on 2026-11-08 (`python -m nifty_engine sources-chec
 
 ```bash
 python -m nifty_engine app              # everything + dashboard (what the launchers run)
-python -m nifty_engine intraday-train   # movement model, about 2 min -> INTRADAY_REPORT.md
+python -m nifty_engine intraday-train   # movement model, a few minutes -> INTRADAY_REPORT.md
 python -m nifty_engine atm-replay       # your rules on real option prices -> ATM_REPLAY_REPORT.md
 python -m nifty_engine news-backfill    # ~3 months of GDELT headlines (once), then:
 python -m nifty_engine news-impact      # how NIFTY reacted to the LLM's reading -> NEWS_IMPACT_REPORT.md
